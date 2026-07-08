@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Git Worktrees — Complete Working Guide</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#ffffff; --ink:#1f2733; --muted:#5b6472;
+    --accent:#2563eb; --accent-soft:#e8f0fe;
+    --line:#e4e8ee; --code-bg:#0f172a; --code-ink:#e2e8f0;
+    --warn-bg:#fff4e5; --warn-line:#f59e0b; --ok-bg:#e9f9ef; --ok-line:#16a34a;
+    --bad-bg:#fdecec; --bad-line:#dc2626; --note-bg:#eef2ff; --note-line:#6366f1;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:32px 20px 80px}
+  header.hero{background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;border-radius:16px;
+    padding:36px 32px;margin-bottom:28px;box-shadow:0 10px 30px rgba(37,99,235,.25)}
+  header.hero h1{margin:0 0 8px;font-size:30px;letter-spacing:-.5px}
+  header.hero p{margin:0;opacity:.92;font-size:16px}
+  header.hero .meta{margin-top:14px;font-size:13px;opacity:.8}
+  h2{font-size:22px;margin:38px 0 12px;padding-bottom:8px;border-bottom:2px solid var(--accent-soft)}
+  h3{font-size:17px;margin:24px 0 8px;color:#111827}
+  p{margin:10px 0}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 24px;
+    margin:16px 0;box-shadow:0 1px 3px rgba(16,24,40,.04)}
+  .toc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 24px;margin-bottom:26px}
+  .toc h2{border:0;margin:0 0 10px;font-size:16px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .toc ol{margin:0;padding-left:20px;columns:2;column-gap:32px}
+  .toc li{margin:4px 0;break-inside:avoid}
+  code{background:#eef1f5;color:#b3184c;padding:2px 6px;border-radius:5px;font-size:14px;
+    font-family:"SF Mono",Consolas,"Roboto Mono",monospace}
+  pre{background:var(--code-bg);color:var(--code-ink);padding:16px 18px;border-radius:12px;overflow-x:auto;
+    font-size:13.5px;line-height:1.5;font-family:"SF Mono",Consolas,"Roboto Mono",monospace}
+  pre code{background:none;color:inherit;padding:0}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14.5px}
+  th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+  th{background:var(--accent-soft);color:#1e3a8a}
+  tr:nth-child(even) td{background:#fafbfc}
+  .callout{border-radius:12px;padding:14px 18px;margin:16px 0;border-left:5px solid}
+  .warn{background:var(--warn-bg);border-color:var(--warn-line)}
+  .ok{background:var(--ok-bg);border-color:var(--ok-line)}
+  .bad{background:var(--bad-bg);border-color:var(--bad-line)}
+  .note{background:var(--note-bg);border-color:var(--note-line)}
+  .callout strong{display:block;margin-bottom:4px}
+  .diagram{background:#0f172a;color:#cbd5e1;padding:18px;border-radius:12px;overflow-x:auto;
+    font-family:"SF Mono",Consolas,monospace;font-size:13px;line-height:1.45;white-space:pre}
+  .analogy{background:linear-gradient(135deg,#fef9c3,#fde68a);border:1px solid #f59e0b;border-radius:14px;
+    padding:20px 24px;margin:16px 0}
+  .analogy h3{margin-top:0;color:#92400e}
+  .pill{display:inline-block;background:var(--accent);color:#fff;font-size:12px;padding:2px 10px;border-radius:20px;margin-right:6px}
+  hr{border:0;border-top:1px solid var(--line);margin:34px 0}
+  .footer{text-align:center;color:var(--muted);font-size:13px;margin-top:40px}
+  @media(max-width:640px){.toc ol{columns:1}header.hero h1{font-size:24px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>Git Worktrees — Complete Working Guide</h1>
+  <p>Run multiple branches in parallel, each in its own folder &amp; VS Code window — no stashing, no collisions.</p>
+  <div class="meta">Personal reference · CPQ Platform Tests · Windows + VS Code + Azure DevOps</div>
+</header>
+
+<nav class="toc">
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#why">Why worktrees (the problem)</a></li>
+    <li><a href="#concept">What a worktree actually is</a></li>
+    <li><a href="#plan">The command plan (in order)</a></li>
+    <li><a href="#anatomy">Anatomy of the command</a></li>
+    <li><a href="#cycle">The per-worktree work cycle</a></li>
+    <li><a href="#vscode">Opening two VS Code windows</a></li>
+    <li><a href="#howmany">How many worktrees?</a></li>
+    <li><a href="#push">Pushing a specific worktree</a></li>
+    <li><a href="#delete">Deleting branches after a PR</a></li>
+    <li><a href="#folders">Where the folders live on disk</a></li>
+    <li><a href="#bestplace">Best-practice placement</a></li>
+    <li><a href="#analogy">Plain-English analogy</a></li>
+    <li><a href="#cheat">One-page cheat-sheet</a></li>
+  </ol>
+</nav>
+
+<!-- 1 -->
+<section id="why" class="card">
+  <h2>1. Why worktrees — the problem they solve</h2>
+  <p>You wanted to work on <strong>two topics at the same time</strong> (e.g. group line items in one chat, another topic in another chat). The instinct is to do both on the <em>same branch in the same folder</em>, then stash one, PR the other, make a new branch, pop the stash, and PR again.</p>
+  <div class="callout bad">
+    <strong>❌ Why "same branch, same folder, two chats" breaks</strong>
+    A single folder has one working tree and one git index. Two sessions editing it at once cause:
+    <ul>
+      <li><code>index.lock</code> contention (git blocks the second operation — we already hit a stale lock earlier today).</li>
+      <li>Chat B's uncommitted edits appear inside Chat A's diff — the two topics get tangled.</li>
+      <li>The stash → pop juggling can conflict and land the wrong files in the wrong PR.</li>
+    </ul>
+  </div>
+  <div class="callout ok">
+    <strong>✅ The fix</strong>
+    Give each topic its <strong>own folder + own branch</strong> from the start using a git <em>worktree</em>. Two chats then run fully in parallel, and each produces its own clean PR — <strong>no stashing at all</strong>.
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="concept" class="card">
+  <h2>2. What a worktree actually is</h2>
+  <p>Normally: <strong>one folder → one working tree → only one branch checked out at a time.</strong> To see another branch you <code>git checkout</code>, which swaps the files in place — that's why you can't view two branches at once.</p>
+  <p>A <strong>worktree is an extra working folder attached to the same <code>.git</code> database.</strong></p>
+  <div class="diagram">                 ┌───────────────────────────────────┐
+                 │      ONE shared .git database     │
+                 │  (all commits, branches, remotes) │
+                 └───────────────────────────────────┘
+                     ▲              ▲              ▲
+        ┌────────────┘              │              └────────────┐
+   MAIN folder                worktree #1                 worktree #2
+   ...Stabilize.../           ../group_line_items/         ../other_topic/
+   branch: main               branch: group_line_items     branch: other_topic
+   (own files + HEAD)         (own files + HEAD)           (own files + HEAD)</div>
+  <table>
+    <tr><th>Shared across all worktrees</th><th>Separate per worktree</th></tr>
+    <tr>
+      <td>The single <code>.git</code> database: every commit, branch, remote, fetch and push is visible everywhere.</td>
+      <td>Its own <strong>files on disk</strong>, its own <strong>staging area (index)</strong>, and its own <strong>checked-out branch (HEAD)</strong>.</td>
+    </tr>
+  </table>
+  <div class="callout note">
+    <strong>🔒 The rule that protects you</strong>
+    The <em>same</em> branch cannot be checked out in two worktrees at once — git refuses. This is a feature: it makes collisions impossible.
+  </div>
+</section>
+
+<!-- 3 -->
+<section id="plan" class="card">
+  <h2>3. The command plan — in exact order</h2>
+  <p>All run from your <strong>main repo folder</strong> unless noted.</p>
+  <table>
+    <tr><th>#</th><th>Command</th><th>What it does</th></tr>
+    <tr><td>1</td><td><code>git fetch origin</code></td><td>Updates the remote state (<code>origin/main</code>) so new branches start from the newest main.</td></tr>
+    <tr><td>2</td><td><code>git worktree add ../worktrees/group_line_items -b AnMehta/group_line_items origin/main</code></td><td>Creates folder + new branch #1, checked out there.</td></tr>
+    <tr><td>3</td><td><code>git worktree add ../worktrees/other_topic -b AnMehta/other_topic origin/main</code></td><td>Creates folder + new branch #2.</td></tr>
+    <tr><td>4</td><td><code>git worktree list</code></td><td>Shows every worktree and the branch each is on (verification).</td></tr>
+  </table>
+</section>
+
+<!-- 4 -->
+<section id="anatomy" class="card">
+  <h2>4. Anatomy of <code>git worktree add</code></h2>
+  <div class="diagram">git worktree add   ../worktrees/group_line_items   -b AnMehta/group_line_items   origin/main
+        │                       │                            │                         │
+     the action          WHERE (new folder,             NEW branch name           STARTING point
+                        outside main folder)                                   (base it on remote main)</div>
+  <p>What git physically does: it <strong>copies the checked-out files of the target branch</strong> into the new folder and writes small linking metadata. It does <strong>not</strong> duplicate the history — that stays shared — so a worktree is much lighter than a full clone.</p>
+</section>
+
+<!-- 5 -->
+<section id="cycle" class="card">
+  <h2>5. The per-worktree work cycle</h2>
+  <p>Inside each worktree folder this is ordinary git — nothing special:</p>
+<pre><code>cd ../worktrees/group_line_items          # this folder IS the group_line_items branch
+# ...edit files...
+git add .
+git commit -m "meaningful message"        # automatically lands on THIS folder's branch
+git push -u origin AnMehta/group_line_items   # first push (-u sets upstream)
+git push                                  # every push after that
+# ...raise the PR in the Azure DevOps web UI...
+git worktree remove ../worktrees/group_line_items   # cleanup after the PR is merged</code></pre>
+  <div class="callout note">
+    <strong>You never run <code>git checkout</code> here.</strong> Each folder is permanently tied to its own branch. The folder <em>is</em> the branch.
+  </div>
+</section>
+
+<!-- 6 -->
+<section id="vscode" class="card">
+  <h2>6. Opening the two worktrees in separate VS Code windows</h2>
+  <p><span class="pill">Option A</span> Command line (fastest):</p>
+<pre><code>code ../worktrees/group_line_items     # opens window #1
+code ../worktrees/other_topic          # opens window #2</code></pre>
+  <p class="muted"><em>(The <code>code</code> command works if VS Code added it to PATH — Command Palette → "Shell Command: Install 'code' command in PATH".)</em></p>
+  <p><span class="pill">Option B</span> Inside VS Code (no CLI):
+    <br>File → <strong>New Window</strong> → <strong>Open Folder…</strong> → pick the folder. Repeat for the second.</p>
+  <div class="diagram">┌────────── VS Code Window 1 ──────────┐   ┌────────── VS Code Window 2 ──────────┐
+│ Folder: group_line_items             │   │ Folder: other_topic                  │
+│ Branch: AnMehta/group_line_items     │   │ Branch: AnMehta/other_topic          │
+│ (edit group line-item tests here)    │   │ (edit the other topic here)          │
+└──────────────────────────────────────┘   └──────────────────────────────────────┘
+              └────────── both share the same .git history ──────────┘</div>
+  <div class="callout ok">
+    <strong>Why editing one can't affect the other</strong>
+    They are two different folders holding two physical copies of the files. An edit in window 1 touches only the files in folder 1. They share only the invisible <code>.git</code> history — never the working files — so nothing crosses over until you commit, push, and merge. Each window's bottom-left status bar permanently shows its own branch.
+  </div>
+</section>
+
+<!-- 7 -->
+<section id="howmany" class="card">
+  <h2>7. How many worktrees can you make?</h2>
+  <ul>
+    <li><strong>Git has no fixed limit</strong> — you can make dozens.</li>
+    <li>Real limits are <strong>disk space</strong> (each worktree copies the working files) and <strong>your machine</strong> (each running build/test uses CPU + RAM).</li>
+    <li>The one hard rule: the <strong>same branch</strong> can only be checked out in <strong>one</strong> worktree at a time.</li>
+    <li>Your original main folder counts as worktree #1, so after the two commands you have <strong>3 total</strong>.</li>
+    <li>Practical advice: keep <strong>2–4</strong> at once, or it gets hard to track.</li>
+  </ul>
+</section>
+
+<!-- 8 -->
+<section id="push" class="card">
+  <h2>8. Pushing a specific worktree</h2>
+  <div class="callout warn">
+    <strong>⚠️ First, the key fact</strong>
+    The two worktrees are on <strong>different branches</strong> — they never share one. So pushing/merging/deleting one never disturbs the other.
+  </div>
+  <p><strong>Can I push only one worktree?</strong> Yes — because each is its own branch, pushing one pushes only that branch.</p>
+  <p><strong>Which command?</strong> Git pushes a <em>branch</em>, not a <em>folder</em>. Two equivalent ways:</p>
+  <p><span class="pill">Option A</span> From inside that worktree's folder (pushes that folder's current branch):</p>
+<pre><code>cd ../worktrees/group_line_items
+git push -u origin AnMehta/group_line_items   # first push
+git push                                       # thereafter</code></pre>
+  <p><span class="pill">Option B</span> From any folder, name the branch explicitly:</p>
+<pre><code>git push origin AnMehta/other_topic</code></pre>
+  <ul>
+    <li><code>git push</code> with <strong>no arguments</strong> pushes the current branch of the folder you're standing in — that's the "push just this worktree" behaviour.</li>
+    <li><code>-u</code> (<code>--set-upstream</code>) is only needed on the <strong>first</strong> push of a new branch.</li>
+  </ul>
+</section>
+
+<!-- 9 -->
+<section id="delete" class="card">
+  <h2>9. Deleting the branch after a PR is merged</h2>
+  <p><strong>Should you avoid deleting the branch on Azure DevOps? No.</strong> Deleting one branch after its PR merges has <strong>zero effect</strong> on the other branch or its worktree — they're independent. The normal habit (delete on merge, or let Azure auto-delete) is perfectly safe.</p>
+  <p>Just follow the correct <strong>local cleanup order</strong> afterwards:</p>
+<pre><code># 1) remove the worktree folder FIRST
+#    (git won't delete a branch that a worktree still occupies)
+git worktree remove ../worktrees/group_line_items
+
+# 2) optional: delete the now-merged local branch
+git branch -d AnMehta/group_line_items</code></pre>
+  <p>Deleting the remote branch (Azure) and cleaning up locally are independent — do both, one branch at a time.</p>
+</section>
+
+<!-- 10 -->
+<section id="folders" class="card">
+  <h2>10. Where the folders physically live</h2>
+  <p>The folder is created <strong>exactly where the path points</strong>, relative to where you run the command. <code>../</code> means "one level up" (a sibling of your repo).</p>
+  <p>Your repo:</p>
+<pre><code>C:\Users\AnMehta\SpecFlowTest\CPQPlatformTests_CSharp_Stabilize_test_pipeline</code></pre>
+  <p>So <code>git worktree add ../worktrees/group_line_items ...</code> creates:</p>
+<pre><code>C:\Users\AnMehta\SpecFlowTest\worktrees\group_line_items</code></pre>
+  <h3>Resulting layout on disk</h3>
+  <div class="diagram">C:\Users\AnMehta\SpecFlowTest\
+├── CPQPlatformTests_CSharp_Stabilize_test_pipeline\   ← main repo (holds the real .git\ folder)
+│   └── .git\
+│       └── worktrees\                                 ← tiny metadata for each extra worktree
+│           ├── group_line_items\
+│           └── other_topic\
+└── worktrees\
+    ├── group_line_items\   ← worktree #1: full copy of files + a .git FILE (not folder)
+    └── other_topic\        ← worktree #2: full copy of files + a .git FILE (not folder)</div>
+  <h3>The technical detail</h3>
+  <ul>
+    <li>A worktree folder has <strong>all your project files</strong> — a real working copy you can build and edit.</li>
+    <li>Instead of a <code>.git</code> <strong>folder</strong>, it holds a small <code>.git</code> <strong>file</strong> — one line pointing back to the main repo:</li>
+  </ul>
+<pre><code>gitdir: C:/Users/AnMehta/SpecFlowTest/CPQPlatformTests_CSharp_Stabilize_test_pipeline/.git/worktrees/group_line_items</code></pre>
+  <p>That's why worktrees are cheaper than cloning — they borrow the one shared <code>.git</code> database and only duplicate the working files.</p>
+</section>
+
+<!-- 11 -->
+<section id="bestplace" class="card">
+  <h2>11. Best-practice placement</h2>
+  <div class="callout ok">
+    <strong>✅ Do</strong>
+    <ul>
+      <li>Put worktrees <strong>outside</strong> the main repo folder — as siblings or in a dedicated parent.</li>
+      <li>Prefer a dedicated <code>worktrees\</code> parent folder so everything stays grouped and tidy.</li>
+      <li>Give folders <strong>descriptive names</strong> that match the branch/topic.</li>
+      <li>Keep them on the <strong>same drive</strong> (<code>C:</code>) — simplest and fastest.</li>
+    </ul>
+  </div>
+  <div class="callout bad">
+    <strong>❌ Don't</strong>
+    <ul>
+      <li>Never create a worktree <strong>inside</strong> the main repo folder (e.g. <code>./other_topic</code>) — git would try to track it and tools would recurse into it.</li>
+      <li>Don't move a worktree by dragging in Explorer — use <code>git worktree move</code> so the link stays intact.</li>
+    </ul>
+  </div>
+  <h3>Two layout options</h3>
+  <p><strong>Option 1 — flat siblings (simplest):</strong></p>
+<pre><code>SpecFlowTest\CPQPlatformTests_CSharp_Stabilize_test_pipeline\   (main)
+SpecFlowTest\group_line_items\
+SpecFlowTest\other_topic\</code></pre>
+  <p><strong>Option 2 — dedicated <code>worktrees\</code> parent (recommended):</strong></p>
+<pre><code>git worktree add ../worktrees/group_line_items -b AnMehta/group_line_items origin/main
+git worktree add ../worktrees/other_topic      -b AnMehta/other_topic      origin/main</code></pre>
+<pre><code>SpecFlowTest\CPQPlatformTests_CSharp_Stabilize_test_pipeline\   (main)
+SpecFlowTest\worktrees\group_line_items\
+SpecFlowTest\worktrees\other_topic\</code></pre>
+  <div class="callout note">
+    <strong>If you ever lose track</strong>
+    <code>git worktree list</code> prints the absolute path and branch of every worktree — your single source of truth.
+  </div>
+</section>
+
+<!-- 12 -->
+<section id="analogy" class="analogy">
+  <h3>12. Plain-English analogy</h3>
+  <p>Think of your <code>.git</code> folder as a single <strong>filing cabinet</strong> that stores every version of every document your team ever saved.</p>
+  <ul>
+    <li>Normally you have <strong>one desk</strong> in front of it and can lay out only <strong>one project's papers</strong> at a time. Switching projects means clearing the desk (<code>git checkout</code>).</li>
+    <li>A <strong>worktree is a second desk</strong> pulled up to the <strong>same cabinet</strong>. Each desk has its own papers spread out — Desk A = "group line items", Desk B = "other topic". Each stays exactly as you left it.</li>
+    <li><strong>VS Code windows are your eyes on each desk.</strong> Scribbling on Desk A can't smudge Desk B — separate stacks of paper.</li>
+    <li>When a job is done you <strong>file its papers back</strong> (commit + push), hand it in for review (the PR), then <strong>fold up that desk</strong> (<code>git worktree remove</code>).</li>
+    <li>The cabinet is shared, so once papers are filed, every desk can see them.</li>
+  </ul>
+  <p><strong>The big win:</strong> no more hiding papers in a drawer to work on the other set (that's the stash/pop juggling) — you simply keep a separate desk per job.</p>
+</section>
+
+<!-- 13 -->
+<section id="cheat" class="card">
+  <h2>13. One-page cheat-sheet</h2>
+<pre><code># ── SET UP (from the main repo folder) ───────────────────────────
+git fetch origin
+git worktree add ../worktrees/group_line_items -b AnMehta/group_line_items origin/main
+git worktree add ../worktrees/other_topic      -b AnMehta/other_topic      origin/main
+git worktree list
+
+# ── OPEN EACH IN ITS OWN VS CODE WINDOW ──────────────────────────
+code ../worktrees/group_line_items
+code ../worktrees/other_topic
+
+# ── WORK CYCLE (inside a worktree folder) ────────────────────────
+git add .
+git commit -m "message"
+git push -u origin AnMehta/group_line_items    # first push only
+git push                                        # thereafter
+#   ...then raise the PR in Azure DevOps...
+
+# ── PUSH A SPECIFIC BRANCH FROM ANYWHERE ─────────────────────────
+git push origin AnMehta/other_topic
+
+# ── CLEANUP AFTER A PR MERGES ────────────────────────────────────
+git worktree remove ../worktrees/group_line_items   # remove folder FIRST
+git branch -d AnMehta/group_line_items              # then delete local branch
+
+# ── HANDY ────────────────────────────────────────────────────────
+git worktree list         # where is each worktree + its branch
+git worktree move OLD NEW  # relocate safely (never drag in Explorer)</code></pre>
+  <div class="callout note" style="margin-top:14px">
+    <strong>Golden rule</strong>
+    One worktree = one folder = one branch = one PR. They never share a branch, so pushing, merging, and deleting one never disturbs the other. Keep worktree folders <em>outside</em> the main repo, and put them nested inside a repo folder <em>never</em>.
+  </div>
+</section>
+
+<div class="footer">
+  Git Worktrees — Complete Working Guide · Prepared for Ankit Mehta · CPQ Platform Tests
+</div>
+
+</div>
+</body>
+</html>
