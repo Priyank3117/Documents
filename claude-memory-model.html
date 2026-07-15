@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Four Memories of Claude — A Developer's Mental Model</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EEF1F6;
+    --surface:#FFFFFF;
+    --surface-2:#F7F9FC;
+    --ink:#141821;
+    --ink-soft:#525C6E;
+    --ink-faint:#8894A6;
+    --line:#D9DFE9;
+    --line-strong:#C4CCDA;
+
+    /* Persistence spectrum: cool = permanent, warm = volatile */
+    --p1:#163E6C;   /* User Memory   — permanent   */
+    --p1-soft:#E3ECF7;
+    --p2:#0E7C6B;   /* Project Know. — persistent  */
+    --p2-soft:#DEF1ED;
+    --p3:#B9791A;   /* Conversation  — ephemeral   */
+    --p3-soft:#F7EEDA;
+    --p4:#C2453B;   /* Context Win.  — volatile    */
+    --p4-soft:#F9E4E1;
+
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
+    --sans:'IBM Plex Sans',system-ui,sans-serif;
+    --display:'Bricolage Grotesque',var(--sans);
+
+    --radius:14px;
+    --maxw:1080px;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:17px;
+    line-height:1.62;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px;}
+
+  a{color:var(--p1);}
+
+  /* ---------- HERO (dark terminal band) ---------- */
+  .hero{
+    background:
+      radial-gradient(1200px 500px at 78% -10%, rgba(194,69,59,.18), transparent 60%),
+      radial-gradient(900px 400px at 10% 120%, rgba(14,124,107,.20), transparent 60%),
+      #10141c;
+    color:#EDF1F7;
+    padding:78px 0 96px;
+    position:relative;
+    overflow:hidden;
+    border-bottom:1px solid #060a12;
+  }
+  .hero::before{
+    content:"";position:absolute;inset:0;
+    background-image:linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px);
+    background-size:44px 44px;
+    mask-image:radial-gradient(circle at 50% 30%, #000 0%, transparent 78%);
+    pointer-events:none;
+  }
+  .hero .wrap{position:relative;}
+  .kicker{
+    font-family:var(--mono);
+    font-size:12.5px;letter-spacing:.32em;text-transform:uppercase;
+    color:#8AA0C0;margin:0 0 26px;
+    display:flex;align-items:center;gap:12px;
+  }
+  .kicker .dot{width:7px;height:7px;border-radius:50%;background:#C2453B;box-shadow:0 0 12px #C2453B;}
+  h1{
+    font-family:var(--display);
+    font-weight:800;
+    font-size:clamp(38px,6.4vw,74px);
+    line-height:1.02;
+    letter-spacing:-.02em;
+    margin:0 0 26px;
+    max-width:15ch;
+  }
+  h1 .swap{color:var(--ink-faint);text-decoration:line-through;text-decoration-color:#C2453B;text-decoration-thickness:3px;}
+  h1 em{font-style:normal;color:#7FD8C8;}
+  .lede{
+    font-size:clamp(17px,2.1vw,21px);
+    color:#B9C4D4;max-width:60ch;margin:0 0 40px;line-height:1.6;
+  }
+  .layer-chips{display:flex;flex-wrap:wrap;gap:10px;}
+  .chip{
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.02em;
+    padding:8px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.16);
+    background:rgba(255,255,255,.04);color:#DCE4EF;
+    display:inline-flex;align-items:center;gap:9px;
+  }
+  .chip i{width:9px;height:9px;border-radius:2px;display:inline-block;}
+
+  /* ---------- SECTION SCAFFOLD ---------- */
+  section{padding:78px 0;}
+  .eyebrow{
+    font-family:var(--mono);font-size:12px;letter-spacing:.26em;text-transform:uppercase;
+    color:var(--ink-faint);margin:0 0 14px;display:flex;align-items:center;gap:12px;
+  }
+  .eyebrow .num{color:var(--p1);font-weight:600;}
+  h2{
+    font-family:var(--display);font-weight:700;
+    font-size:clamp(27px,3.6vw,40px);line-height:1.08;letter-spacing:-.015em;
+    margin:0 0 20px;max-width:22ch;
+  }
+  h3{
+    font-family:var(--display);font-weight:600;font-size:22px;letter-spacing:-.01em;
+    margin:0 0 10px;
+  }
+  p{margin:0 0 18px;color:var(--ink);}
+  .muted{color:var(--ink-soft);}
+  .section-intro{max-width:64ch;color:var(--ink-soft);font-size:18.5px;}
+
+  /* callout */
+  .callout{
+    border-left:4px solid var(--p1);
+    background:var(--p1-soft);
+    padding:20px 24px;border-radius:0 var(--radius) var(--radius) 0;
+    margin:26px 0;
+  }
+  .callout strong{color:var(--p1);}
+  .callout.warm{border-color:var(--p4);background:var(--p4-soft);}
+  .callout.warm strong{color:var(--p4);}
+
+  /* ---------- PIPELINE ---------- */
+  .pipe{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:30px;margin-top:34px;
+    display:grid;grid-template-columns:1fr;gap:0;
+  }
+  .pipe-node{
+    display:flex;align-items:flex-start;gap:18px;padding:16px 0;position:relative;
+  }
+  .pipe-node:not(:last-child)::after{
+    content:"";position:absolute;left:19px;top:46px;bottom:-16px;width:2px;
+    background:linear-gradient(var(--line-strong),transparent);
+  }
+  .pipe-badge{
+    flex:0 0 40px;height:40px;border-radius:10px;display:grid;place-items:center;
+    font-family:var(--mono);font-weight:600;font-size:14px;color:#fff;
+  }
+  .pipe-body h4{margin:0 0 3px;font-family:var(--sans);font-weight:600;font-size:16.5px;}
+  .pipe-body p{margin:0;font-size:15px;color:var(--ink-soft);}
+  .pipe-node.q .pipe-badge,.pipe-node.a .pipe-badge{background:var(--ink);}
+  .pipe-node.a .pipe-badge{background:var(--p2);}
+
+  /* ---------- STORAGE STACK (signature) ---------- */
+  .stack{display:flex;flex-direction:column;gap:14px;margin-top:36px;}
+  .layer{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:22px 24px;position:relative;overflow:hidden;
+    transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s,border-color .35s;
+    cursor:default;
+  }
+  .layer::before{
+    content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--accent);
+  }
+  .layer:hover{transform:translateX(6px);box-shadow:0 14px 34px -20px rgba(20,24,33,.4);border-color:var(--accent);}
+  .layer-top{display:flex;flex-wrap:wrap;align-items:baseline;gap:12px 18px;}
+  .layer-name{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:-.01em;}
+  .layer-analogy{
+    font-family:var(--mono);font-size:12.5px;color:#fff;background:var(--accent);
+    padding:4px 10px;border-radius:6px;letter-spacing:.01em;
+  }
+  .layer-life{font-family:var(--mono);font-size:12.5px;color:var(--ink-faint);margin-left:auto;}
+  .layer-desc{margin:12px 0 16px;color:var(--ink-soft);font-size:15.5px;max-width:70ch;}
+  .persist{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .persist-label{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);}
+  .persist-track{flex:1;min-width:160px;height:8px;border-radius:99px;background:var(--line);overflow:hidden;}
+  .persist-fill{height:100%;width:0;background:var(--accent);border-radius:99px;transition:width 1.1s cubic-bezier(.2,.7,.2,1);}
+  .persist-tag{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:600;}
+
+  .layer.l1{--accent:var(--p1);}
+  .layer.l2{--accent:var(--p2);}
+  .layer.l3{--accent:var(--p3);}
+  .layer.l4{--accent:var(--p4);}
+
+  .spectrum-note{
+    display:flex;align-items:center;gap:14px;margin-top:24px;
+    font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);flex-wrap:wrap;
+  }
+  .spectrum-bar{height:10px;width:180px;border-radius:99px;
+    background:linear-gradient(90deg,var(--p1),var(--p2),var(--p3),var(--p4));}
+
+  /* ---------- CARD GRID ---------- */
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:34px;}
+  .card{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:26px;
+  }
+  .card h3{display:flex;align-items:center;gap:10px;}
+  .card h3 .tick{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font-size:13px;color:#fff;flex:0 0 auto;}
+  .good .tick{background:var(--p2);}
+  .bad .tick{background:var(--p4);}
+  .card ul{margin:0;padding:0;list-style:none;}
+  .card li{
+    font-family:var(--mono);font-size:13.5px;color:var(--ink-soft);
+    padding:7px 0 7px 22px;position:relative;border-bottom:1px dashed var(--line);
+  }
+  .card li:last-child{border-bottom:none;}
+  .card li::before{content:"›";position:absolute;left:4px;color:var(--ink-faint);}
+
+  /* code block */
+  .code{
+    font-family:var(--mono);font-size:13.5px;line-height:1.75;
+    background:#10141c;color:#D7E0EC;border-radius:12px;padding:18px 20px;
+    overflow-x:auto;margin:18px 0;border:1px solid #060a12;
+  }
+  .code .c{color:#6E7E95;}
+  .code .g{color:#7FD8C8;}
+  .code .r{color:#F0938C;}
+
+  /* Q&A false/true rows */
+  .qa{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);margin-top:30px;overflow:hidden;}
+  .qa-row{padding:22px 26px;border-bottom:1px solid var(--line);}
+  .qa-row:last-child{border-bottom:none;}
+  .qa-q{font-family:var(--display);font-weight:600;font-size:18px;margin:0 0 8px;display:flex;gap:10px;align-items:flex-start;}
+  .qa-q .verdict{font-family:var(--mono);font-size:12px;font-weight:600;padding:3px 9px;border-radius:6px;flex:0 0 auto;margin-top:2px;}
+  .v-no{background:var(--p4-soft);color:var(--p4);}
+  .v-yes{background:var(--p2-soft);color:var(--p2);}
+  .v-dep{background:var(--p3-soft);color:var(--p3);}
+  .qa-a{margin:0;color:var(--ink-soft);font-size:15.5px;}
+
+  /* ---------- TABLE ---------- */
+  .table-scroll{overflow-x:auto;margin-top:34px;border-radius:var(--radius);border:1px solid var(--line);}
+  table{width:100%;border-collapse:collapse;background:var(--surface);min-width:640px;}
+  th,td{text-align:left;padding:15px 18px;border-bottom:1px solid var(--line);vertical-align:top;font-size:14.5px;}
+  th{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);background:var(--surface-2);}
+  tbody tr:last-child td{border-bottom:none;}
+  td .lname{font-family:var(--display);font-weight:700;display:flex;align-items:center;gap:9px;}
+  td .lname i{width:11px;height:11px;border-radius:3px;flex:0 0 auto;}
+  .yes{color:var(--p2);font-weight:600;}
+  .no{color:var(--p4);font-weight:600;}
+  .dep{color:var(--p3);font-weight:600;}
+
+  /* ---------- DECISION ---------- */
+  .decide{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:34px;}
+  .decide-card{
+    background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--accent);
+    border-radius:var(--radius);padding:24px;
+  }
+  .decide-card .qmark{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:600;letter-spacing:.08em;margin-bottom:10px;}
+  .decide-card p{margin:0;font-size:16px;}
+  .decide-card .lands{font-family:var(--display);font-weight:700;color:var(--accent);margin-top:12px;font-size:17px;}
+  .decide-card.d1{--accent:var(--p1);}
+  .decide-card.d2{--accent:var(--p2);}
+  .decide-card.d3{--accent:var(--p3);}
+  .decide-card.d4{--accent:var(--p4);}
+
+  /* ---------- FOOTER ---------- */
+  footer{background:#10141c;color:#9AA8BC;padding:54px 0;font-size:14px;}
+  footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:20px;align-items:center;}
+  footer .fnote{font-family:var(--mono);font-size:12px;color:#6E7E95;max-width:52ch;line-height:1.7;}
+  footer strong{color:#EDF1F7;font-family:var(--display);font-weight:700;}
+
+  .band{background:var(--surface-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+
+  /* reveal */
+  .reveal{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1);}
+  .reveal.in{opacity:1;transform:none;}
+
+  @media (max-width:760px){
+    body{font-size:16px;}
+    .grid,.decide{grid-template-columns:1fr;}
+    .layer-life{margin-left:0;width:100%;}
+    section{padding:58px 0;}
+    .hero{padding:60px 0 70px;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none!important;scroll-behavior:auto!important;}
+    .reveal{opacity:1;transform:none;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="wrap">
+    <p class="kicker"><span class="dot"></span>A developer's mental model</p>
+    <h1>Claude doesn't have <span class="swap">one memory</span>.<br>It has <em>four</em>.</h1>
+    <p class="lede">The single biggest misunderstanding is imagining one big brain. In reality Claude works across four distinct storage layers — each with its own purpose, lifetime, and answer to the question <em>"will this survive?"</em> Think of it the way a software project spreads across your account, your repo, your terminal, and your RAM.</p>
+    <div class="layer-chips">
+      <span class="chip"><i style="background:var(--p1)"></i>User Memory · permanent</span>
+      <span class="chip"><i style="background:var(--p2)"></i>Project Knowledge · persistent</span>
+      <span class="chip"><i style="background:var(--p3)"></i>Conversation · ephemeral</span>
+      <span class="chip"><i style="background:var(--p4)"></i>Context Window · volatile</span>
+    </div>
+  </div>
+</header>
+
+<!-- ============ HOW AN ANSWER IS BUILT ============ -->
+<section>
+  <div class="wrap reveal">
+    <p class="eyebrow"><span class="num">01</span> The pipeline</p>
+    <h2>How Claude assembles a single answer</h2>
+    <p class="section-intro">Every response is built by pulling from the durable layers, then loading whatever is most relevant into a working space to reason over. Read it top to bottom:</p>
+
+    <div class="pipe">
+      <div class="pipe-node q">
+        <div class="pipe-badge">?</div>
+        <div class="pipe-body"><h4>Your question</h4><p>The prompt that starts everything.</p></div>
+      </div>
+      <div class="pipe-node">
+        <div class="pipe-badge" style="background:var(--p1)">1</div>
+        <div class="pipe-body"><h4>User Memory</h4><p>Your long-term preferences, if the feature is available on your account.</p></div>
+      </div>
+      <div class="pipe-node">
+        <div class="pipe-badge" style="background:var(--p2)">2</div>
+        <div class="pipe-body"><h4>Project Knowledge</h4><p>Files and docs attached to the current project or repository.</p></div>
+      </div>
+      <div class="pipe-node">
+        <div class="pipe-badge" style="background:var(--p3)">3</div>
+        <div class="pipe-body"><h4>Current conversation history</h4><p>Everything said so far in this chat.</p></div>
+      </div>
+      <div class="pipe-node">
+        <div class="pipe-badge" style="background:var(--p4)">4</div>
+        <div class="pipe-body"><h4>The Context Window</h4><p>As much relevant information from the layers above as physically fits.</p></div>
+      </div>
+      <div class="pipe-node a">
+        <div class="pipe-badge">✓</div>
+        <div class="pipe-body"><h4>Claude's answer</h4><p>Generated from whatever was loaded into the window.</p></div>
+      </div>
+    </div>
+
+    <div class="callout warm">
+      <p style="margin:0"><strong>The key correction.</strong> The Context Window is <strong>not another memory source</strong>. It is the <strong>workspace (RAM)</strong> where Claude loads information from the other three. It doesn't store anything itself — it's the space where information is temporarily available while Claude reasons.</p>
+    </div>
+
+    <p class="muted">A cleaner one-line summary: <em>Claude gathers information from User Memory, Project Knowledge, and the current conversation, then loads as much relevant information as fits into the Context Window to generate an answer.</em></p>
+  </div>
+</section>
+
+<!-- ============ THE FOUR LAYERS (signature) ============ -->
+<section class="band">
+  <div class="wrap reveal">
+    <p class="eyebrow"><span class="num">02</span> The storage stack</p>
+    <h2>Four layers, ordered by how long they last</h2>
+    <p class="section-intro">The colours aren't decoration — they run along a persistence spectrum. Cool means permanent; warm means volatile. Hover any layer to inspect it.</p>
+
+    <div class="stack">
+      <!-- L1 -->
+      <div class="layer l1">
+        <div class="layer-top">
+          <span class="layer-name">1 · User Memory</span>
+          <span class="layer-analogy">≈ your GitHub profile</span>
+          <span class="layer-life">lifetime: months → years</span>
+        </div>
+        <p class="layer-desc">Facts about <strong>you</strong>, not your project: preferred language, coding style, formatting habits, favourite framework, how you want Claude to answer. It's your account — repositories come and go, but the account always exists. Stays until you edit it, remove it, or ask Claude to forget. <span style="color:var(--ink-faint)">Belongs here: "I write Playwright tests in C#," "keep answers concise," "SQL first." Not here: bug numbers, current sprint, this branch's architecture.</span></p>
+        <div class="persist">
+          <span class="persist-label">Persistence</span>
+          <div class="persist-track"><div class="persist-fill" data-fill="98%"></div></div>
+          <span class="persist-tag">Survives new chats &amp; new computers</span>
+        </div>
+      </div>
+      <!-- L2 -->
+      <div class="layer l2">
+        <div class="layer-top">
+          <span class="layer-name">2 · Project Knowledge</span>
+          <span class="layer-analogy">≈ your Git repository</span>
+          <span class="layer-life">lifetime: as long as the files exist</span>
+        </div>
+        <p class="layer-desc">Everything about the <strong>current repository</strong>: architecture, design docs, coding guidelines, requirements, README, and files like <code>memory.md</code> or <code>CLAUDE.md</code>. Claude reads these like any documentation. Different branches can carry different docs — switch branches and Claude sees different files without touching User Memory. <span style="color:var(--ink-faint)">Its durability depends entirely on where the files live (see layer's persistence below).</span></p>
+        <div class="persist">
+          <span class="persist-label">Persistence</span>
+          <div class="persist-track"><div class="persist-fill" data-fill="66%"></div></div>
+          <span class="persist-tag">Safe if committed / backed up — gone if only local</span>
+        </div>
+      </div>
+      <!-- L3 -->
+      <div class="layer l3">
+        <div class="layer-top">
+          <span class="layer-name">3 · Conversation Context</span>
+          <span class="layer-analogy">≈ your terminal session</span>
+          <span class="layer-life">lifetime: until the chat ends</span>
+        </div>
+        <p class="layer-desc">Today's chat. Ask Claude to "explain Playwright" and later "show an example" — it remembers because it's inside this conversation, not User Memory. Like terminal history: close the terminal and it's gone. A brand-new chat starts fresh and does not automatically reuse the old one as context.</p>
+        <div class="persist">
+          <span class="persist-label">Persistence</span>
+          <div class="persist-track"><div class="persist-fill" data-fill="34%"></div></div>
+          <span class="persist-tag">Does not carry into a new chat</span>
+        </div>
+      </div>
+      <!-- L4 -->
+      <div class="layer l4">
+        <div class="layer-top">
+          <span class="layer-name">4 · Context Window</span>
+          <span class="layer-analogy">≈ your computer's RAM</span>
+          <span class="layer-life">lifetime: this response only</span>
+        </div>
+        <p class="layer-desc">The hardest one — because it isn't memory at all, it's RAM. A fixed budget (say 200K tokens) into which Claude loads conversation, User Memory, project files, the current prompt and code. Everything must fit. When there's too much, the least relevant material is dropped, exactly like RAM under pressure. Git stores everything; RAM only holds what's needed right now.</p>
+        <div class="persist">
+          <span class="persist-label">Persistence</span>
+          <div class="persist-track"><div class="persist-fill" data-fill="10%"></div></div>
+          <span class="persist-tag">Nothing is stored here</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="spectrum-note">
+      <span>PERMANENT</span>
+      <span class="spectrum-bar"></span>
+      <span>VOLATILE</span>
+      <span style="margin-left:auto">Every answer combines all four layers at once.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHAT BELONGS WHERE ============ -->
+<section>
+  <div class="wrap reveal">
+    <p class="eyebrow"><span class="num">03</span> Sorting your information</p>
+    <h2>User Memory vs. <code>memory.md</code> — what goes where</h2>
+    <p class="section-intro">The most common mix-up: dumping project details into personal memory. Preferences are about <em>you</em>; project facts are about the <em>repo</em>.</p>
+
+    <div class="grid">
+      <div class="card good">
+        <h3><span class="tick">✓</span> Put in User Memory</h3>
+        <ul>
+          <li>Preferred language &amp; coding style</li>
+          <li>Formatting preference (e.g. concise, no emojis)</li>
+          <li>Favourite framework — "I use Playwright"</li>
+          <li>How Claude should answer — "SQL first, then explain"</li>
+          <li>Career role &amp; writing style</li>
+        </ul>
+      </div>
+      <div class="card bad">
+        <h3><span class="tick">✕</span> Keep out of User Memory</h3>
+        <ul>
+          <li>Bug 3156 / the current sprint</li>
+          <li>The branch you're on right now</li>
+          <li>Meeting notes &amp; temporary tasks</li>
+          <li>This project's architecture</li>
+          <li>Anything that changes per branch</li>
+        </ul>
+      </div>
+      <div class="card good">
+        <h3><span class="tick">✓</span> Put in <code>memory.md</code> / project files</h3>
+        <ul>
+          <li>Repository &amp; folder structure</li>
+          <li>Architecture and design docs</li>
+          <li>Business rules &amp; requirements</li>
+          <li>Naming &amp; testing conventions</li>
+          <li>Known issues, common mistakes, key files</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--p3)">What <code>memory.md</code> actually is</h3>
+        <p class="muted" style="font-size:15px;margin:0">A README, but written <em>for Claude</em>. It is an ordinary project document — not Claude's built-in User Memory. Claude reads it when it's in the project or context; delete it and only that project knowledge disappears. Your personal User Memory is untouched.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CAN YOU EDIT USER MEMORY AS A FILE ============ -->
+<section class="band">
+  <div class="wrap reveal">
+    <p class="eyebrow"><span class="num">04</span> The file question</p>
+    <h2>Can you open or edit User Memory as a file?</h2>
+    <p class="section-intro">Short answer — no. On Claude.ai it lives on Anthropic's servers, like your GitHub account settings: you change them through the interface, but you never get a file on your PC.</p>
+
+    <div class="qa">
+      <div class="qa-row">
+        <p class="qa-q"><span class="verdict v-no">NO</span>Is there a local file like <code>~/.claude/user_memory.md</code>?</p>
+        <p class="qa-a">There's no local file, no <code>memory.db</code>, and no Git repo or cloud folder holding it. You can't download a <code>memory.json</code>.</p>
+      </div>
+      <div class="qa-row">
+        <p class="qa-q"><span class="verdict v-no">NO</span>Can you create User Memory by writing a file?</p>
+        <p class="qa-a">Dropping a <code>user_memory.md</code> into a folder won't auto-import. It stays an ordinary document unless you explicitly bring it into the conversation.</p>
+      </div>
+      <div class="qa-row">
+        <p class="qa-q"><span class="verdict v-yes">YES</span>Can you view or update it through Claude?</p>
+        <p class="qa-a">Yes — conversationally. "Remember that I prefer C#," "Forget that I use Selenium," or "What do you remember about me?" is how you read and write it (where the feature is available on your plan).</p>
+      </div>
+      <div class="qa-row">
+        <p class="qa-q"><span class="verdict v-yes">YES</span>Can you roll your own memory file instead?</p>
+        <p class="qa-a">Absolutely — a <code>preferences.md</code> you paste in at the start of a chat. It's version-controlled, editable anywhere, and portable across tools. But Claude won't recall it in future chats unless you provide it again or save the equivalent via built-in memory.</p>
+      </div>
+      <div class="qa-row">
+        <p class="qa-q"><span class="verdict v-dep">MOVING PC?</span>What comes with you?</p>
+        <p class="qa-a">Log into the same account and your built-in User Memory travels with the account (not copied from the old PC). Local files like <code>preferences.md</code> only follow if you commit, copy, or cloud-sync them.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SHOULD YOU COMMIT memory.md ============ -->
+<section>
+  <div class="wrap reveal">
+    <p class="eyebrow"><span class="num">05</span> Persistence in practice</p>
+    <h2>Local vs. committed — the survival test</h2>
+    <p class="section-intro">Project knowledge isn't "permanent inside Claude." It's persistent only because something else stores it. Git is what makes it survive.</p>
+
+    <div class="grid">
+      <div class="card">
+        <h3 style="color:var(--p4)">Local only</h3>
+        <div class="code"><span class="c"># lives only on your machine</span>
+Project/
+ ├── README.md
+ ├── memory.md   <span class="c">← in .gitignore</span>
+ └── docs/</div>
+        <p class="muted" style="margin:0;font-size:15px">PC crashes, disk fails, or you delete it — and it's <span class="no">gone</span>. Teammates never had it. Exactly like deleting a README.</p>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--p2)">Committed &amp; pushed</h3>
+        <div class="code"><span class="c"># backed by the remote</span>
+git commit -m "docs"
+git push
+<span class="c"># later, on any machine…</span>
+git clone <span class="g">✓ everything restored</span></div>
+        <p class="muted" style="margin:0;font-size:15px">New laptop, fresh clone, and every doc comes back. <span class="yes">Everyone</span> on the team shares identical project knowledge.</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <p style="margin:0"><strong>Recommended:</strong> commit <code>memory.md</code> when the whole team should share it — treat it like <code>README.md</code>. Keep it local (or gitignored) only when it's your private notes. Best committed content: architecture, guidelines, folder structure, coding conventions.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MASTER TABLE ============ -->
+<section class="band">
+  <div class="wrap reveal">
+    <p class="eyebrow"><span class="num">06</span> The whole picture</p>
+    <h2>All four, side by side</h2>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>Layer</th><th>Real-world analogy</th><th>What belongs there</th><th>New chat?</th><th>PC crash?</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="lname"><i style="background:var(--p1)"></i>User Memory</span></td>
+            <td>Your GitHub profile</td>
+            <td>Long-term personal preferences &amp; coding style</td>
+            <td class="yes">Survives ✓</td>
+            <td class="yes">Survives ✓ <span class="muted">(with your account)</span></td>
+          </tr>
+          <tr>
+            <td><span class="lname"><i style="background:var(--p2)"></i>Project Knowledge</span></td>
+            <td>Your Git repository</td>
+            <td>Docs, architecture, standards, branch-specific info</td>
+            <td class="yes">Survives ✓ <span class="muted">(if files exist)</span></td>
+            <td class="dep">If committed ✓ / if only local ✕</td>
+          </tr>
+          <tr>
+            <td><span class="lname"><i style="background:var(--p3)"></i>Conversation</span></td>
+            <td>Your terminal session</td>
+            <td>Everything discussed in this chat</td>
+            <td class="no">Fresh start ✕</td>
+            <td class="dep">Depends on your account history; not auto-reused</td>
+          </tr>
+          <tr>
+            <td><span class="lname"><i style="background:var(--p4)"></i>Context Window</span></td>
+            <td>Your computer's RAM</td>
+            <td>The subset Claude actively holds while answering</td>
+            <td class="no">Gone ✕</td>
+            <td class="no">Gone ✕</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DECISION RULE ============ -->
+<section>
+  <div class="wrap reveal">
+    <p class="eyebrow"><span class="num">07</span> The simple rule</p>
+    <h2>Unsure where something belongs? Ask one question.</h2>
+    <div class="decide">
+      <div class="decide-card d1">
+        <div class="qmark">ASK YOURSELF →</div>
+        <p>"Do I want Claude to remember this across <em>all</em> future conversations?"</p>
+        <div class="lands">→ User Memory</div>
+      </div>
+      <div class="decide-card d2">
+        <div class="qmark">ASK YOURSELF →</div>
+        <p>"Does <em>everyone</em> working on this repository need it?"</p>
+        <div class="lands">→ Project Knowledge <span style="font-weight:400;color:var(--ink-soft);font-family:var(--sans);font-size:14px">(commit it to share)</span></div>
+      </div>
+      <div class="decide-card d3">
+        <div class="qmark">ASK YOURSELF →</div>
+        <p>"Is it only relevant to <em>this</em> discussion?"</p>
+        <div class="lands">→ Conversation Context</div>
+      </div>
+      <div class="decide-card d4">
+        <div class="qmark">ASK YOURSELF →</div>
+        <p>"Is it just information Claude is actively processing <em>right now</em>?"</p>
+        <div class="lands">→ Context Window</div>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:36px">
+      <p style="margin:0"><strong>Best practice — use both systems together.</strong> Built-in User Memory for long-term personal preferences ("I write Playwright tests in C#"), and project files like <code>CLAUDE.md</code> / <code>memory.md</code> / <code>README.md</code> for repo-specific rules, architecture, and conventions. Keeping the two separate is what keeps everything maintainable over time.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div>
+      <strong>Four memories, one answer.</strong>
+      <p class="fnote" style="margin:8px 0 0">User Memory persists · Project Knowledge is only as safe as its backup · Conversation lasts the chat · the Context Window is just the RAM it all loads into.</p>
+    </div>
+    <p class="fnote" style="text-align:right">A mental model for developers.<br>Cool = permanent · warm = volatile.</p>
+  </div>
+</footer>
+
+<script>
+  // Scroll reveals
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        e.target.classList.add('in');
+        // animate persistence bars inside this block
+        e.target.querySelectorAll('.persist-fill').forEach(f=>{
+          f.style.width = f.dataset.fill;
+        });
+        io.unobserve(e.target);
+      }
+    });
+  },{threshold:0.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
