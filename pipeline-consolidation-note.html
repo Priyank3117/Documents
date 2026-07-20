@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>One Pipeline, One YAML — Design Note</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14202E;
+    --ink-soft:#41546A;
+    --ink-faint:#7B8C9E;
+    --paper:#E6EBF1;
+    --panel:#FBFCFE;
+    --panel-2:#F1F4F8;
+    --line:#D2DBE5;
+    --line-strong:#B9C6D4;
+
+    --sanity:#0E8A72;
+    --sanity-bg:#E2F3EE;
+    --regression:#2C56C9;
+    --regression-bg:#E4EAFB;
+    --manual:#B96D12;
+    --manual-bg:#F7ECDA;
+    --danger:#C0431D;
+    --danger-bg:#F8E4DC;
+
+    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:'Space Grotesk',system-ui,sans-serif;
+    --body:'Inter',system-ui,sans-serif;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--body);
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:44px 44px;
+    background-position:-1px -1px;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:0 24px;}
+
+  /* ---------- header ---------- */
+  header.masthead{padding:64px 0 40px;}
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+    display:flex;align-items:center;gap:10px;
+    margin-bottom:22px;
+  }
+  .eyebrow::before{content:"";width:26px;height:1px;background:var(--line-strong);}
+  h1{
+    font-family:var(--disp);
+    font-weight:700;
+    font-size:clamp(34px,6vw,58px);
+    line-height:1.02;
+    letter-spacing:-.02em;
+    margin:0 0 20px;
+  }
+  h1 .slash{color:var(--sanity);}
+  .lede{
+    font-size:clamp(17px,2.2vw,20px);
+    color:var(--ink-soft);
+    max-width:640px;
+    margin:0;
+  }
+  .lede code{
+    font-family:var(--mono);
+    font-size:.86em;
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    padding:1px 6px;
+    border-radius:5px;
+    color:var(--ink);
+  }
+  .verdict{
+    margin-top:32px;
+    display:inline-flex;flex-wrap:wrap;gap:8px;
+    font-family:var(--mono);font-size:12.5px;
+  }
+  .chip{
+    border:1px solid var(--line-strong);
+    background:var(--panel);
+    border-radius:999px;
+    padding:6px 14px;
+    color:var(--ink-soft);
+  }
+  .chip strong{color:var(--ink);font-weight:600;}
+
+  /* ---------- sections ---------- */
+  section{padding:34px 0;}
+  .sec-label{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+    margin-bottom:14px;
+    display:flex;gap:12px;align-items:baseline;
+  }
+  .sec-label .n{color:var(--sanity);font-weight:600;}
+  h2{
+    font-family:var(--disp);
+    font-weight:600;
+    font-size:clamp(24px,3.4vw,32px);
+    letter-spacing:-.015em;
+    margin:0 0 16px;
+    line-height:1.12;
+  }
+  p{margin:0 0 16px;color:var(--ink-soft);}
+  p strong{color:var(--ink);font-weight:600;}
+  code.i{
+    font-family:var(--mono);font-size:.85em;
+    background:var(--panel-2);border:1px solid var(--line);
+    padding:1px 6px;border-radius:5px;color:var(--ink);
+    word-break:break-word;
+  }
+
+  /* ---------- drift panel ---------- */
+  .drift{
+    display:grid;grid-template-columns:1fr auto 1fr;gap:0;
+    border:1px solid var(--line);border-radius:14px;overflow:hidden;
+    background:var(--panel);margin-top:8px;
+  }
+  .drift .col{padding:22px 20px;}
+  .drift .col.now{background:var(--panel);}
+  .drift .col.later{background:var(--danger-bg);}
+  .drift .arrow{
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--mono);color:var(--ink-faint);
+    background:var(--panel-2);border-left:1px solid var(--line);border-right:1px solid var(--line);
+    padding:0 18px;font-size:20px;
+  }
+  .drift h4{
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;
+    margin:0 0 14px;color:var(--ink-faint);
+  }
+  .drift .later h4{color:var(--danger);}
+  .stack{font-family:var(--mono);font-size:12.5px;line-height:1;}
+  .stack .step{
+    border:1px solid var(--line-strong);background:var(--panel-2);
+    border-radius:7px;padding:9px 11px;margin-bottom:0;color:var(--ink);
+  }
+  .stack .tie{color:var(--line-strong);text-align:center;padding:4px 0;}
+  .stack .step.added{
+    border-color:var(--danger);background:#fff;color:var(--danger);font-weight:600;
+    position:relative;
+  }
+  .stack .step.missing{
+    border-style:dashed;border-color:var(--danger);
+    background:transparent;color:var(--danger);opacity:.85;
+  }
+  .drift-note{
+    font-family:var(--mono);font-size:12px;color:var(--danger);
+    margin:16px 0 0;display:flex;align-items:center;gap:8px;
+  }
+
+  /* ---------- glossary ---------- */
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+  .card{
+    border:1px solid var(--line);border-radius:12px;background:var(--panel);
+    padding:20px;
+  }
+  .card .term{
+    font-family:var(--mono);font-size:13px;font-weight:600;color:var(--ink);
+    display:flex;align-items:center;gap:9px;margin-bottom:10px;
+  }
+  .card .dot{width:9px;height:9px;border-radius:50%;background:var(--sanity);flex:0 0 auto;}
+  .card p{font-size:14.5px;margin:0;color:var(--ink-soft);}
+  .card p + p{margin-top:9px;}
+
+  /* ---------- routing diagram (signature) ---------- */
+  .router{
+    border:1px solid var(--line);border-radius:16px;background:var(--panel);
+    padding:26px 22px 30px;margin-top:6px;
+  }
+  .router-hint{
+    font-family:var(--mono);font-size:12px;color:var(--ink-faint);
+    margin:0 0 18px;text-align:center;
+  }
+  .triggers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  .trigger{
+    border:1.5px solid var(--line-strong);background:var(--panel-2);
+    border-radius:11px;padding:15px 14px;cursor:pointer;text-align:left;
+    font-family:var(--body);transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease,background .15s ease;
+    display:flex;flex-direction:column;gap:6px;
+  }
+  .trigger:focus-visible{outline:3px solid var(--regression);outline-offset:2px;}
+  .trigger .tk{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);}
+  .trigger .tn{font-family:var(--disp);font-weight:600;font-size:16px;color:var(--ink);}
+  .trigger .td{font-family:var(--mono);font-size:11px;color:var(--ink-faint);}
+  .trigger[data-lane="sanity"].on{border-color:var(--sanity);background:var(--sanity-bg);box-shadow:0 6px 20px -12px var(--sanity);transform:translateY(-2px);}
+  .trigger[data-lane="regression"].on{border-color:var(--regression);background:var(--regression-bg);box-shadow:0 6px 20px -12px var(--regression);transform:translateY(-2px);}
+  .trigger[data-lane="manual"].on{border-color:var(--manual);background:var(--manual-bg);box-shadow:0 6px 20px -12px var(--manual);transform:translateY(-2px);}
+  .trigger:not(.on){opacity:.62;}
+
+  .funnel{
+    display:flex;flex-direction:column;align-items:center;gap:0;margin-top:6px;
+  }
+  .pipe{width:2px;height:26px;background:var(--line-strong);transition:background .2s ease;}
+  .pipe.live-sanity{background:var(--sanity);}
+  .pipe.live-regression{background:var(--regression);}
+  .pipe.live-manual{background:var(--manual);}
+
+  .node{
+    width:100%;max-width:560px;border:1.5px solid var(--line-strong);border-radius:11px;
+    background:var(--panel-2);padding:15px 18px;text-align:center;transition:all .2s ease;
+  }
+  .node .nl{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:7px;}
+  .node .nv{font-family:var(--mono);font-size:13px;color:var(--ink);word-break:break-word;}
+  .node .nv b{color:inherit;font-weight:600;}
+  .node.lit-sanity{border-color:var(--sanity);background:var(--sanity-bg);}
+  .node.lit-sanity .nv b{color:var(--sanity);}
+  .node.lit-regression{border-color:var(--regression);background:var(--regression-bg);}
+  .node.lit-regression .nv b{color:var(--regression);}
+  .node.lit-manual{border-color:var(--manual);background:var(--manual-bg);}
+  .node.lit-manual .nv b{color:var(--manual);}
+
+  .suite{
+    width:100%;max-width:560px;border-radius:11px;padding:16px 18px;text-align:center;
+    border:1.5px solid var(--line-strong);background:var(--panel-2);transition:all .2s ease;
+  }
+  .suite .sl{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px;}
+  .suite .sn{font-family:var(--disp);font-weight:700;font-size:22px;color:var(--ink);}
+  .suite.run-sanity{border-color:var(--sanity);background:var(--sanity);}
+  .suite.run-sanity .sn,.suite.run-sanity .sl{color:#fff;}
+  .suite.run-regression{border-color:var(--regression);background:var(--regression);}
+  .suite.run-regression .sn,.suite.run-regression .sl{color:#fff;}
+  .suite.run-manual{border-color:var(--manual);background:var(--manual);}
+  .suite.run-manual .sn,.suite.run-manual .sl{color:#fff;}
+
+  .shared-tag{
+    font-family:var(--mono);font-size:11px;color:var(--ink-faint);
+    border:1px dashed var(--line-strong);border-radius:7px;padding:5px 12px;margin:2px 0;
+    background:var(--panel);
+  }
+
+  /* ---------- code block ---------- */
+  .code{
+    border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#101a26;margin-top:8px;
+  }
+  .code .bar{
+    display:flex;align-items:center;gap:8px;padding:11px 16px;background:#0b131d;border-bottom:1px solid #1e2c3a;
+  }
+  .code .bar .fn{font-family:var(--mono);font-size:12px;color:#8aa0b6;}
+  .code .bar .lbl{margin-left:auto;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#5f7285;}
+  .code pre{
+    margin:0;padding:18px 18px;overflow-x:auto;
+    font-family:var(--mono);font-size:13px;line-height:1.7;color:#c9d6e3;
+  }
+  .code pre .k{color:#7fd7c4;}
+  .code pre .s{color:#e6c07b;}
+  .code pre .c{color:#5c7085;font-style:italic;}
+  .code pre .v{color:#79b8ff;}
+
+  /* ---------- callout ---------- */
+  .callout{
+    border:1px solid var(--line);border-left:3px solid var(--manual);border-radius:10px;
+    background:var(--panel);padding:20px 22px;margin-top:8px;
+  }
+  .callout h3{
+    font-family:var(--disp);font-weight:600;font-size:19px;margin:0 0 10px;color:var(--ink);
+  }
+  .callout ul{margin:12px 0 0;padding-left:20px;color:var(--ink-soft);}
+  .callout li{margin-bottom:6px;}
+  .callout li::marker{color:var(--manual);}
+
+  .quote{
+    font-family:var(--disp);font-weight:500;font-size:clamp(20px,3vw,26px);
+    line-height:1.32;color:var(--ink);border-top:1px solid var(--line-strong);border-bottom:1px solid var(--line-strong);
+    padding:26px 0;margin:8px 0;letter-spacing:-.01em;
+  }
+  .quote span{color:var(--sanity);}
+
+  footer{padding:44px 0 70px;color:var(--ink-faint);font-family:var(--mono);font-size:12px;}
+  footer .rule{height:1px;background:var(--line-strong);margin-bottom:20px;}
+
+  @media (max-width:680px){
+    .grid{grid-template-columns:1fr;}
+    .drift{grid-template-columns:1fr;}
+    .drift .arrow{border:none;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px;}
+    .triggers{grid-template-columns:1fr;}
+    body{background-size:32px 32px;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none !important;scroll-behavior:auto;}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="eyebrow">CI/CD Design Note · Azure Pipelines</div>
+    <h1>One pipeline,<br>one YAML<span class="slash">.</span></h1>
+    <p class="lede">Why <code>azure-pipelines-sanity.yml</code> shouldn't exist as a near-duplicate of <code>azure-pipelines.yml</code> — and how a single file can drive the sanity run, the regression run, and manual ad-hoc runs on its own.</p>
+    <div class="verdict">
+      <span class="chip"><strong>1</strong> pipeline registration</span>
+      <span class="chip"><strong>1</strong> YAML file</span>
+      <span class="chip"><strong>N</strong> schedules</span>
+      <span class="chip">routed by <strong>Build.CronSchedule.DisplayName</strong></span>
+    </div>
+  </header>
+
+  <!-- 1. THE PROBLEM -->
+  <section>
+    <div class="sec-label"><span class="n">01</span> The problem</div>
+    <h2>Two files that are 99% identical will drift apart</h2>
+    <p>Right now <code class="i">azure-pipelines-sanity.yml</code> is effectively a byte-for-byte copy of <code class="i">azure-pipelines.yml</code>. The only real differences are the <code class="i">schedules:</code> block and the default <code class="i">TestFilter</code> (plus a couple of cosmetic <code class="i">displayName</code> tweaks).</p>
+    <p>The risk isn't today — it's every change after today. A new step, a task version bump, a filter tweak: each one has to be manually mirrored into both files, or they quietly fall out of sync. That silent divergence is <strong>configuration drift</strong>.</p>
+
+    <div class="drift">
+      <div class="col now">
+        <h4>Today · both files</h4>
+        <div class="stack">
+          <div class="step">Restore</div>
+          <div class="tie">│</div>
+          <div class="step">Build</div>
+          <div class="tie">│</div>
+          <div class="step">Run Tests</div>
+          <div class="tie">│</div>
+          <div class="step">Publish Results</div>
+        </div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="col later">
+        <h4>3 months later · only the main file gets edited</h4>
+        <div class="stack">
+          <div class="step">Restore</div>
+          <div class="tie">│</div>
+          <div class="step">Build</div>
+          <div class="tie">│</div>
+          <div class="step">Run Tests</div>
+          <div class="tie">│</div>
+          <div class="step">Publish Results</div>
+          <div class="tie">│</div>
+          <div class="step added">+ Publish Code Coverage</div>
+          <div class="tie">│</div>
+          <div class="step missing">sanity.yml never got this</div>
+        </div>
+      </div>
+    </div>
+    <p class="drift-note">▲ Regression publishes coverage, sanity doesn't — and nobody notices for weeks.</p>
+  </section>
+
+  <!-- 2. VOCABULARY -->
+  <section>
+    <div class="sec-label"><span class="n">02</span> The moving parts</div>
+    <h2>Five terms that make the single-file design click</h2>
+    <div class="grid">
+      <div class="card">
+        <div class="term"><span class="dot"></span>Pipeline</div>
+        <p>A registration in Azure DevOps that knows <em>when</em> to start and <em>which</em> YAML to run. It holds no steps itself — it just triggers execution (commit, PR, manual, or schedule).</p>
+      </div>
+      <div class="card">
+        <div class="term"><span class="dot"></span>YAML file</div>
+        <p>The actual instruction manual: variables, jobs, steps, conditions, and schedules. The pipeline just points at it and follows it.</p>
+      </div>
+      <div class="card">
+        <div class="term"><span class="dot"></span>Schedule</div>
+        <p>Only a timer. A cron entry says "start the pipeline at this time." It knows nothing about smoke, sanity, or regression — it just fires.</p>
+      </div>
+      <div class="card">
+        <div class="term"><span class="dot"></span>displayName (on a schedule)</div>
+        <p>A human label on a cron entry, e.g. <code class="i">"Daily Sanity"</code>. It's more than cosmetic — Azure exposes it at runtime.</p>
+      </div>
+      <div class="card" style="grid-column:1 / -1;">
+        <div class="term"><span class="dot"></span>Build.CronSchedule.DisplayName</div>
+        <p>The predefined variable Azure sets to the <code class="i">displayName</code> of whichever schedule fired the run. That single value is how one YAML file can tell <em>which timer woke it up</em> and branch accordingly — no second file required.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. HOW IT WORKS (signature) -->
+  <section>
+    <div class="sec-label"><span class="n">03</span> How it works</div>
+    <h2>Same file, same pipeline — the trigger picks the path</h2>
+    <p>Pick a trigger below to trace how one <code class="i">azure-pipelines.yml</code> resolves an <code class="i">effectiveTestFilter</code> and runs the right suite. Scheduled runs read <code class="i">Build.CronSchedule.DisplayName</code>; manual runs fall back to the <code class="i">TestFilter</code> parameter.</p>
+
+    <div class="router">
+      <p class="router-hint">▾ tap a trigger to route it through the file</p>
+      <div class="triggers">
+        <button class="trigger on" data-lane="sanity" aria-pressed="true">
+          <span class="tk">Schedule · cron 30 19</span>
+          <span class="tn">Daily Sanity</span>
+          <span class="td">1:00 AM IST</span>
+        </button>
+        <button class="trigger" data-lane="regression" aria-pressed="false">
+          <span class="tk">Schedule · nightly</span>
+          <span class="tn">Daily Regression</span>
+          <span class="td">full suite</span>
+        </button>
+        <button class="trigger" data-lane="manual" aria-pressed="false">
+          <span class="tk">Manual · Run pipeline</span>
+          <span class="tn">Ad-hoc Run</span>
+          <span class="td">TestFilter param</span>
+        </button>
+      </div>
+
+      <div class="funnel">
+        <div class="pipe" id="pipe1"></div>
+        <div class="shared-tag">one pipeline → one azure-pipelines.yml</div>
+        <div class="pipe" id="pipe2"></div>
+        <div class="node" id="nodeVar">
+          <div class="nl" id="varLabel">Variable at runtime</div>
+          <div class="nv" id="varValue"></div>
+        </div>
+        <div class="pipe" id="pipe3"></div>
+        <div class="node" id="nodeFilter">
+          <div class="nl">effectiveTestFilter resolves to</div>
+          <div class="nv" id="filterValue"></div>
+        </div>
+        <div class="pipe" id="pipe4"></div>
+        <div class="suite" id="suite">
+          <div class="sl">Executes</div>
+          <div class="sn" id="suiteName"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. THE CODE -->
+  <section>
+    <div class="sec-label"><span class="n">04</span> The mechanism in code</div>
+    <h2>A named schedule, plus a compile-time filter switch</h2>
+    <p>Add the sanity timer alongside the existing schedules, then let a template expression choose the filter based on which schedule fired (or the manual parameter). Both live in the one existing <code class="i">azure-pipelines.yml</code>.</p>
+
+    <div class="code">
+      <div class="bar"><span class="fn">azure-pipelines.yml</span><span class="lbl">schedules</span></div>
+<pre><span class="k">schedules:</span>
+<span class="k">- cron:</span> <span class="s">"30 19 * * *"</span>
+  <span class="k">displayName:</span> <span class="s">"Daily Sanity run at 1:00 AM IST"</span>
+  <span class="k">branches:</span>
+    <span class="k">include:</span> [main]
+  <span class="k">always:</span> <span class="v">true</span>
+<span class="c"># (plus the existing full-regression schedule here too,</span>
+<span class="c">#  if it isn't already a classic UI trigger)</span></pre>
+    </div>
+
+    <div class="code" style="margin-top:14px;">
+      <div class="bar"><span class="fn">azure-pipelines.yml</span><span class="lbl">variables</span></div>
+<pre><span class="k">variables:</span>
+  <span class="v">${{ if eq(variables['Build.CronSchedule.DisplayName'], 'Daily Sanity run at 1:00 AM IST') }}:</span>
+    <span class="k">effectiveTestFilter:</span> <span class="s">'TestCategory=sanity&FullyQualifiedName!~CustomerTests&FullyQualifiedName!~Salesforce'</span>
+  <span class="v">${{ elif and(ne(parameters.TestFilter, ''), ne(parameters.TestFilter, 'all')) }}:</span>
+    <span class="k">effectiveTestFilter:</span> <span class="s">${{ parameters.TestFilter }}&FullyQualifiedName!~CustomerTests&FullyQualifiedName!~Salesforce</span>
+  <span class="v">${{ else }}:</span>
+    <span class="k">effectiveTestFilter:</span> <span class="s">'FullyQualifiedName!~CustomerTests&FullyQualifiedName!~Salesforce'</span></pre>
+    </div>
+    <p style="margin-top:16px;">Read top-down: if the sanity schedule fired, run sanity. Otherwise, if a real manual <code class="i">TestFilter</code> was passed, honour it. Otherwise fall through to the full regression default. One file covers all three paths.</p>
+  </section>
+
+  <!-- 5. NOT A BLOCKER -->
+  <section>
+    <div class="sec-label"><span class="n">05</span> When keeping them separate is fine</div>
+    <h2>Not a blocker — just the alternative worth considering</h2>
+    <div class="callout">
+      <h3>Legitimate reasons to keep a second pipeline</h3>
+      <p>Consolidation is about the <em>YAML duplication</em>. There are real operational reasons a team might still want two separate pipeline registrations:</p>
+      <ul>
+        <li>Independently enable / disable one without touching the other</li>
+        <li>Separate permissions or approvals</li>
+        <li>Separate retention policies</li>
+        <li>Cleaner, separated run history</li>
+        <li>Ability to delete one without affecting the other</li>
+      </ul>
+    </div>
+    <p style="margin-top:22px;">If none of those apply, one pipeline with multiple named schedules is simpler and drift-proof. And note: even two pipelines could point at the <em>same</em> YAML — but that's a different pattern than the one recommended here.</p>
+
+    <div class="quote">The recommendation is <span>one file, one pipeline registration</span> — not two pipelines sharing a file, and not two near-identical files to keep in sync.</div>
+  </section>
+
+  <footer>
+    <div class="rule"></div>
+    DESIGN NOTE · azure-pipelines.yml consolidation · reference copy
+  </footer>
+
+</div>
+
+<script>
+  const lanes = {
+    sanity: {
+      varLabel: "Build.CronSchedule.DisplayName",
+      varValue: '= <b>"Daily Sanity run at 1:00 AM IST"</b>',
+      filter: "TestCategory=sanity & !~CustomerTests & !~Salesforce",
+      suite: "SANITY"
+    },
+    regression: {
+      varLabel: "Build.CronSchedule.DisplayName",
+      varValue: '= <b>"Daily Regression"</b>  →  no sanity match, no manual filter → falls to <b>else</b>',
+      filter: "!~CustomerTests & !~Salesforce  (full default)",
+      suite: "REGRESSION"
+    },
+    manual: {
+      varLabel: "parameters.TestFilter (no schedule fired)",
+      varValue: 'e.g. <b>TestFilter = "Smoke"</b>  →  matches the <b>elif</b> branch',
+      filter: "Smoke & !~CustomerTests & !~Salesforce",
+      suite: "SMOKE"
+    }
+  };
+
+  const buttons = document.querySelectorAll('.trigger');
+  const pipes = ['pipe1','pipe2','pipe3','pipe4'].map(id => document.getElementById(id));
+  const nodeVar = document.getElementById('nodeVar');
+  const nodeFilter = document.getElementById('nodeFilter');
+  const suite = document.getElementById('suite');
+  const varLabel = document.getElementById('varLabel');
+  const varValue = document.getElementById('varValue');
+  const filterValue = document.getElementById('filterValue');
+  const suiteName = document.getElementById('suiteName');
+  const litClasses = ['lit-sanity','lit-regression','lit-manual'];
+  const runClasses = ['run-sanity','run-regression','run-manual'];
+  const pipeClasses = ['live-sanity','live-regression','live-manual'];
+
+  function select(lane){
+    buttons.forEach(b=>{
+      const on = b.dataset.lane === lane;
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-pressed', on ? 'true':'false');
+    });
+    const d = lanes[lane];
+    varLabel.textContent = d.varLabel;
+    varValue.innerHTML = d.varValue;
+    filterValue.textContent = d.filter;
+    suiteName.textContent = d.suite;
+
+    pipes.forEach(p=>{ p.classList.remove(...pipeClasses); p.classList.add('live-'+lane); });
+    nodeVar.classList.remove(...litClasses); nodeVar.classList.add('lit-'+lane);
+    nodeFilter.classList.remove(...litClasses); nodeFilter.classList.add('lit-'+lane);
+    suite.classList.remove(...runClasses); suite.classList.add('run-'+lane);
+  }
+
+  buttons.forEach(b=> b.addEventListener('click', ()=> select(b.dataset.lane)));
+  select('sanity');
+</script>
+</body>
+</html>

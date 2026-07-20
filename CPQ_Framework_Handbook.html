@@ -1,0 +1,1368 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Architect's Field Guide to the CPQ Automation Framework</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%90%3C/text%3E%3C/svg%3E">
+  <style>
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  img{max-width:100%}
+  </style>
+<style>
+  /* ============================================================
+     THE ARCHITECT'S FIELD GUIDE — CPQ Automation Framework
+     Treatment: engineering handbook / blueprint logbook
+     ============================================================ */
+  :root {
+    --paper:#E9EDF1; --panel:#FFFFFF; --panel-2:#F3F6F9; --ink:#131A22; --ink-soft:#3D4A57;
+    --ink-faint:#647383; --rule:#D2DAE2; --rule-soft:#E1E7ED; --accent:#1E7C9C; --accent-deep:#145E77;
+    --accent-wash:#E1EFF4; --amber:#A9711A; --amber-wash:#F6ECD8; --green:#2E7D52; --green-wash:#E0EFE6;
+    --red:#B34632; --red-wash:#F6E2DC; --code-bg:#F4F7FA; --code-ink:#1c2530;
+    --shadow:0 1px 2px rgba(19,26,34,.06),0 8px 24px rgba(19,26,34,.06);
+    --serif:Georgia,"Iowan Old Style","Times New Roman",serif;
+    --mono:ui-monospace,"SF Mono","Cascadia Mono","Consolas","Roboto Mono",monospace;
+    --measure:70ch; --rail:310px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper:#0C1219; --panel:#121B24; --panel-2:#16212C; --ink:#DCE4EC; --ink-soft:#A7B4C1;
+      --ink-faint:#74838F; --rule:#24323F; --rule-soft:#1B2732; --accent:#4FB6D8; --accent-deep:#7FD0EA;
+      --accent-wash:#12303C; --amber:#D6A24E; --amber-wash:#2C2413; --green:#5EBE88; --green-wash:#14271C;
+      --red:#E07C63; --red-wash:#2C1712; --code-bg:#0E1720; --code-ink:#cdd7e1;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="light"]{--paper:#E9EDF1;--panel:#FFFFFF;--panel-2:#F3F6F9;--ink:#131A22;--ink-soft:#3D4A57;--ink-faint:#647383;--rule:#D2DAE2;--rule-soft:#E1E7ED;--accent:#1E7C9C;--accent-deep:#145E77;--accent-wash:#E1EFF4;--amber:#A9711A;--amber-wash:#F6ECD8;--green:#2E7D52;--green-wash:#E0EFE6;--red:#B34632;--red-wash:#F6E2DC;--code-bg:#F4F7FA;--code-ink:#1c2530;--shadow:0 1px 2px rgba(19,26,34,.06),0 8px 24px rgba(19,26,34,.06)}
+  :root[data-theme="dark"]{--paper:#0C1219;--panel:#121B24;--panel-2:#16212C;--ink:#DCE4EC;--ink-soft:#A7B4C1;--ink-faint:#74838F;--rule:#24323F;--rule-soft:#1B2732;--accent:#4FB6D8;--accent-deep:#7FD0EA;--accent-wash:#12303C;--amber:#D6A24E;--amber-wash:#2C2413;--green:#5EBE88;--green-wash:#14271C;--red:#E07C63;--red-wash:#2C1712;--code-bg:#0E1720;--code-ink:#cdd7e1;--shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35)}
+
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:17px;line-height:1.62;-webkit-font-smoothing:antialiased}
+  .shell{display:grid;grid-template-columns:var(--rail) minmax(0,1fr);gap:0;max-width:1380px;margin:0 auto}
+  .rail{position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;padding:30px 20px 60px 26px;border-right:1px solid var(--rule);background:linear-gradient(180deg,var(--panel-2),var(--paper) 70%)}
+  .rail .brand{font-family:var(--mono);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+  .rail .brand-title{font-family:var(--serif);font-size:1.12rem;font-weight:700;line-height:1.25;margin:0 0 20px;color:var(--ink)}
+  .rail nav a{display:block;font-family:var(--mono);font-size:.75rem;line-height:1.4;color:var(--ink-soft);text-decoration:none;padding:3px 0 3px 12px;border-left:2px solid transparent}
+  .rail nav a:hover{color:var(--accent);border-left-color:var(--accent)}
+  .rail nav .grp{font-family:var(--mono);font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);margin:16px 0 5px}
+  .rail nav a .n{color:var(--ink-faint);margin-right:6px}
+  main{padding:0 clamp(20px,4vw,66px) 120px;overflow:hidden}
+  section{padding-top:44px;scroll-margin-top:18px}
+  section>.kicker{font-family:var(--mono);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}
+  h1,h2,h3,h4{font-family:var(--serif);color:var(--ink);text-wrap:balance;line-height:1.2}
+  h2{font-size:clamp(1.6rem,3.2vw,2.15rem);margin:6px 0 4px;letter-spacing:-.01em}
+  h3{font-size:1.32rem;margin:34px 0 6px}
+  h4{font-size:1.05rem;margin:24px 0 4px;font-variant:small-caps;letter-spacing:.03em;color:var(--accent-deep)}
+  p,li{max-width:var(--measure)}
+  a{color:var(--accent-deep)} strong{color:var(--ink)}
+  .lead{font-size:1.15rem;color:var(--ink-soft);max-width:62ch}
+  hr.div{border:0;border-top:1px solid var(--rule);margin:40px 0 0}
+  .part{font-family:var(--mono);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);border-top:2px solid var(--accent);padding-top:10px;margin-top:26px}
+  .hero{padding:62px clamp(20px,4vw,66px) 22px;border-bottom:1px solid var(--rule);position:relative;overflow:hidden}
+  .hero::before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--rule-soft) 1px,transparent 1px),linear-gradient(90deg,var(--rule-soft) 1px,transparent 1px);background-size:26px 26px;opacity:.55;mask-image:radial-gradient(120% 80% at 80% 0%,#000 30%,transparent 78%);-webkit-mask-image:radial-gradient(120% 80% at 80% 0%,#000 30%,transparent 78%)}
+  .hero>*{position:relative}
+  .hero .eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent)}
+  .hero h1{font-size:clamp(2.1rem,6vw,3.8rem);margin:12px 0 10px;letter-spacing:-.02em}
+  .hero h1 em{font-style:italic;color:var(--accent-deep)}
+  .hero .sub{font-size:1.2rem;color:var(--ink-soft);max-width:60ch}
+  .hero .meta{font-family:var(--mono);font-size:.74rem;color:var(--ink-faint);margin-top:24px;display:flex;flex-wrap:wrap;gap:8px 22px}
+  .hero .meta b{color:var(--accent-deep);font-weight:600}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 0}
+  .chip{font-family:var(--mono);font-size:.72rem;padding:4px 10px;border:1px solid var(--rule);border-radius:2px;background:var(--panel);color:var(--ink-soft)}
+  .chip b{color:var(--accent-deep)}
+  .note{border:1px solid var(--rule);border-left:3px solid var(--accent);background:var(--panel);border-radius:3px;padding:16px 20px;margin:22px 0;box-shadow:var(--shadow);max-width:76ch}
+  .note .tag{font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:5px}
+  .note.mind{border-left-color:var(--accent)} .note.mind .tag{color:var(--accent)}
+  .note.warn{border-left-color:var(--amber);background:var(--amber-wash)} .note.warn .tag{color:var(--amber)}
+  .note.good{border-left-color:var(--green);background:var(--green-wash)} .note.good .tag{color:var(--green)}
+  .note.pit{border-left-color:var(--red);background:var(--red-wash)} .note.pit .tag{color:var(--red)}
+  .note p:first-of-type{margin-top:0} .note p:last-child{margin-bottom:0}
+  pre{background:var(--code-bg);color:var(--code-ink);border:1px solid var(--rule);border-radius:4px;padding:15px 18px;overflow-x:auto;font-family:var(--mono);font-size:.79rem;line-height:1.55;margin:18px 0}
+  pre.diagram{line-height:1.35;font-size:.75rem;color:var(--ink-soft);background:var(--panel-2)}
+  pre.diagram b{color:var(--accent-deep);font-weight:600}
+  code{font-family:var(--mono);font-size:.84em;background:var(--code-bg);padding:1px 5px;border-radius:3px;border:1px solid var(--rule-soft);color:var(--code-ink)}
+  pre code{background:none;border:0;padding:0;font-size:1em}
+  .cap{font-family:var(--mono);font-size:.7rem;color:var(--ink-faint);margin:-10px 0 22px;letter-spacing:.02em}
+  .tbl-wrap{overflow-x:auto;margin:20px 0;border:1px solid var(--rule);border-radius:4px}
+  table{border-collapse:collapse;width:100%;font-size:.83rem;font-family:var(--serif)}
+  th,td{text-align:left;padding:9px 14px;border-bottom:1px solid var(--rule-soft);vertical-align:top}
+  th{font-family:var(--mono);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);background:var(--panel-2);border-bottom:1px solid var(--rule)}
+  tr:last-child td{border-bottom:0}
+  td code{font-size:.8rem}
+  .facets{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:4px;overflow:hidden;margin:22px 0}
+  @media (min-width:720px){.facets{grid-template-columns:1fr 1fr}}
+  .facets.three{grid-template-columns:1fr}
+  @media (min-width:720px){.facets.three{grid-template-columns:1fr 1fr 1fr}}
+  .facet{background:var(--panel);padding:14px 18px}
+  .facet h5{font-family:var(--mono);font-size:.67rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin:0 0 5px}
+  .facet p{margin:0;font-size:.9rem;color:var(--ink-soft);max-width:none}
+  ol.steps{counter-reset:s;list-style:none;padding:0;margin:22px 0}
+  ol.steps>li{counter-increment:s;position:relative;padding:4px 0 16px 46px;max-width:74ch}
+  ol.steps>li::before{content:counter(s,decimal-leading-zero);position:absolute;left:0;top:2px;font-family:var(--mono);font-size:.8rem;color:var(--accent);border:1px solid var(--rule);border-radius:3px;padding:2px 6px;background:var(--panel)}
+  dl.qa{margin:20px 0} dl.qa dt{font-family:var(--mono);font-size:.8rem;color:var(--accent-deep);margin-top:14px;font-weight:600}
+  dl.qa dd{margin:2px 0 0;max-width:74ch;color:var(--ink-soft)}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;font-family:var(--mono);font-size:.72rem;color:var(--ink-faint);margin:8px 0 0}
+  .legend span::before{content:"▉ "}
+  .legend .l-mind::before{color:var(--accent)} .legend .l-warn::before{color:var(--amber)}
+  .legend .l-good::before{color:var(--green)} .legend .l-pit::before{color:var(--red)}
+  .backtop{display:inline-block;font-family:var(--mono);font-size:.7rem;color:var(--ink-faint);text-decoration:none;margin-top:18px}
+  .backtop:hover{color:var(--accent)}
+  footer{border-top:1px solid var(--rule);margin-top:60px;padding:30px clamp(20px,4vw,66px);font-family:var(--mono);font-size:.74rem;color:var(--ink-faint)}
+  .toggle{position:fixed;top:14px;right:16px;z-index:50;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;background:var(--panel);color:var(--ink-soft);border:1px solid var(--rule);border-radius:3px;padding:6px 11px;cursor:pointer;box-shadow:var(--shadow)}
+  .toggle:hover{color:var(--accent);border-color:var(--accent)}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  @media (max-width:860px){.shell{grid-template-columns:1fr}.rail{position:static;height:auto;border-right:0;border-bottom:1px solid var(--rule)}.rail nav{columns:2;column-gap:22px}}
+</style>
+</head>
+<body>
+
+<button class="toggle" id="themeBtn" aria-label="Toggle light/dark theme">◐ THEME</button>
+
+<header class="hero">
+  <div class="eyebrow">Reverse-Engineering Handbook · Complete Edition · Reqnroll + Playwright · .NET 10</div>
+  <h1>The Architect's Field Guide to the <em>CPQ Automation Framework</em></h1>
+  <p class="sub">A reconstruction of <strong>how the framework was designed and why</strong> — every layer, every package, every extension recipe, and the workflows the day-to-day author actually needs (including turning a raw cURL into production framework code).</p>
+  <div class="chips">
+    <span class="chip"><b>Reqnroll</b> 3.3.0</span>
+    <span class="chip"><b>Playwright</b> 1.52.0</span>
+    <span class="chip"><b>NUnit</b> 3 + Test.Sdk 18</span>
+    <span class="chip"><b>BoDi</b> DI</span>
+    <span class="chip"><b>AwesomeAssertions</b> 9.3</span>
+    <span class="chip"><b>Newtonsoft.Json</b> 13</span>
+    <span class="chip"><b>Microsoft.Extensions.Configuration</b></span>
+    <span class="chip"><b>Xray + Jira</b></span>
+  </div>
+  <div class="meta">
+    <span>SUBJECT · <b>CPQPlatformTests.sln</b></span>
+    <span>ASSEMBLIES · <b>5</b></span>
+    <span>SECTIONS · <b>30</b></span>
+    <span>PARALLELISM · <b>10 workers</b></span>
+  </div>
+</header>
+
+<div class="shell">
+  <aside class="rail">
+    <div class="brand">Field Guide · Complete Edition</div>
+    <div class="brand-title">CPQ Automation<br>Framework Architecture</div>
+    <nav>
+      <div class="grp">0 · Orientation</div>
+      <a href="#read"><span class="n">00</span>How to read + the method</a>
+      <a href="#bigpicture"><span class="n">01</span>The big picture</a>
+      <a href="#topology"><span class="n">02</span>Topology & folders</a>
+      <div class="grp">1 · The Toolbox</div>
+      <a href="#packages"><span class="n">03</span>Every package explained</a>
+      <a href="#provenance"><span class="n">04</span>Where the code came from</a>
+      <a href="#readingdocs"><span class="n">05</span>Reading official docs</a>
+      <div class="grp">2 · Core Engine</div>
+      <a href="#config"><span class="n">06</span>Configuration</a>
+      <a href="#di"><span class="n">07</span>Dependency injection</a>
+      <a href="#lifecycle"><span class="n">08</span>Lifecycle (hooks)</a>
+      <a href="#browser"><span class="n">09</span>Browser lifecycle</a>
+      <div class="grp">3 · BDD Layer</div>
+      <a href="#feature"><span class="n">10</span>Feature files + patterns</a>
+      <a href="#reqnroll"><span class="n">11</span>How Reqnroll executes</a>
+      <a href="#matching"><span class="n">12</span>Step matching internals</a>
+      <a href="#steps"><span class="n">13</span>Step definitions</a>
+      <a href="#context"><span class="n">14</span>ScenarioContext deep + debug</a>
+      <div class="grp">4 · UI Layer</div>
+      <a href="#pom"><span class="n">15</span>Page Object Model / BasePage</a>
+      <a href="#components"><span class="n">16</span>Shared components</a>
+      <a href="#custom"><span class="n">17</span>Customer customization</a>
+      <div class="grp">5 · API Layer</div>
+      <a href="#api"><span class="n">18</span>API framework</a>
+      <a href="#auth"><span class="n">19</span>Authentication deep</a>
+      <a href="#curl"><span class="n">20</span>cURL → framework code</a>
+      <a href="#cleanup"><span class="n">21</span>Cleanup pipeline</a>
+      <div class="grp">6 · Delivery</div>
+      <a href="#reporting"><span class="n">22</span>Reporting & replacement</a>
+      <a href="#cicd"><span class="n">23</span>CI/CD pipeline</a>
+      <a href="#parallel"><span class="n">24</span>Parallel execution</a>
+      <div class="grp">7 · Practitioner</div>
+      <a href="#organization"><span class="n">25</span>Code organization guide</a>
+      <a href="#extend"><span class="n">26</span>How to extend</a>
+      <a href="#evolution"><span class="n">27</span>Build from scratch</a>
+      <a href="#patterns"><span class="n">28</span>Patterns & SOLID</a>
+      <a href="#tradeoffs"><span class="n">29</span>Trade-offs & watch-outs</a>
+      <a href="#exercises"><span class="n">30</span>Exercises & takeaway</a>
+    </nav>
+  </aside>
+
+  <main>
+
+  <!-- 00 -->
+  <section id="read">
+    <div class="part">Part 0 · Orientation</div>
+    <div class="kicker">Section 00</div>
+    <h2>How to read this — and the analytical method</h2>
+    <p class="lead">Read once top-to-bottom in request order; after that, jump anywhere. Every section is written through the same two lenses your prompt asked for, so you can apply them yourself to any future module.</p>
+
+    <div class="legend">
+      <span class="l-mind">Designer's mind — the reasoning behind a decision</span>
+      <span class="l-good">Good practice already in place</span>
+      <span class="l-warn">Trade-off — a deliberate compromise</span>
+      <span class="l-pit">Watch-out — a real risk in the code</span>
+    </div>
+
+    <h3>The 10 questions I ask of every module</h3>
+    <p>When you meet any component (a class, a folder, a package), interrogate it with these. Most sections below answer them inline; here they are as a checklist you can reuse:</p>
+    <div class="facets three">
+      <div class="facet"><h5>1 · Why this way</h5><p>What constraint forced this shape?</p></div>
+      <div class="facet"><h5>2 · What problem</h5><p>What breaks without it?</p></div>
+      <div class="facet"><h5>3 · Alternatives</h5><p>What else could solve it?</p></div>
+      <div class="facet"><h5>4 · Why better</h5><p>Why win over the alternatives?</p></div>
+      <div class="facet"><h5>5 · Patterns</h5><p>Which GoF / architectural pattern?</p></div>
+      <div class="facet"><h5>6 · SOLID</h5><p>Which principle is at work?</p></div>
+      <div class="facet"><h5>7 · .NET features</h5><p>Language/runtime feature used?</p></div>
+      <div class="facet"><h5>8 · Package</h5><p>Which NuGet provides it?</p></div>
+      <div class="facet"><h5>9 · Docs</h5><p>Where is it documented?</p></div>
+      <div class="facet"><h5>10 · DIY</h5><p>How would I build it myself?</p></div>
+    </div>
+
+    <h3>The 17-point structure per major topic</h3>
+    <p>Big topics (Config, DI, BDD, POM, API, Reporting) are each presented as: <strong>purpose → problem → designer's thought process → architecture → patterns → SOLID → packages → key classes → execution flow → data flow → folder placement → how to extend → common mistakes → alternatives → trade-offs → docs → exercises</strong>, closing with a takeaway. You'll see these as headings, tables, and callouts rather than a rigid numbered list, so the doc stays readable.</p>
+
+    <div class="note mind">
+      <span class="tag">Designer's mind · the one idea that explains everything</span>
+      <p>If you keep one thing: <strong>a test is a pipeline that assembles state, then asserts on it — and the architecture is organised around who owns which state and for how long.</strong> Config is run-lived; the browser and the <code>ScenarioContextProperties</code> bag are scenario-lived; a page object is view-lived. Every decision — DI restraint, hooks, the page factory, cleanup, parallelism — falls out of managing those three lifetimes safely under 10 parallel workers.</p>
+    </div>
+  </section>
+
+  <!-- 01 -->
+  <section id="bigpicture">
+    <div class="kicker">Section 01</div>
+    <h2>The big picture</h2>
+    <p class="lead">Five assemblies, three lifetimes, one rule: dependencies point inward toward the domain, never outward toward the test.</p>
+
+    <h3>Layered architecture</h3>
+    <pre class="diagram">
+   ┌──────────────────────────────────────────────────────────────────┐
+   │  <b>SpecFlowTests</b>  (test host — .feature + infrastructure)            │
+   │  • *.feature (Gherkin)   • TestInfrastructure/ (hooks, config)      │
+   │  • reqnroll.json         • Cleanup/ · Xray · Jira · Browser         │
+   └───────────────┬───────────────────────────────┬──────────────────┘
+                   │ bindingAssemblies              │ orchestrates
+                   ▼                                ▼
+   ┌───────────────────────────────┐   ┌──────────────────────────────┐
+   │  <b>PageObjects</b>                 │   │  <b>TestCustomObjects</b>          │
+   │  *Steps.cs · *Page.cs         │◄──┤  per-customer overrides        │
+   │  Shared/ · ApiSteps/          │   │  [Scope(Feature=...)] bindings │
+   └───────┬───────────────┬───────┘   └──────────────────────────────┘
+           │ calls         │ builds payloads with
+           ▼               ▼
+   ┌───────────────┐   ┌──────────────────────────────────────────────┐
+   │  <b>CpqRestApi</b>    │──►│  <b>Models</b>  (DTOs · Helpers · Organization ·   │
+   │  ApiService   │   │         GuidedSelling.Web.Entities.dll)        │
+   └───────────────┘   └──────────────────────────────────────────────┘
+</pre>
+    <p class="cap">Fig 1 · Dependency direction. SpecFlowTests knows everyone; Models knows no-one. The domain DLL is the immutable centre.</p>
+
+    <h3>The mental model — how execution & data flow</h3>
+    <pre class="diagram">
+ EXECUTION (top-down)                 DATA (round-trip)
+ NUnit [Test]                         Feature step arg
+   → Reqnroll runtime                   → transform (placeholders → live values)
+     → match step regex                   → Step reads ScenarioContextProperties
+       → BoDi builds step class             → Page/Service acts on app
+         → step body                          → result returns
+           → Page/Service                       → written back to ScenarioContextProperties
+             → Playwright / HttpClient            → Assertion (.Should())
+</pre>
+
+    <div class="note mind">
+      <span class="tag">Designer's mind · why steps live with pages, not features</span>
+      <p>Step definitions are <strong>not</strong> in the test project — they sit in <code>PageObjects</code> next to the pages they drive, wired via <code>reqnroll.json → bindingAssemblies</code>. A step is glue between Gherkin and a page object, so it belongs beside the page, and the pair ships as one reusable library. This is what lets <code>TestCustomObjects</code> be a second binding assembly overriding behaviour per customer without touching core.</p>
+    </div>
+
+    <h3>The seven design qualities, and how each is achieved</h3>
+    <p>An analogy: think of the framework as a <em>factory line</em>. Config is the loading dock (materials in), the API layer stamps raw parts (test data), page objects are the assembly stations, steps are the work orders, and reporting is quality inspection at the end. Each station does one job and hands off cleanly — which is exactly what these qualities describe:</p>
+    <div class="facets three">
+      <div class="facet"><h5>Architecture</h5><p>Five assemblies in strict dependency order; the domain DLL at the centre.</p></div>
+      <div class="facet"><h5>Layering</h5><p>Gherkin → steps → pages/services → Playwright/HTTP → app. No layer skips another.</p></div>
+      <div class="facet"><h5>Separation of concerns</h5><p>UI mechanics on pages, transport in services, lifecycle in hooks, state in the context bag.</p></div>
+      <div class="facet"><h5>Maintainability</h5><p>A DOM change touches one <code>Selectors</code> class; an endpoint change touches one service.</p></div>
+      <div class="facet"><h5>Scalability</h5><p>10 parallel workers via per-scenario isolation + per-worker profiles; add capacity by adding profiles.</p></div>
+      <div class="facet"><h5>Testability</h5><p>API-first setup + fail-soft cleanup make each scenario independently runnable and repeatable.</p></div>
+      <div class="facet"><h5>Reusability</h5><p>Shared components, grid factories, and the <code>ApiService</code> base are written once and reused everywhere.</p></div>
+    </div>
+  </section>
+
+  <!-- 02 -->
+  <section id="topology">
+    <div class="kicker">Section 02</div>
+    <h2>Solution topology & folder rationale</h2>
+    <p class="lead">Why five projects? Because each has a different <em>reason to change</em> — Single Responsibility at assembly scale. And every folder answers four questions: why it exists, what belongs, what never, and what breaks without it.</p>
+
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Assembly</th><th>Owns</th><th>Reason to change</th><th>Depends on</th></tr></thead>
+      <tbody>
+        <tr><td><code>SpecFlowTests</code></td><td>.feature, hooks, config, Xray/Jira/cleanup</td><td>New tests; lifecycle behaviour</td><td>PageObjects, TestCustomObjects, Models</td></tr>
+        <tr><td><code>PageObjects</code></td><td>Steps + Pages + Shared + ApiSteps</td><td>UI changes in the app</td><td>CpqRestApi, Models</td></tr>
+        <tr><td><code>CpqRestApi</code></td><td><code>ApiService</code> + per-entity services + auth</td><td>REST API changes</td><td>Models</td></tr>
+        <tr><td><code>Models</code></td><td>DTOs, Helpers, Organization, ContextKeys, domain DLL</td><td>Data-shape changes</td><td>— (leaf)</td></tr>
+        <tr><td><code>TestCustomObjects</code></td><td>Per-customer overrides</td><td>A customer's DOM differs</td><td>PageObjects</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>Folder-by-folder: why it exists / what belongs / what never / what if absent</h3>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Folder</th><th>Why it exists</th><th>What belongs / never</th><th>If it didn't exist…</th></tr></thead>
+      <tbody>
+        <tr><td><code>SpecFlowTests/CoreCpqTests</code></td><td>Home for product-area feature files</td><td>Gherkin only / no C# logic</td><td>Features would scatter; no area grouping for filtering</td></tr>
+        <tr><td><code>TestInfrastructure/</code></td><td>Cross-cutting lifecycle & config</td><td>Hooks, config, Xray/Jira, cleanup / no page or step logic</td><td>Hooks would bloat; concerns would leak into steps</td></tr>
+        <tr><td><code>PageObjects/PageObjects/[Feature]</code></td><td>One folder per screen family</td><td><code>*Page.cs</code>+<code>*Steps.cs</code> / no HTTP, no config</td><td>Pages and steps would drift apart; reuse would collapse</td></tr>
+        <tr><td><code>Shared/ (Modal/Components/Entities)</code></td><td>Reusable UI building blocks</td><td>Widgets used by ≥2 pages / no page-specific logic</td><td>Table/modal code duplicated across every page</td></tr>
+        <tr><td><code>ApiSteps/</code></td><td>Data-setup bindings separate from UI bindings</td><td>"Api, I …" steps / no UI clicks</td><td>Setup and UI steps would tangle; slower tests</td></tr>
+        <tr><td><code>CpqRestApi/RestHelper</code></td><td>HTTP client layer</td><td>Services + auth / no Gherkin, no Playwright</td><td>Every step would hand-roll HTTP</td></tr>
+        <tr><td><code>Models/Helpers</code></td><td>Payload builders seeded from org settings</td><td><code>*Helper.CreateTest*</code> / no HTTP</td><td>Every ApiStep would assemble entity graphs by hand</td></tr>
+        <tr><td><code>TestCustomObjects/[Customer]</code></td><td>Isolate customer quirks</td><td>Subclassed pages + <code>[Scope]</code> steps / no core changes</td><td>Customer hacks would pollute the shared core</td></tr>
+        <tr><td><code>NonParallelizableFeatures/</code></td><td>Quarantine contended tests</td><td><code>[NonParallelizable]</code> partials / nothing else</td><td>Flaky failures under parallel CI load</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="note warn">
+      <span class="tag">Trade-off · two REST stacks + legacy Core</span>
+      <p><code>SpecFlowTests/Core/CpqApi</code> is an older <code>HttpWebRequest</code> stack with hard-coded creds — largely dead, superseded by <code>CpqRestApi</code>. Kept rather than deleted (debt). Use <code>CpqRestApi</code>; treat <code>Core/CpqApi</code> as archaeology.</p>
+    </div>
+  </section>
+
+  <!-- 03 -->
+  <section id="packages">
+    <div class="part">Part 1 · The Toolbox</div>
+    <div class="kicker">Section 03</div>
+    <h2>Every package explained</h2>
+    <p class="lead">For each NuGet: why it exists, the problem it solves, alternatives, why chosen, its key namespace/classes/methods used here, and how hard it'd be to build yourself.</p>
+
+    <h4>Reqnroll 3.3.0 (+ Reqnroll.NUnit)</h4>
+    <dl class="qa">
+      <dt>Problem it solves</dt><dd>Turns Gherkin (<code>.feature</code>) into runnable tests and routes each step line to a C# method. It is the SpecFlow successor (SpecFlow is EOL) — the choice was essentially forced by that migration.</dd>
+      <dt>Alternatives</dt><dd>SpecFlow (dead), raw NUnit/xUnit (no Gherkin), Cucumber (JVM/JS), LightBDD (fluent, not Gherkin-file based).</dd>
+      <dt>Key namespaces/classes</dt><dd><code>Reqnroll</code>: <code>[Binding]</code>, <code>[Given/When/Then]</code>, <code>ScenarioContext</code>, <code>FeatureContext</code>, <code>Table</code>, <code>[StepArgumentTransformation]</code>, <code>[Scope]</code>; <code>Reqnroll.BoDi.IObjectContainer</code> (DI); <code>ReqnrollOutputHelper</code> (attachments).</dd>
+      <dt>Build it yourself?</dt><dd>Very hard — you'd re-implement a Gherkin parser, a source generator that emits NUnit tests, a regex-based binding registry, and a DI container. This is the package you never rebuild.</dd>
+      <dt>Docs</dt><dd>docs.reqnroll.net — Bindings, Hooks, Context Injection, Configuration.</dd>
+    </dl>
+
+    <h4>Microsoft.Playwright 1.52.0</h4>
+    <dl class="qa">
+      <dt>Problem</dt><dd>Cross-browser automation with auto-waiting, network control, tracing, and isolated browser contexts.</dd>
+      <dt>Alternatives</dt><dd>Selenium WebDriver (older, flakier waits, no built-in trace), Cypress (JS-only), Puppeteer (Chromium-only).</dd>
+      <dt>Why chosen</dt><dd>Auto-waiting locators remove most explicit sleeps; <code>BrowserContext</code> gives cheap per-test isolation (crucial for 10× parallel); Trace Viewer + video for debugging.</dd>
+      <dt>Key classes/methods used</dt><dd><code>Playwright.CreateAsync</code>, <code>IBrowser.NewContextAsync</code>, <code>IPage.Locator/GotoAsync/ScreenshotAsync</code>, <code>ILocator.ClickAsync/Filter</code>, <code>WaitForLoadStateAsync</code>, <code>Tracing.Start/StopAsync</code>.</dd>
+      <dt>Build it yourself?</dt><dd>Impractical — it drives browsers over the DevTools/WebKit protocols.</dd>
+      <dt>Docs</dt><dd>playwright.dev/dotnet — Locators, Auto-waiting, Browser Contexts, Trace Viewer.</dd>
+    </dl>
+
+    <h4>NUnit 3 + Microsoft.NET.Test.Sdk 18 + NUnit3TestAdapter</h4>
+    <dl class="qa">
+      <dt>Problem</dt><dd>The actual test runner underneath Reqnroll — discovers tests, runs them in parallel, reports results to <code>dotnet test</code> / VSTest.</dd>
+      <dt>Why NUnit</dt><dd>Its parallelism model (<code>[Parallelizable(ParallelScope.Fixtures)]</code>, <code>[LevelOfParallelism]</code>, <code>[NonParallelizable]</code>) is the most mature — and it's what <code>reqnroll.json</code>'s <code>unitTestProvider</code> targets.</dd>
+      <dt>Key APIs used</dt><dd><code>TestContext.AddTestAttachment</code> (evidence), the assembly-level parallelism attributes, <code>Assert.Warn</code> (fail-soft cleanup).</dd>
+      <dt>Docs</dt><dd>docs.nunit.org — Attributes → Parallelizable; framework-parallel-tests.</dd>
+    </dl>
+
+    <h4>Microsoft.Extensions.Configuration (+ .Json, .Binder, .EnvironmentVariables)</h4>
+    <dl class="qa">
+      <dt>Problem</dt><dd>Load layered settings (JSON + env vars) and bind sections to POCOs.</dd>
+      <dt>Alternatives</dt><dd>Raw <code>File.ReadAllText</code>+<code>JsonConvert</code> (no layering/env-override), <code>System.Configuration</code> (legacy XML).</dd>
+      <dt>Key APIs</dt><dd><code>ConfigurationBuilder</code>, <code>AddJsonFile</code>, <code>AddEnvironmentVariables</code>, <code>IConfiguration.Bind</code>.</dd>
+      <dt>Build it yourself?</dt><dd>Easy for one file; hard to match provider ordering + binding cleanly. Use the platform.</dd>
+      <dt>Docs</dt><dd>learn.microsoft.com → Fundamentals → Configuration.</dd>
+    </dl>
+
+    <h4>Newtonsoft.Json 13.0.4</h4>
+    <dl class="qa">
+      <dt>Problem</dt><dd>Serialize request bodies and deserialize responses (and the auth token) across the API layer and Models.</dd>
+      <dt>Alternatives</dt><dd><code>System.Text.Json</code> (faster, built-in). Newtonsoft chosen for <code>JObject</code>/<code>JArray</code> dynamic patching (<code>UpdateQuoteProductWithCustomProperties</code>, <code>BulkUpdateAsync</code>'s change envelope) and legacy <code>TypeNameHandling</code> in the old stack.</dd>
+      <dt>Key APIs</dt><dd><code>JsonConvert.SerializeObject</code>, <code>JsonTextReader</code>+<code>JsonSerializer</code> with <code>NullValueHandling.Ignore</code>, <code>JObject/JArray/JToken.ToObject&lt;T&gt;()</code>.</dd>
+      <dt>Docs</dt><dd>newtonsoft.com/json — Serialization settings; LINQ-to-JSON.</dd>
+    </dl>
+
+    <h4>AwesomeAssertions 9.3 (+ FluentAssertions 8.8 in PageObjects)</h4>
+    <dl class="qa">
+      <dt>Problem</dt><dd>Readable, chainable assertions with good failure messages (<code>value.Should().Be(...)</code>, <code>.Should().MatchRegex(...)</code>).</dd>
+      <dt>Why AwesomeAssertions</dt><dd>A community fork of FluentAssertions created after FA's licence change — same fluent API, permissive licence. The framework standardises on it (FA lingers only in PageObjects — converge later).</dd>
+      <dt>Alternatives</dt><dd>Built-in NUnit <code>Assert.That</code> + constraints (less fluent), Shouldly.</dd>
+    </dl>
+
+    <h4>Expressium.LivingDoc.ReqnrollPlugin 1.1.6</h4>
+    <dl class="qa">
+      <dt>Problem</dt><dd>Generate a human-readable "living documentation" HTML report of executed features (SpecFlow's old LivingDoc replacement).</dd>
+      <dt>Wired via</dt><dd><code>reqnroll.json → formatters</code> (<code>html</code> + <code>expressium</code> ndjson) into <code>Results/</code>.</dd>
+    </dl>
+
+    <h4>protobuf-net.Core 3.2.56 · GuidedSelling.Web.Entities.dll</h4>
+    <dl class="qa">
+      <dt>protobuf-net</dt><dd>Transitively needed by the domain entities (protobuf attributes on the CPQ models) — you rarely touch it directly.</dd>
+      <dt>The domain DLL</dt><dd>A referenced binary supplying <code>Quote</code>, <code>Basket</code>, <code>PriceAgreement</code>, <code>Product</code>, <code>Organization</code>, etc. It is the shared vocabulary between the app, the API layer, and the tests — every project references it; it references nothing. This is why test entities exactly match production shapes: <strong>one source of truth for data, reused rather than re-declared.</strong></dd>
+    </dl>
+  </section>
+
+  <!-- 04 -->
+  <section id="provenance">
+    <div class="kicker">Section 04</div>
+    <h2>Where the code most likely came from</h2>
+    <p class="lead">Experienced authors rarely invent from zero — they lift a documented recipe and harden it. Recognising the origin tells you which docs to read to master each piece.</p>
+
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Framework piece</th><th>Origin</th><th>How it evolved into production code</th></tr></thead>
+      <tbody>
+        <tr><td><code>AppConfiguration</code> loader</td><td>Microsoft config docs, verbatim recipe</td><td>Added lazy static cache (<code>field</code> keyword) + two-file split so tests don't rebuild config per read.</td></tr>
+        <tr><td>Static <code>HttpClient</code> in <code>ApiService</code></td><td>MS "HttpClient guidelines" (avoid per-call sockets)</td><td>Wrapped in typed verb helpers (<code>PostAsJsonAsync&lt;TIn,TOut&gt;</code>) + auth header injection.</td></tr>
+        <tr><td>Playwright setup + settle</td><td>playwright.dev quick-start + waiting docs</td><td>Centralised in <code>BrowserSetupConfiguration</code>; the settle helper composes multiple wait states + app-specific spinner/modal waits + try/catch.</td></tr>
+        <tr><td>Page Object Model</td><td>Playwright/Selenium POM guidance</td><td>Added self-validating constructors and fluent "return next page" navigation — beyond the docs' basic example.</td></tr>
+        <tr><td>BoDi context injection</td><td>Reqnroll "Context Injection" docs</td><td>Restrained to browser instances only; page-state moved to a typed context bag.</td></tr>
+        <tr><td>Factories & Template Method</td><td>Gang-of-Four patterns</td><td><code>PropertyCellFactory</code>/<code>EntityTableFactory</code> and <code>ApiService</code> base applied to real CPQ variability.</td></tr>
+        <tr><td>Xray Cucumber upload</td><td>Xray Cloud REST API docs (import/execution/cucumber/multipart)</td><td>Built <code>CucumberStep</code> collection in hooks + <code>SemaphoreSlim</code>-serialised uploads.</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="note mind">
+      <span class="tag">Designer's mind · the "documentation → production" transformation</span>
+      <p>The pattern repeats: take the docs' happy-path snippet, then add the three things docs omit — <strong>lifetime management</strong> (cache/dispose), <strong>failure tolerance</strong> (try/catch, fail-soft), and <strong>variability</strong> (factory/override seams for the messy real world). Learn to spot "this is the docs example, hardened" and you can read any framework fast.</p>
+    </div>
+  </section>
+
+  <!-- 05 -->
+  <section id="readingdocs">
+    <div class="kicker">Section 05</div>
+    <h2>How to read official documentation like a framework author</h2>
+    <p class="lead">The skill that frees you from tutorials: extract architecture from reference docs. On every docs page, hunt three things and ignore the rest.</p>
+
+    <div class="facets three">
+      <div class="facet"><h5>Hunt 1 · Lifetime</h5><p>The lifecycle/disposal section tells you what to create once vs. per-use (<code>HttpClient</code> static; browser per scenario).</p></div>
+      <div class="facet"><h5>Hunt 2 · Extension points</h5><p>Interfaces, <code>virtual</code>/<code>override</code> hooks, attributes — where <em>your</em> code plugs in (<code>ITestCleanupAction</code>, <code>[StepArgumentTransformation]</code>).</p></div>
+      <div class="facet"><h5>Hunt 3 · Thread safety</h5><p>Concurrency notes decide your parallelism model (<code>ScenarioContext</code> scenario-confined; counters need <code>Interlocked</code>).</p></div>
+    </div>
+
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>To master…</th><th>Start here</th><th>Study</th><th>Ignore</th></tr></thead>
+      <tbody>
+        <tr><td>Reqnroll</td><td>docs.reqnroll.net → Bindings</td><td>Hooks, Context Injection, Step Argument Conversions, <code>reqnroll.json</code></td><td>SpecFlow-migration pages</td></tr>
+        <tr><td>Playwright</td><td>playwright.dev/dotnet → Locators</td><td>Auto-waiting, Browser Contexts, Trace Viewer, Assertions</td><td>Codegen/inspector demos</td></tr>
+        <tr><td>.NET config</td><td>learn.microsoft.com → Configuration</td><td>Provider order, Binder, env-var provider</td><td>Azure App Configuration (unless used)</td></tr>
+        <tr><td>HttpClient</td><td>learn.microsoft.com → HttpClient guidelines</td><td>Static/shared instance, <code>SendAsync</code>, socket exhaustion</td><td><code>WebClient</code>/<code>HttpWebRequest</code> (legacy)</td></tr>
+        <tr><td>NUnit parallel</td><td>docs.nunit.org → Parallelizable</td><td><code>LevelOfParallelism</code>, fixture scope, <code>NonParallelizable</code></td><td>Legacy NUnit 2 syntax</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="note good">
+      <span class="tag">Good practice · production vs. demo APIs</span>
+      <p>Docs mix "you'll use this daily" with "cute demo." Production Playwright is <code>Locator</code> + auto-wait; the demo is <code>WaitForSelector</code>+sleep. Production Reqnroll is constructor injection + <code>ScenarioContext</code>; the demo is <code>ScenarioContext.Current</code> (which breaks under parallel — never use it). This framework already made those calls; mirror them.</p>
+    </div>
+  </section>
+
+  <!-- 06 -->
+  <section id="config">
+    <div class="part">Part 2 · The Core Engine</div>
+    <div class="kicker">Section 06</div>
+    <h2>Configuration layer</h2>
+    <p class="lead">One job: turn flat JSON + env vars into a resolved, per-worker target URL and credentials — without leaking CI secrets into code.</p>
+
+    <div class="facets">
+      <div class="facet"><h5>Purpose</h5><p>Centralise all environment-dependent values behind one loader.</p></div>
+      <div class="facet"><h5>Problem</h5><p>Same tests, many envs (dev/test/stage) and orgs, with CI overriding without a rebuild.</p></div>
+      <div class="facet"><h5>Pattern / SOLID</h5><p>Layered provider + lazy cache + typed binding · SRP (config isolated from tests).</p></div>
+      <div class="facet"><h5>Packages / .NET</h5><p>Microsoft.Extensions.Configuration.* · C# 13 <code>field</code> keyword; expression-bodied members.</p></div>
+    </div>
+
+    <pre><code>// SpecFlowTests/TestInfrastructure/AppConfiguration.cs
+public static IConfiguration AppSettingsConfiguration =>
+    field ??= GetAppConfiguration("appsettings.json");     // lazy static cache
+
+private static IConfiguration GetAppConfiguration(string configName) =>
+    new ConfigurationBuilder()
+        .SetBasePath(Directory.GetCurrentDirectory())
+        .AddJsonFile(configName)
+        .AddEnvironmentVariables()      // ← last provider wins → CI overrides JSON
+        .Build();</code></pre>
+
+    <div class="note mind">
+      <span class="tag">Designer's mind · why env vars come last</span>
+      <p>Provider order = precedence. JSON gives local defaults; the env layer lets Azure's <code>FileTransform</code>/variables override <code>RunMode</code>, <code>Headless</code>, <code>Xray.*</code> at runtime. Straight from the MS recipe — <em>use the platform's config system, don't rebuild it.</em></p>
+    </div>
+
+    <h3>Execution & data flow: URL resolution</h3>
+    <pre class="diagram">
+ RunMode="stage"        org.Url="autotestspecflowui.vendavocpq.com"
+      │                       │
+      ▼  UrlHelper.BuildUrl:  "cpqstage-" + org.Url
+      ▼
+ org.FullUrl = "https://cpqstage-autotestspecflowui.vendavocpq.com"
+      ▼  (OrganizationResolver sets it; allocates a per-worker Profile)
+ Playwright BaseURL + REST base + login credentials
+</pre>
+    <p><code>UrlHelper</code> maps <code>RunMode</code>→a <code>Version</code> enum→prefix; <code>OrgHelper.GetOrganization</code> binds the <code>Organizations</code> section to <code>List&lt;Organization&gt;</code> (case-insensitive match, throws if missing); <code>OrganizationResolver</code> combines them and allocates a distinct <code>Profile</code> per worker for parallel safety.</p>
+
+    <h4>How to extend · common mistakes · exercise</h4>
+    <ul>
+      <li><strong>Extend:</strong> new setting → add to <code>appsettings.json</code>, read via <code>AppConfiguration.AppSettingsConfiguration["Key"]</code> or bind a POCO.</li>
+      <li><strong>Mistake:</strong> reading <code>Directory.GetCurrentDirectory()</code>-relative files that aren't copied to output — the <code>.csproj</code> must <code>CopyToOutputDirectory</code> them (it does for both JSON files).</li>
+      <li><strong>Exercise:</strong> add a <code>SlowMoOverride</code> key and thread it into <code>BrowserSetupConfiguration</code> without touching any step.</li>
+    </ul>
+
+    <div class="note pit">
+      <span class="tag">Watch-out · secrets in the repo</span>
+      <p>Real Xray secret, Jira token, and org passwords are committed in plaintext. The env-var layer already supports overrides — move secrets to pipeline secret variables / a key vault and delete them from tracked files. Highest-priority hygiene fix.</p>
+    </div>
+  </section>
+
+  <!-- 07 -->
+  <section id="di">
+    <div class="kicker">Section 07</div>
+    <h2>Dependency injection (BoDi)</h2>
+    <p class="lead">Reqnroll ships a tiny IoC container — BoDi. This framework uses it deliberately sparingly; understanding <em>where it stops</em> is the lesson.</p>
+
+    <pre><code>// TestHooks.RegisterDependencies — the ONLY registration site
+container.RegisterInstanceAs(playwright);   // IPlaywright
+container.RegisterInstanceAs(browser);      // IBrowser
+container.RegisterInstanceAs(page);         // IPage
+context.Set(page, ContextKeys.BrowserPage);
+context.Set(new LoginPage(page), ContextKeys.CurrentPage);   // first view = login
+context.Add(ContextKeys.BaseUrl, organization.FullUrl);
+context.Add(ContextKeys.BrowserContext, browserContext);</code></pre>
+
+    <div class="note mind">
+      <span class="tag">Designer's mind · why page objects are NOT in the container</span>
+      <p>A page object represents "the screen you're on" — <em>runtime state</em>, not a static dependency. You can't know at registration time whether the user is on Basket or Quote. So pages stay out of DI; the <em>current</em> page lives in <code>ScenarioContext</code> under <code>CurrentPage</code>, swapped by a factory (<code>UpdateCurrentPage()</code>) after each navigation. DI holds what lives for the scenario (browser); the context holds what changes (view). Two lifetimes, two mechanisms.</p>
+    </div>
+
+    <dl class="qa">
+      <dt>How steps receive dependencies</dt><dd>Constructor injection only: <code>public sealed class BasketPageSteps(ScenarioContext ctx) : StepsBase(ctx)</code>. Reqnroll resolves <code>ScenarioContext</code> (and hook params like <code>IObjectContainer</code>, <code>IPage</code>, <code>ReqnrollOutputHelper</code>) from BoDi.</dd>
+      <dt>Alternatives</dt><dd>Microsoft.Extensions.DependencyInjection via a Reqnroll plugin (heavier), or manual singletons (loses scenario scoping). BoDi is right-sized for scenario lifetime.</dd>
+      <dt>Why inheritance here (StepsBase)</dt><dd>Every step needs the same typed context accessors — pushing them to a base class is DRY and gives one place to change context access. Composition would mean each step holds a helper field; inheritance is lighter for this ubiquitous, uniform need.</dd>
+    </dl>
+  </section>
+
+  <!-- 08 -->
+  <section id="lifecycle">
+    <div class="kicker">Section 08</div>
+    <h2>Test lifecycle — the hooks</h2>
+    <p class="lead"><code>TestHooks.cs</code> is the conductor. Four scopes (run / scenario / step) where every cross-cutting concern is bolted onto the test.</p>
+
+    <pre class="diagram">
+<b>[BeforeTestRun]</b> (once, static)  load config ─► OrganizationResolver.Init ─► delete artifacts ─► (opt) create Xray execution
+   ┌──────────────── per scenario ×10 parallel ────────────────┐
+   │ <b>[BeforeScenario]</b> resolve org ─► allocate worker profile   │
+   │   context.Add(ScenarioContextProperties)                   │
+   │   SetupPlaywrightAsync ─► RegisterDependencies ─► navigate  │
+   │   for each step: <b>[BeforeStep]</b> ─► BODY ─► <b>[AfterStep]</b>     │
+   │      → collect CucumberStep{keyword,text,status,dur,error}  │
+   │ <b>[AfterScenario]</b> HandleTestResult ─► (fail) screenshot+trace│
+   │   attach evidence ─► (tag) Jira bug ─► (on) Xray upload      │
+   │   ExecuteCleanupActions ─► browser.Close ─► playwright.Dispose│
+   └────────────────────────────────────────────────────────────┘
+<b>[AfterTestRun]</b> Xray summary (uploaded/failed/skipped)
+</pre>
+    <p class="cap">Fig 3 · Reqnroll creates one <code>TestHooks</code> instance per scenario — static fields hold run state, instance fields hold scenario state. That's why it's parallel-safe.</p>
+
+    <div class="note mind">
+      <span class="tag">Designer's mind · reporting is a side effect, never a gate</span>
+      <p>Every Xray/Jira call is wrapped in try/catch so a flaky reporting API can't fail a passing test. Counters use <code>Interlocked</code> because ten workers report concurrently. <strong>Observability must degrade silently, not take the run down.</strong></p>
+    </div>
+    <div class="note good">
+      <span class="tag">Good practice · deterministic teardown</span>
+      <p>Browser created in <code>BeforeScenario</code>, disposed in <code>AfterScenario</code> (<code>browser.CloseAsync()</code> → <code>playwright.Dispose()</code>). One full stack per scenario = zero shared browser state. Isolation by construction beats isolation by discipline.</p>
+    </div>
+  </section>
+
+  <!-- 09 -->
+  <section id="browser">
+    <div class="kicker">Section 09</div>
+    <h2>Browser lifecycle</h2>
+    <p class="lead">All Playwright creation is centralised in <code>BrowserSetupConfiguration.cs</code> so no page or step ever launches a browser.</p>
+
+    <pre><code>var playwright     = await Playwright.CreateAsync();
+var browser        = await LaunchBrowserAsync(playwright, launchOptions);  // chromium/firefox/webkit switch
+var browserContext = await browser.NewContextAsync(contextOptions);        // BaseURL, ReducedMotion, video
+ConfigureBrowserTimeouts(browserContext);
+var page           = await browserContext.NewPageAsync();
+await SetViewPortIfNeededAsync(page);
+return (playwright, browser, browserContext, page);</code></pre>
+
+    <div class="note mind">
+      <span class="tag">Designer's mind · the settle helper is the framework's heartbeat</span>
+      <p><code>PlaywrightExtensions.WaitForLoadingAsync()</code> runs after almost every click: waits <code>NetworkIdle</code>+<code>DOMContentLoaded</code>+<code>Load</code>, then for spinners (<code>.fa-cog</code>) and modal backdrops (<code>.modal-backdrop.fade</code>) to hide, then <code>body.modal-open</code> to detach — all in <code>try/catch{}</code>. It swallows errors because a settle helper that <em>throws</em> turns every timing blip into a failure; its job is to wait as much as possible, not to assert. The most important 20 lines in the framework, and why the suite survives a flaky SPA at 10× parallel.</p>
+    </div>
+    <p><strong>Extension methods, why:</strong> <code>ClickAndWaitForLoadingAsync</code>/<code>WaitForLoadingAsync</code> are extension methods on <code>IPage</code> — you can't modify Playwright's sealed types, and an extension reads like a native call (<code>page.WaitForLoadingAsync()</code>) while living in your code. That's exactly when extension methods are the right tool: adding verbs to a type you don't own.</p>
+  </section>
+
+  <!-- 10 -->
+  <section id="feature">
+    <div class="part">Part 3 · The BDD Layer</div>
+    <div class="kicker">Section 10</div>
+    <h2>Feature files + the pattern catalogue</h2>
+    <p class="lead">The Gherkin follows a deliberate house style. Learn the grammar and the recurring patterns once, and every feature reads the same way.</p>
+
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Convention</th><th>Rule</th></tr></thead>
+      <tbody>
+        <tr><td>Requirement tag</td><td>Line 1: <code>@REQ_CPD-XXXXX</code> (feature → Jira story)</td></tr>
+        <tr><td>Test tag</td><td>Each scenario: <code>@TEST_CPD-XXXXX</code> (→ Xray). No tag ⇒ skipped from upload by design (Xray never auto-creates tests)</td></tr>
+        <tr><td>Feature name</td><td><code>Area_SubArea_Group</code> e.g. <code>Quote_Basket_AddConfiguration</code></td></tr>
+        <tr><td>Suite selectors</td><td><code>@smoke @sanity @CPQ_Regression @CPQ_Automation_Xray</code> + area tags</td></tr>
+        <tr><td>Step grammar</td><td><strong>PageName-prefixed, first person:</strong> <code>Basket, I click on "Submit" button</code></td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="note mind">
+      <span class="tag">Designer's mind · why "Basket, I …" not "I …"</span>
+      <p>The <code>PageName,</code> prefix is a <strong>namespace for steps</strong>. With hundreds of steps, plain <code>I click "Submit"</code> collides everywhere and is ambiguous to Reqnroll's matcher. Prefixing turns the sentence into a self-documenting, collision-resistant routing key — a naming convention doing the work a heavier step-scoping mechanism would need.</p>
+    </div>
+
+    <h3>The recurring feature-file patterns</h3>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Pattern</th><th>Shape</th><th>When</th></tr></thead>
+      <tbody>
+        <tr><td>Login</td><td><code>Given Login, I log in</code></td><td>Nearly every UI scenario (shared reusable Given)</td></tr>
+        <tr><td>API data-setup</td><td><code>Given Api, I create new Quote with following values:</code> + table</td><td>Any expensive precondition — build via REST, not clicks</td></tr>
+        <tr><td>Navigation</td><td><code>And SideMenu, I navigate to Quotes</code></td><td>Move between screens; returns the next page</td></tr>
+        <tr><td>CRUD create</td><td><code>When Quotes, I click Create ... Then I verify screen title is "..."</code></td><td>New-entity flows</td></tr>
+        <tr><td>Search</td><td><code>When Quotes, I search "CurrentQuote"</code></td><td>Find-by-live-value (placeholder resolved)</td></tr>
+        <tr><td>Data-driven</td><td>Scenario Outline + <code>Examples:</code> (Quantity/Discount%/Amount)</td><td>One behaviour, ≥2 parametric variants</td></tr>
+        <tr><td>Table assertion</td><td><code>Then Basket, I verify the following values are displayed for Configuration "Guitars":</code></td><td>Grid verification (shared reusable Then)</td></tr>
+        <tr><td>Background</td><td><code>Background: Given Login ... And SideMenu, I navigate to AdminConsole</code></td><td>Shared setup across a whole feature (AdminConsole)</td></tr>
+      </tbody>
+    </table></div>
+
+    <pre><code>@TEST_CPD-30087 @CPQ_Automation_Xray @CPQ_Regression @Quote @Quote_Workflow @smoke @sanity
+Scenario: Quote_Create_New_Quote
+    Given Login, I log in
+    And SideMenu, I navigate to Quotes
+    When Quotes, I click on Create Quote Button
+    Then I verify that screen title is "Customer and Pricing"
+    When Account, I fill following Customer and Pricing values
+        | Team             | Price Level | Currency |
+        | Registered Users | MSRP        | USD      |</code></pre>
+
+    <div class="note good">
+      <span class="tag">Good practice · API-first setup, Background sparingly</span>
+      <p>Preconditions are POSTed, not clicked. Background is used only where the whole feature shares setup (AdminConsole); Quote features repeat login per scenario to keep each scenario independently runnable (isolation &gt; DRY). House rule (CLAUDE.md): <em>no blank line between the outline and its <code>Examples:</code> table.</em></p>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section id="reqnroll">
+    <div class="kicker">Section 11</div>
+    <h2>How Reqnroll executes a scenario</h2>
+    <p class="lead">How does one Gherkin line find the one C# method that runs it? Here's the machinery — compile time and run time.</p>
+
+    <pre class="diagram">
+ <b>BUILD TIME</b>
+   *.feature ──► Reqnroll generator ──► *.feature.cs  (one NUnit [Test] per scenario)
+                 reads reqnroll.json: unitTestProvider=NUnit, bindingAssemblies
+ <b>RUN TIME</b>
+   NUnit runs [Test] ──► Reqnroll runtime
+        │ builds the <b>binding registry</b> ONCE: reflect over bindingAssemblies,
+        │ find [Binding] classes, index every [Given]/[When]/[Then] regex
+        ▼ per step line:
+        match text vs indexed regexes ──► exactly one?  0→"no match"  2+→"ambiguous"
+        resolve binding class from BoDi (ctor gets ScenarioContext)
+        bind captured groups + run transformations ──► method params
+        invoke async method ──► pass/fail
+</pre>
+    <p class="cap">Fig 4 · The generator makes NUnit tests at build; the runtime does regex routing at execution. Reflection runs <em>once</em> to build the registry, not per step.</p>
+
+    <div class="note mind">
+      <span class="tag">Designer's mind · "why does only the current step run?"</span>
+      <p>Reqnroll doesn't scan all definitions each line. At startup it builds an in-memory index <em>(regex → method)</em> from the binding assemblies; each step is matched against that index and the runtime enforces <strong>exactly-one</strong> — zero or two-plus matches are hard errors. This is why <code>PageName,</code> prefixes + <code>^…$</code> anchoring + alternation groups matter: they keep every regex unambiguous. Duplicates are resolved by naming discipline and, for customers, <code>[Scope]</code>. Performance is fine because matching is a dictionary/regex scan over a fixed index, and reflection is amortised to once.</p>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section id="matching">
+    <div class="kicker">Section 12</div>
+    <h2>Step matching internals — all the binding types</h2>
+    <p class="lead">Every way Reqnroll turns text and table data into typed method parameters, and how this framework uses each.</p>
+
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Binding</th><th>Mechanism</th><th>Used here?</th></tr></thead>
+      <tbody>
+        <tr><td>Attribute matching</td><td><code>[Given/When/Then("regex")]</code> indexed at startup</td><td>Yes — the core routing</td></tr>
+        <tr><td>Regular expressions</td><td><code>^…$</code>-anchored, alternation to constrain args: <code>"(Save|Submit|Reprice)"</code></td><td>Yes — the chosen style (<code>AsyncRegexAttribute</code>)</td></tr>
+        <tr><td>Cucumber Expressions</td><td><code>{string}</code>/<code>{int}</code> params</td><td>No — regex preferred for tight constraints</td></tr>
+        <tr><td>Parameter binding</td><td>Capture groups → method args by position + type-convert</td><td>Yes — <code>string button</code>, <code>int qty</code></td></tr>
+        <tr><td>DataTable binding</td><td><code>Table</code> param: <code>table.Rows/.Header</code> (UI) or <code>table.CreateInstance&lt;T&gt;()</code> (API)</td><td>Yes — heavily; API steps also <code>ValidateAgainstObjectProperties&lt;T&gt;()</code></td></tr>
+        <tr><td>DocString binding</td><td>Triple-quoted block → <code>string</code> param</td><td>Rare — most payloads come from tables/helpers</td></tr>
+        <tr><td>Enum binding</td><td>Reqnroll parses a string arg into an enum</td><td>Not used — regex alternation of allowed strings instead</td></tr>
+        <tr><td>Custom transformations</td><td><code>[StepArgumentTransformation]</code> preprocesses args</td><td>Yes — booleans, dates, placeholder resolution</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>The custom transformations (StepArgumentTransformation.cs)</h3>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Transform</th><th>Turns…</th><th>Into…</th></tr></thead>
+      <tbody>
+        <tr><td><code>(is|is not)</code>, <code>(are|are not)</code></td><td>a phrase</td><td><code>bool</code></td></tr>
+        <tr><td><code>TODAY_OFFSET_BY(n)</code></td><td>a token</td><td><code>DateTime</code> in session timezone</td></tr>
+        <tr><td>whole-<code>Table</code></td><td>every cell</td><td>placeholder-resolved cell</td></tr>
+        <tr><td>catch-all <code>(.+)</code></td><td>any quoted arg</td><td>placeholder-resolved string</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note mind">
+      <span class="tag">Designer's mind · placeholders = late-binding to live data</span>
+      <p>A quote number is generated at runtime, so a feature can't hard-code it. The catch-all transform resolves tokens like <code>CurrentQuote</code>, <code>CurrentQuoteNumber</code>, <code>CurrentPriceAgreement</code>, <code>CurrentUserName</code> against <code>ScenarioContextProperties</code> the moment the step runs (via <code>CurrentObjectTransformationValueCheck</code>). A tiny template engine bolted onto the argument pipeline — the reason features stay declarative.</p>
+    </div>
+  </section>
+
+  <!-- 13 -->
+  <section id="steps">
+    <div class="kicker">Section 13</div>
+    <h2>Step definitions</h2>
+    <p class="lead">Steps are glue and nothing more: translate a sentence into a page/service call and update context. No business logic, no locators, no substantive assertions in the step itself.</p>
+
+    <pre><code>[Binding]
+public sealed class ConfigureSteps(ScenarioContext scenarioContext) : StepsBase(scenarioContext)
+{
+    private ConfigurePage ConfigurePage => (ConfigurePage)CurrentPage;
+
+    [When(@"Configure, I add the products to Quote")]
+    [When(@"Configure, I add the products to Price Agreement")]   // 2 phrasings, 1 method
+    public async Task WhenIAddTheProductsToBasket()
+    {
+        await ConfigurePage.AddToBasket();   // delegate to the page
+        await UpdateCurrentPage();           // re-derive the view after navigation
+    }
+}</code></pre>
+
+    <dl class="qa">
+      <dt>Why business logic is avoided here</dt><dd>A step is a translation layer. Logic in steps can't be reused by other steps and hides behind Gherkin, where it's untestable and undiscoverable. Behaviour belongs on the page (UI) or service (API); the step only orchestrates.</dd>
+      <dt>Why page objects are called (not raw Playwright)</dt><dd>So selectors and waits live in one place per screen — change the DOM once, not in every step.</dd>
+      <dt>Why API calls may appear in steps</dt><dd>Only in <code>ApiSteps/</code>, for data setup — and even then they delegate to a <code>*Service</code>, never issue raw HTTP.</dd>
+      <dt>Responsibilities that belong here</dt><dd>Cast <code>CurrentPage</code>, call one page/service method, refresh via <code>UpdateCurrentPage()</code>, occasionally branch on a returned modal type, store created entities.</dd>
+    </dl>
+  </section>
+
+  <!-- 14 -->
+  <section id="context">
+    <div class="kicker">Section 14</div>
+    <h2>ScenarioContext — deep dive & debugging</h2>
+    <p class="lead">The spine of the run. Where it's created, how long it lives, how it's injected, how state flows, how to debug it, and the mistakes to avoid.</p>
+
+    <dl class="qa">
+      <dt>What / why</dt><dd>A scenario-scoped key/value bag Reqnroll provides so independent step methods can share state (step 5 sees the quote created in step 1).</dd>
+      <dt>Where created / how long it lives / disposal</dt><dd>Reqnroll creates it before the first step and disposes it after the last — lifetime = exactly one scenario. Nothing survives into the next scenario (which is what isolation demands).</dd>
+      <dt>How injected</dt><dd>Via constructor injection into every <code>[Binding]</code> class (and hook methods) by BoDi.</dd>
+      <dt>Thread safety / parallel</dt><dd>Confined to one scenario ⇒ effectively single-threaded for ordinary reads/writes; no locking needed except genuine cross-thread touch-points (<code>AddCreatedEntity</code> lock, run-wide <code>Interlocked</code> counters).</dd>
+    </dl>
+
+    <h3>This framework's refinement: one typed carrier, not many keys</h3>
+    <pre class="diagram">
+ ScenarioContext (Reqnroll, scenario-scoped)  — keyed by ContextKeys constants (no magic strings)
+   ├── BrowserPage            → IPage
+   ├── BrowserContext         → IBrowserContext
+   ├── CurrentPage            → PageObjectBase   (current view; swapped by the factory)
+   ├── BaseUrl                → string
+   └── <b>ScenarioContextProperties</b> → ONE typed bag holding everything else:
+          Organization, CreatedEntities (drives cleanup), CurrentQuote, CurrentBasket,
+          CurrentPriceAgreement, CurrentSmartCatalog, UserSession, UpdatedApplicationSettings ...
+</pre>
+
+    <div class="note mind">
+      <span class="tag">Designer's mind · typed bag beats loose Get/Set&lt;T&gt; everywhere</span>
+      <p>The naïve way sprays <code>Set(quote,"quote")</code>/<code>Get&lt;Quote&gt;("quote")</code> across steps — stringly-typed, un-discoverable, refactor-hostile. Instead one <code>ScenarioContextProperties</code> object is stored and its typed properties mutated: <code>ScenarioContextProperties.CurrentQuote = quote;</code>. Benefits: IntelliSense, compile-time safety, one place to see all scenario state, a natural home for <code>CreatedEntities</code>. All raw <code>Get/Set</code> is hidden in <code>StepsBase</code> (the Facade) — no step touches the context API directly.</p>
+    </div>
+
+    <pre><code>// PageObjects/StepsBase.cs — the facade every step inherits
+protected PageObjectBase CurrentPage {
+    get => CurrentContext.Get&lt;PageObjectBase&gt;(ContextKeys.CurrentPage);
+    set => CurrentContext.Set(value, ContextKeys.CurrentPage);
+}
+protected ScenarioContextProperties ScenarioContextProperties =>
+    CurrentContext.Get&lt;ScenarioContextProperties&gt;(ContextKeys.ScenarioContextProperties);</code></pre>
+
+    <h3>How to debug / visualize what's stored</h3>
+    <ul>
+      <li><strong>Inspect the bag:</strong> set a breakpoint in any step and expand <code>ScenarioContextProperties</code> — one object shows the entire scenario state (a direct payoff of the single-carrier design).</li>
+      <li><strong>Dump on failure:</strong> in <code>AfterScenario</code> you can serialise <code>ScenarioContextProperties</code> to the attached output for post-mortem (the hook already has the context).</li>
+      <li><strong>Placeholder not resolving?</strong> The value wasn't set — check the create-step actually assigned <code>Current*</code>. The transform reads what's there; it can't invent a value.</li>
+    </ul>
+    <div class="note pit">
+      <span class="tag">Common mistakes</span>
+      <p>① Using <code>ScenarioContext.Current</code> — a static that breaks under parallel; always inject. ② Expecting <code>FeatureContext</code> to carry data — it isn't used here; scenario-scoped only. ③ Forgetting <code>AddCreatedEntity</code> after a create — the entity then leaks past cleanup. ④ Storing raw values under ad-hoc string keys instead of a typed property on the bag.</p>
+    </div>
+  </section>
+
+  <!-- 15 -->
+  <section id="pom">
+    <div class="part">Part 4 · The UI Layer</div>
+    <div class="kicker">Section 15</div>
+    <h2>Page Object Model & the Base Page</h2>
+    <p class="lead">Pages encapsulate <em>how</em> to drive a screen so steps stay declarative. Two signature moves: self-validating constructors and fluent navigation returning the next page.</p>
+
+    <pre><code>// PageObjects/PageObjectBase.cs — primary ctor takes the Playwright page
+public partial class PageObjectBase(IPage page)
+{
+    public IPage CurrentPage { get; set; } = page;
+    public SideMenuComponent SideMenu { get; } = new(page);   // composed onto EVERY page
+
+    protected void VerifyPageObjectUrlAndState(string pageObjectName)
+    {   // asserts URL matches the page — called from every concrete ctor
+        CurrentPage.WaitForLoadingAsync().GetAwaiter().GetResult();
+        CurrentPage.Url.Should().MatchRegex(/* from pageObjectName + CpqUrlPattern */);
+    }
+}</code></pre>
+
+    <dl class="qa">
+      <dt>Why BasePage exists</dt><dd>Every page shares: a Playwright page reference, the side menu, URL/state verification, and the settle behaviour. Hoisting these to a base removes duplication and gives one place to evolve them.</dd>
+      <dt>What belongs on BasePage</dt><dd>Truly universal concerns: <code>CurrentPage</code>, <code>SideMenu</code>, <code>GetScreenTitleAsync</code>, <code>VerifyPageObjectUrlAndState</code>.</dd>
+      <dt>What must NEVER be on BasePage</dt><dd>Screen-specific selectors or actions (a <code>ClickSubmitQuote</code> belongs on <code>BasketPage</code>, not the base) — that would couple every page to one screen's DOM.</dd>
+      <dt>Inheritance vs composition here</dt><dd>Pages <em>inherit</em> BasePage (shared identity/behaviour) but <em>compose</em> components (<code>SideMenu</code>, tables) — inheritance for "is-a page," composition for "has-a widget."</dd>
+    </dl>
+
+    <div class="note mind">
+      <span class="tag">Designer's mind · the self-validating constructor</span>
+      <p>Every concrete page calls <code>VerifyPageObjectUrlAndState(nameof(BasketPage))</code> in its ctor. Consequence: <strong>you cannot hold a <code>BasketPage</code> unless you're genuinely on the basket screen.</strong> A navigation bug fails <em>at construction</em>, with a clear message, not ten steps later on a confusing "element not found." Type + runtime URL check together enforce "the object matches reality."</p>
+    </div>
+
+    <h3>Locators, actions, and the page factory</h3>
+    <pre><code>private static class Selectors {           // nested, const CSS + parameterised methods
+    public const string Submit = "#SaveAsQuoteButton:visible";
+    public static string ModifyFromDropDown(string name) =>
+        $"ul.config-actions-menu[style*='display: block;'] li a:has-text('{name}')";
+}
+public async Task&lt;QuotesPage&gt; ClickSaveQuote() {          // fluent: returns the next page
+    await CurrentPage.ClickAndWaitForLoadingAsync(Selectors.Save);
+    return new QuotesPage(CurrentPage);                   // self-validates on construction
+}</code></pre>
+    <pre class="diagram">
+ UpdateCurrentPage()  (for steps with no return value)
+   wait load ─► poll URL (10×300ms) ─► ExtractPageName ─► switch:
+     "basket"→BasketPage · "quotedetail"→QuoteDetailPage · "configure"→ConfigurePage · ...
+   ─► context.Set(newPage, CurrentPage)
+</pre>
+    <p>Selectors are CSS-first (IDs → <code>data-*</code> app attributes like <code>data-property</code>/<code>data-datatype</code> → <code>:has-text</code> → <code>role</code>); <code>data-testid</code> is absent because the app doesn't emit it.</p>
+
+    <div class="note warn">
+      <span class="tag">Trade-off · the URL-switch factory</span>
+      <p><code>UpdateCurrentPage()</code> is a big <code>switch</code> (self-flagged <code>// TODO: Refactor to page Factory</code>). Readable now; a mild Open/Closed cost (new page ⇒ edit switch). The refactor is a registry (<code>Dictionary&lt;string,Func&lt;IPage,PageObjectBase&gt;&gt;</code>) — but not before the switch stops fitting on a screen.</p>
+    </div>
+  </section>
+
+  <!-- 16 -->
+  <section id="components">
+    <div class="kicker">Section 16</div>
+    <h2>Shared components & the entity grid</h2>
+    <p class="lead">The most sophisticated part of the framework: modals, tables, and editable cells modelled as composable objects that scope to any container and pick behaviour from the live DOM.</p>
+
+    <div class="facets">
+      <div class="facet"><h5>Page-scoped component</h5><p>Subclass <code>PageObjectBase</code>, take <code>IPage</code>. Global widgets: <code>SideMenuComponent</code>, <code>NavigationButtons</code>.</p></div>
+      <div class="facet"><h5>Parent-scoped component</h5><p>Take <code>(IPage, string parentSelector)</code> so the same widget works inside any container; every locator is prefixed with the parent selector.</p></div>
+    </div>
+
+    <pre class="diagram">
+ BasketBasePage.GetConfigurationTableComponent("Guitars")
+   ─► EntityTableFactory ── table visible? ─► EntityTable (grid)   else ─► EntityTableStandard (cards)
+   ─► new BasketTableComponent(page, table)     // TableComponent → Quotation → Basket chain
+   ─► SetPropertyValueAsync(rowKey, column, value)
+       ─► EntityTable → EntityRow → <b>PropertyCellFactory</b> (by data-datatype):
+            RichText→RichTextPropertyCell(+modal) · Dropdown→DynamicDropdownPropertyCell(select2)
+            Date→ValidityDatePropertyCell(+modal) · default→PropertyCell
+       ─► PropertyCell.SetValueAsync branches by PropertyType:
+            Boolean→checkbox · PickList→select · Date→JS datepicker · else→input
+</pre>
+    <p class="cap">Fig 5 · Two Abstract Factories inspect the runtime DOM/<code>PropertyType</code> and return the right polymorphic implementation. Callers say "set this cell to this value" and never know it's a checkbox, a select2, or a flatpickr date.</p>
+
+    <div class="note mind">
+      <span class="tag">Designer's mind · factories instead of if/else in the step</span>
+      <p>A CPQ cell can be text, money, boolean, picklist, rich-text, or date — each edited differently. That <code>if/else</code> in every step would duplicate hundreds of times. Pushing the decision into <code>PropertyCellFactory</code> + polymorphic subclasses means "how to edit a date cell" lives in <strong>one place</strong> and <code>SetValueAsync</code> is uniform. Open/Closed in action: a new cell type = a new subclass + one factory branch, zero caller changes. The crown jewel — and the steepest learning curve.</p>
+    </div>
+    <p><strong>Composition over inheritance, why:</strong> parent-scoped components (<code>ItemActionComponent(page, parentSelector)</code>) are <em>composed</em> because the same button-group appears inside many containers with different parents — composition lets one class serve all of them; inheritance couldn't express "same widget, different location." ~30 modals under <code>Shared/ModalDialogs/</code> each wrap one dialog and are constructed on demand (<code>new DeleteModal(CurrentPage)</code>).</p>
+
+    <div class="note mind">
+      <span class="tag">Designer's mind · why these interfaces exist (ITableActions, IPropertyCell, IEntityTable, ISearchActions)</span>
+      <p>An interface is created here for one reason: <strong>a caller needs to depend on a capability without knowing the concrete type.</strong> <code>TableComponent</code> talks to <code>IEntityTable</code>, so it works whether the factory returned a real grid (<code>EntityTable</code>) or a card layout (<code>EntityTableStandard</code>). The factory + interface pair is what makes the polymorphism possible: the factory chooses the concrete class, the interface hides which one it chose. Contrast the alternative — a concrete <code>EntityTable</code> everywhere — which would force <code>if (isGrid) … else …</code> at every call site. Interfaces here are small and role-focused (Interface Segregation): <code>ISearchActions</code> is only search, <code>IPropertyCell</code> is only get/set — no god-interface. Rule of thumb: introduce an interface when you have (or will have) <em>more than one implementation the caller shouldn't distinguish</em> — not speculatively for a single class.</p>
+    </div>
+  </section>
+
+  <!-- 17 -->
+  <section id="custom">
+    <div class="kicker">Section 17</div>
+    <h2>Customer customization</h2>
+    <p class="lead">Different customers have different DOM. Absorbed with two mechanisms — virtual selector seams and feature-scoped bindings — without forking core.</p>
+
+    <pre><code>// base seam
+public virtual string GetBasketConfigurationSelector(string name)
+    => Selectors.BasketConfiguration(name);
+
+// customer override — inherit ALL table/cell logic, change only the DOM assumption
+internal class ClearwaterBasketPage : BasketPage {
+    public override string GetBasketConfigurationSelector(string name)
+        => $"div[id^=container-detail] div[data-container='Configurations']:has(input[value='{name}'])";
+}
+
+// feature-scoped step binding — restores uniqueness so it can't collide with core
+[Binding, Scope(Feature = "Balldev")]
+public sealed class BallBasketSteps : StepsBase {
+    private BallBasketPage BasketPage => new(BrowserPage);
+    // "BallBasket, I click on ..."
+}</code></pre>
+
+    <div class="note mind">
+      <span class="tag">Designer's mind · [Scope] is how two "same" steps coexist</span>
+      <p>Given the exactly-one-match rule (§11), a second binding with the same regex is ambiguous. <code>[Scope(Feature=…)]</code> restricts a binding to certain features, restoring uniqueness. With overrides in the separate <code>TestCustomObjects</code> assembly, a customer's quirks are fully isolated: core never learns a customer exists, and a customer can override DOM assumptions by touching one <code>virtual</code> method. Liskov + Open/Closed doing exactly what they promise.</p>
+    </div>
+  </section>
+
+  <!-- 18 -->
+  <section id="api">
+    <div class="part">Part 5 · The API Layer</div>
+    <div class="kicker">Section 18</div>
+    <h2>API framework</h2>
+    <p class="lead">A hand-rolled REST client on <code>HttpClient</code> + Newtonsoft. One base class owns HTTP mechanics; per-entity services express the domain.</p>
+
+    <div class="facets">
+      <div class="facet"><h5>HTTP client</h5><p>Raw <code>System.Net.Http.HttpClient</code> — a single <code>static</code> shared instance in <code>ApiService</code>.</p></div>
+      <div class="facet"><h5>Serialization</h5><p>Newtonsoft (<code>JsonConvert</code>, <code>NullValueHandling.Ignore</code>, <code>JObject</code> patching).</p></div>
+      <div class="facet"><h5>Error handling</h5><p><code>EnsureSuccessStatusCode()</code> on every call; <code>DeleteAsync</code> returns status instead of throwing.</p></div>
+      <div class="facet"><h5>Retry / logging</h5><p><strong>No retry policy</strong> in the main layer; logging is via NUnit output/Xray log files, not a logging package.</p></div>
+    </div>
+
+    <h3>The request pipeline & HttpClient lifecycle</h3>
+    <pre class="diagram">
+ ApiSteps ("Api, I create new Quote")  ── builds payload via Models/Helpers
+   ─► QuoteService : ApiService         ── domain verbs (CreateQuote, CopyQuote, GetByFilter)
+        ─► PostAsJsonAsync&lt;TIn,TOut&gt;    ── serialize → StringContent(application/json)
+             ─► AddRequestAuthorizationHeader  ── token from ApiAuthentication (cached on org)
+                  ─► static HttpClient.SendAsync
+                       ─► EnsureSuccessStatusCode ─► DeserializeResponse&lt;T&gt; (stream + JsonSerializer)
+</pre>
+    <pre><code>protected async Task&lt;TOut&gt; PostAsJsonAsync&lt;TIn,TOut&gt;(string url, TIn body) {
+    var req = new HttpRequestMessage(HttpMethod.Post, url) {
+        Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json") };
+    await AddRequestAuthorizationHeader(req);
+    var res = await s_client.SendAsync(req);   // s_client is a single static instance
+    res.EnsureSuccessStatusCode();
+    return DeserializeResponse&lt;TOut&gt;(res);
+}</code></pre>
+
+    <dl class="qa">
+      <dt>Why a static HttpClient</dt><dd>Straight from MS guidance: a new <code>HttpClient</code> per request exhausts sockets under load. One shared static instance reuses connections — correct for a suite firing many requests across 10 workers.</dd>
+      <dt>Why HttpClient, not RestSharp/Refit</dt><dd>Zero extra dependency, full control over the change-envelope shapes (bulk update), and easy <code>JObject</code> patching. Refit would be terser for static endpoints but fights dynamic payloads.</dd>
+      <dt>Verb wrappers</dt><dd><code>PostAsJsonAsync</code>, <code>GetAsync&lt;T&gt;</code>, <code>PutAsJsonAsync</code>, <code>PatchAsJsonAsync</code>, <code>PutRawAsync</code>, <code>DeleteAsync</code>, <code>BulkUpdateAsync</code>.</dd>
+    </dl>
+
+    <div class="note mind">
+      <span class="tag">Designer's mind · Template Method at the service layer</span>
+      <p><code>ApiService</code> owns <em>how</em> to send (serialize, auth, deserialize, error-check); each <code>*Service</code> owns <em>what</em> to send (endpoints, shapes). A new endpoint is a subclass method reading like the domain — <code>CreateQuoteFromBasket(basketId)</code> — with all HTTP tedium inherited. <code>ApiServiceFactory</code> (static) centralises construction. This keeps the API layer thin: the boilerplate is written once.</p>
+    </div>
+    <div class="note good">
+      <span class="tag">Good practice · BulkUpdate mirrors the browser</span>
+      <p><code>BulkUpdateAsync</code> PUTs to <code>/v3/api/bulk/update</code> with the same change-envelope the UI sends, so <strong>server-side pricing recalculation runs exactly as for a user.</strong> Plain entity PUTs skip that logic — choosing bulk-update for PA changes keeps test data correctly priced.</p>
+    </div>
+    <div class="note warn">
+      <span class="tag">Trade-off · no retry / no structured logging</span>
+      <p>The main layer relies on <code>EnsureSuccessStatusCode</code> with no retry — a transient 5xx fails the setup. If setup flakiness appears, wrap <code>SendAsync</code> in a small retry (e.g. Polly, or a hand-rolled loop) at the <code>ApiService</code> level so every service benefits at once. Same for logging: add it in the base, not per service.</p>
+    </div>
+  </section>
+
+  <!-- 19 -->
+  <section id="auth">
+    <div class="kicker">Section 19</div>
+    <h2>Authentication — deep</h2>
+    <p class="lead">Token lifecycle, headers, and the security considerations behind the API auth.</p>
+
+    <pre><code>// CpqRestApi/RestHelper/ApiAuthentication.cs
+public async Task&lt;string&gt; GetAuthToken(Organization org, HttpClient client) {
+    if (string.IsNullOrEmpty(org.AuthToken)) {         // cached ON the org object
+        var body = new AuthTokenRequest {
+            client_id = "SpecflowUiTests", grant_type = "password",
+            username = org.UserName, password = org.Password, platform = "cpq" };
+        // POST {org.FullUrl}/v3/api/oauth2/token  → EnsureSuccessStatusCode → AuthToken
+        org.AuthToken = token.access_token;
+    }
+    return org.AuthToken;
+}
+// header: httpRequest.Headers.TryAddWithoutValidation("Authorization", token);  // NB: no "Bearer " prefix</code></pre>
+
+    <dl class="qa">
+      <dt>Token lifecycle</dt><dd>OAuth password grant; the <code>access_token</code> is cached on <code>Organization.AuthToken</code> and reused for the whole scenario. In-memory only.</dd>
+      <dt>Refresh</dt><dd>None — there's no expiry check. Fine for short scenarios; a long one could hit expiry.</dd>
+      <dt>Headers / cookies</dt><dd>Raw token set directly as the <code>Authorization</code> value (no <code>Bearer </code> prefix — that's what this API expects); <code>Accept: application/json</code> set in the <code>ApiService</code> ctor. No cookie handling (the API is token-based; the UI session is separate, driven by Playwright).</dd>
+      <dt>Security considerations</dt><dd>Credentials come from <code>orgsettings.json</code> — which currently commits real passwords (see §06 watch-out). The right shape is already here (per-org creds, env overridable); the fix is moving secrets out of source control.</dd>
+    </dl>
+  </section>
+
+  <!-- 20 -->
+  <section id="curl">
+    <div class="kicker">Section 20</div>
+    <h2>Converting a cURL command into framework code</h2>
+    <p class="lead">The everyday workflow: you have a raw cURL (from browser DevTools or a colleague) and need it as a reusable, authenticated, tested part of the framework. Here is the full path.</p>
+
+    <ol class="steps">
+      <li><strong>Understand the cURL.</strong> Break it into its parts — method, URL/path, headers, and body. Example to work through:
+        <pre><code>curl 'https://cpqstage-autotestspecflowui.vendavocpq.com/v3/api/workflows/copyquote/123' \
+  -X GET \
+  -H 'Authorization: eyJhbGci...' \
+  -H 'Accept: application/json'</code></pre>
+        Identify: verb <code>GET</code>, path <code>/v3/api/workflows/copyquote/{id}</code>, auth header, no body.</li>
+
+      <li><strong>Import into Postman</strong> (Import → Raw text → paste cURL). Postman parses it into method/URL/headers/body so you can send it, tweak params, and confirm the real response shape before writing any C#.</li>
+
+      <li><strong>Understand the headers.</strong> Decide which are <em>framework-managed</em> vs <em>request-specific</em>. Here <code>Authorization</code> and <code>Accept</code> are already handled by <code>ApiService</code> (<code>AddRequestAuthorizationHeader</code> + the <code>Accept</code> ctor header) — so you drop them from your code; the base class adds them. You only keep genuinely per-call headers.</li>
+
+      <li><strong>Understand the payload.</strong> For a POST/PUT, capture the JSON body from Postman and map it to a model. If a matching entity exists in <code>GuidedSelling.Web.Entities.dll</code> or <code>Models/</code>, reuse it; otherwise add a DTO under <code>Models/DTO</code> or <code>Models/CPQEntity</code>. (Our example has no body.)</li>
+
+      <li><strong>Generate C# from the cURL</strong> (Postman → Code snippet → C# / RestSharp, or DevTools → Copy as → C#). Treat the output as <em>disposable scaffolding</em> — it will create its own <code>HttpClient</code>, hard-code the URL and token, and inline the JSON. Never commit this; it violates every rule of the framework.</li>
+
+      <li><strong>Convert to production quality</strong> — strip everything the framework already owns:
+        <pre class="diagram">
+ generated (throwaway)                    framework (production)
+ new HttpClient()               ───►      inherited static s_client in ApiService
+ hard-coded URL + token         ───►      org.FullUrl + AddRequestAuthorizationHeader
+ raw SendAsync + ReadAsString   ───►      GetAsync&lt;T&gt; / PostAsJsonAsync&lt;TIn,TOut&gt;
+ manual JsonConvert             ───►      DeserializeResponse&lt;T&gt; in the base
+ no error check                 ───►      EnsureSuccessStatusCode (inherited)
+</pre></li>
+
+      <li><strong>Refactor into the existing service</strong> — add a domain method to the right <code>*Service</code> (create a new <code>XxxService : ApiService</code> only if no entity fits). For our example, it belongs on <code>QuoteService</code>:
+        <pre><code>// CpqRestApi/RestHelper/QuoteService.cs
+public async Task&lt;Quote&gt; CopyQuote(string quoteId) =>
+    await GetAsync&lt;Quote&gt;($"/v3/api/workflows/copyquote/{quoteId}");   // auth+deserialize inherited</code></pre></li>
+
+      <li><strong>Create reusable methods, not one-offs.</strong> Parameterise the volatile parts (the id), name the method for the domain intent (<code>CopyQuote</code>, not <code>Get123</code>), and let the base handle transport. If the endpoint needs server-side recalculation, use <code>BulkUpdateAsync</code> instead of a plain PUT.</li>
+
+      <li><strong>Integrate authentication</strong> — nothing to do: because the method routes through <code>ApiService</code>, the per-org cached token is injected automatically. This is the payoff of the Template Method base — new endpoints are authenticated for free.</li>
+
+      <li><strong>Expose it to BDD & test it.</strong> Add a binding in <code>PageObjects/ApiSteps/QuoteApiSteps.cs</code>, register the result for cleanup, and store it as the current entity:
+        <pre><code>[When(@"Api, I copy Quote with Number ""([^""]*)""")]
+public async Task WhenICopyQuote(string number) {
+    var source = await QuoteService.GetQuoteByFilter("QuoteNumber", number);
+    var copy   = await QuoteService.CopyQuote(source.QuoteId);
+    AddCreatedEntity(new CreatedEntity(copy.QuoteId, "Quote"));   // cleanup will delete it
+    ScenarioContextProperties.CurrentQuote = copy;                // later steps/placeholders use it
+}</code></pre>
+        Then drive it from a scenario: <code>Given Api, I copy Quote with Number "CurrentQuoteNumber"</code>.</li>
+    </ol>
+
+    <div class="note mind">
+      <span class="tag">Designer's mind · why the framework makes cURL conversion trivial</span>
+      <p>Notice steps 6–9 are almost entirely deletion. Because <code>ApiService</code> centralises transport, auth, and deserialization, converting a cURL collapses to "pick the service, add one typed method." The whole point of the base class is that <strong>the interesting part of a new endpoint is one line of domain intent</strong> — everything else is inherited. A framework earns its keep when adding capability means writing less, not more.</p>
+    </div>
+  </section>
+
+  <!-- 21 -->
+  <section id="cleanup">
+    <div class="kicker">Section 21</div>
+    <h2>Cleanup pipeline</h2>
+    <p class="lead">Whatever a test creates, it removes — reliably, in isolation, and without one failure blocking the rest.</p>
+
+    <pre class="diagram">
+ During scenario: AddCreatedEntity(new CreatedEntity(id,"Quote")) → ScenarioContextProperties.CreatedEntities (locked, deduped)
+ [AfterScenario] ExecuteCleanupActionsAsync runs an ordered list, each in its own try/catch:
+   1 ApplicationSettingsCleanup · 2 ProfilePropertyCleanup · 3 EntityCleanup · 4 UserCleanupAction
+        └─ EntityCleanup: for each CreatedEntity → DELETE /v3/api/entities/{EntityName}/{EntityID}  (Assert.Warn on failure)
+</pre>
+    <div class="note mind">
+      <span class="tag">Designer's mind · Command pattern + fail-soft teardown</span>
+      <p>Each cleanup is an <code>ITestCleanupAction</code> (a Command). The hook just iterates — a new cleanup concern is a new class, not a hook edit (Open/Closed). Each runs in its own try/catch and failures are <code>Assert.Warn</code>, not <code>Assert.Fail</code>: a stuck delete degrades to a warning instead of failing a green test or blocking later cleanups. <strong>Teardown must be best-effort and total, never all-or-nothing.</strong></p>
+    </div>
+  </section>
+
+  <!-- 22 -->
+  <section id="reporting">
+    <div class="part">Part 6 · Delivery</div>
+    <div class="kicker">Section 22</div>
+    <h2>Reporting, evidence & how to replace it</h2>
+    <p class="lead">Three independent outputs — human report, failure evidence, test-management sync — all produced as side effects, never gating the run.</p>
+
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Output</th><th>Mechanism / package</th><th>Where</th></tr></thead>
+      <tbody>
+        <tr><td>Human report</td><td>Reqnroll LivingDoc (<code>Expressium.LivingDoc.ReqnrollPlugin</code>) → HTML + ndjson</td><td><code>Results/</code>; CI copies newest → <code>LivingDoc.html</code></td></tr>
+        <tr><td>Failure screenshot</td><td><code>TestArtifactHandler</code> → <code>page.ScreenshotAsync</code></td><td><code>Results/*.png</code>; <code>outputHelper.AddAttachment</code> + <code>TestContext.AddTestAttachment</code></td></tr>
+        <tr><td>Trace + video (opt-in)</td><td>Playwright tracing (<code>EnableTracing</code>)</td><td><code>Results/*.zip</code>, <code>Results/Videos/</code></td></tr>
+        <tr><td>Xray sync</td><td>Per-scenario Cucumber multipart (<code>XrayReportService</code>)</td><td>Xray Cloud; screenshot embedded base64 on the failed step</td></tr>
+        <tr><td>Auto bug</td><td><code>JiraBugReportService</code> on <code>@JiraBugOnFailure</code></td><td>Jira CPD project</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="note mind">
+      <span class="tag">Designer's mind · why per-scenario Xray upload, in-process</span>
+      <p>Upload happens inside the run (from <code>AfterScenario</code>), not as a pipeline step. The first upload creates one Test Execution and caches its key; later scenarios append by tagging the feature with that key; uploads are serialised across workers with a <code>SemaphoreSlim</code>. Results appear as tests finish and the failure screenshot rides along as embedded evidence. The cost — coupling to a network service — is contained by the try/catch-everything rule.</p>
+    </div>
+
+    <h3>How to replace the reporting system</h3>
+    <ol class="steps">
+      <li><strong>Human report → Allure:</strong> add the Allure Reqnroll plugin, point its output at <code>Results/</code>, remove the <code>expressium</code>/<code>html</code> formatter blocks from <code>reqnroll.json</code>, and publish the Allure folder in CI. No step/page changes.</li>
+      <li><strong>Evidence:</strong> screenshot/trace capture is all inside <code>TestArtifactHandler</code> — retarget attachment sinks there only.</li>
+      <li><strong>Test-management → other than Xray:</strong> swap <code>XrayReportService</code> for a new service implementing the same "collect <code>CucumberStep</code>s → upload in <code>AfterScenario</code>" contract; the hook wiring stays.</li>
+    </ol>
+    <div class="note good">
+      <span class="tag">Good practice · replaceability is a design outcome</span>
+      <p>Because reporting is confined to <code>TestArtifactHandler</code> + <code>XrayReportService</code> + <code>reqnroll.json</code> formatters, swapping it is localised. That's the payoff of keeping cross-cutting concerns in the infrastructure layer instead of sprinkling them through steps.</p>
+    </div>
+  </section>
+
+  <!-- 23 -->
+  <section id="cicd">
+    <div class="kicker">Section 23</div>
+    <h2>CI/CD pipeline</h2>
+    <p class="lead"><code>azure-pipelines.yml</code>, manual trigger, single Windows job: parameterise → patch config → install browsers → run parallel → publish results.</p>
+    <pre class="diagram">
+ trigger:none · pool:windows-2022 · job RunTests (360m)
+ params: TestFilter · XrayEnabled · XrayCreateExecution · TestEnvironment · NumberOfWorkers(8)
+   1 NuGet restore
+   2 <b>FileTransform@2</b> → patch appsettings.json: Headless, RunMode, Xray.*  (NO→YES here)
+   3 VSBuild (Release)
+   4 PowerShell → playwright.ps1 install   (browsers)
+   5 <b>VSTest@2</b> → SpecFlowTests.dll   filter = user & ALWAYS !~CustomerTests & !~Salesforce
+        parallel: -- NUnit.NumberOfTestWorkers=${NumberOfWorkers}   (rerun failed except env=test)
+   6 copy newest reqnroll_report_*.html → Results/LivingDoc.html
+   7 PublishBuildArtifacts → Results/  (screenshots, traces, LivingDoc, Xray logs)
+</pre>
+    <div class="note mind">
+      <span class="tag">Designer's mind · config-as-parameter, not config-as-commit</span>
+      <p>The pipeline never rebuilds to change behaviour — it <em>transforms</em> <code>appsettings.json</code> at deploy time using pipeline variables (the <code>AddEnvironmentVariables()</code> layer from §06). That's why committed <code>Xray.CreateExecution:"NO"</code> becomes <code>YES</code> at runtime, and one artifact runs against stage/test/prod. Xray upload isn't a task; it's carried by <code>TestHooks</code> during the run, gated by the injected <code>Xray.*</code> values.</p>
+    </div>
+  </section>
+
+  <!-- 24 -->
+  <section id="parallel">
+    <div class="kicker">Section 24</div>
+    <h2>Parallel execution</h2>
+    <p class="lead">Ten workers, isolated by construction. The few tests that can't parallelise are quarantined explicitly.</p>
+    <pre><code>// top of TestHooks.cs
+[assembly: Parallelizable(ParallelScope.Fixtures)]   // features run concurrently
+[assembly: LevelOfParallelism(10)]                    // up to 10 at once</code></pre>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Isolation mechanism</th><th>Guarantees</th></tr></thead>
+      <tbody>
+        <tr><td>One Playwright stack per scenario</td><td>No shared browser/cookies between workers</td></tr>
+        <tr><td>Per-worker profile allocation</td><td>No two workers log in as the same user</td></tr>
+        <tr><td>Scenario-scoped <code>ScenarioContext</code></td><td>No shared in-memory test state</td></tr>
+        <tr><td><code>@notParallel</code> + <code>NonParallelizableFeatures.cs</code></td><td>Settings-mutating / rule-engine-contended tests run serially</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note mind">
+      <span class="tag">Designer's mind · two ways to say "don't parallelise", and why</span>
+      <p>The tag <code>@notParallel</code> flows through <code>reqnroll.json</code>'s <code>addNonParallelizableMarkerForTags</code>. The primary mechanism is <code>NonParallelizableFeatures.cs</code> — partial classes stamping <code>[NonParallelizable]</code> on generated feature classes (multi-currency, culture, multi-level-approval) because the SmartCatalog rule engine contends under concurrent CI load. Lesson: <strong>parallelism is a property of shared resources, not of code.</strong> Serialise exactly the tests that touch the same server-side mutable state; don't abandon parallelism globally. Workers must never exceed the org's profile count — that's the real ceiling.</p>
+    </div>
+  </section>
+
+  <!-- 25 -->
+  <section id="organization">
+    <div class="part">Part 7 · Practitioner</div>
+    <div class="kicker">Section 25</div>
+    <h2>Code organization — where does this code belong?</h2>
+    <p class="lead">The decisions that keep the project maintainable: which file, when a new class, and inheritance vs composition vs helper vs extension method.</p>
+
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>The behaviour is…</th><th>It belongs in…</th></tr></thead>
+      <tbody>
+        <tr><td>How to drive a screen (click, read, wait)</td><td>A <code>*Page.cs</code> method</td></tr>
+        <tr><td>How to edit a grid cell / operate a table or modal</td><td>A Shared component / <code>PropertyCell</code> subclass</td></tr>
+        <tr><td>How to call a REST endpoint</td><td>A <code>*Service.cs</code> method (<code>CpqRestApi</code>)</td></tr>
+        <tr><td>Assembling an entity payload</td><td>A <code>Models/Helpers/*Helper</code></td></tr>
+        <tr><td>Translating a Gherkin sentence</td><td>A thin <code>*Steps.cs</code> binding</td></tr>
+        <tr><td>Cross-cutting lifecycle (screenshot, cleanup)</td><td><code>TestInfrastructure/</code> (hook or <code>ITestCleanupAction</code>)</td></tr>
+        <tr><td>Customer-specific DOM</td><td><code>TestCustomObjects/</code> subclass + <code>[Scope]</code> steps</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>When to create a new class vs. modify an existing one</h3>
+    <ul>
+      <li><strong>New class</strong> when the concern is genuinely new (a new screen, a new endpoint, a new cell type). New reason to change ⇒ new class (SRP).</li>
+      <li><strong>Modify existing</strong> when you're extending a behaviour that already has a home (a new button on an existing page → a method on that page).</li>
+    </ul>
+
+    <h3>Inheritance vs composition vs helper vs extension vs generic vs static</h3>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Use…</th><th>When…</th><th>Example here</th></tr></thead>
+      <tbody>
+        <tr><td>Inheritance</td><td>An "is-a" with shared identity/behaviour + a substitutable override seam</td><td><code>BasketPage : BasketBasePage : PageObjectBase</code>; customer pages</td></tr>
+        <tr><td>Composition</td><td>A "has-a" reused across many owners / different locations</td><td>Parent-scoped components; <code>SideMenu</code> on every page</td></tr>
+        <tr><td>Extension method</td><td>Adding a verb to a type you don't own</td><td><code>IPage.WaitForLoadingAsync()</code></td></tr>
+        <tr><td>Generic method</td><td>Same logic over many types</td><td><code>PostAsJsonAsync&lt;TIn,TOut&gt;</code>, <code>DeserializeResponse&lt;T&gt;</code></td></tr>
+        <tr><td>Static helper</td><td>Stateless, cross-cutting, no instance identity</td><td><code>UrlHelper</code>, <code>ApiServiceFactory</code></td></tr>
+        <tr><td>Factory</td><td>The concrete type depends on runtime data</td><td><code>PropertyCellFactory</code>, <code>UpdateCurrentPage</code></td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="note pit">
+      <span class="tag">Watch-out · when a utility becomes bad design</span>
+      <p>A grab-bag <code>Helper</code> with unrelated statics is where cohesion dies. Before creating one, ask if the behaviour is really of a page, an entity/table, or an HTTP entity — it usually is, and belongs there. Utilities are justified only for genuinely cross-cutting, stateless operations, and even then, name them for what they do — not "Helper" / "Utils" / "Manager".</p>
+    </div>
+  </section>
+
+  <!-- 26 -->
+  <section id="extend">
+    <div class="kicker">Section 26</div>
+    <h2>How to extend the framework</h2>
+    <p class="lead">Four recipes; each answers the only question that matters — where does this code belong, and why?</p>
+
+    <h3>Add a new scenario — the full 12-point decision walkthrough</h3>
+    <p>Tomorrow a new test case lands. This is the exact engineering process, one decision per line:</p>
+    <ol class="steps">
+      <li><strong>Analyze the requirement.</strong> Name the screen(s) touched, the precondition data, the single behaviour under test, and the observable outcome. That four-part read decides everything below.</li>
+      <li><strong>Reuse an existing feature file, or create a new one?</strong> Same area <em>and</em> same page family → append to the existing <code>.feature</code>. New area/screen family → new <code>Area_SubArea_Group.feature</code> in the matching <code>CoreCpqTests/</code> folder. Rule of thumb: a feature file = one screen family's behaviours.</li>
+      <li><strong>Write the scenario</strong> in the house grammar (<code>PageName, I …</code>), with <code>@REQ_CPD</code> on the feature and <code>@TEST_CPD</code> + suite tags on the scenario. Seed expensive preconditions with <code>Given Api, I …</code>, not UI clicks.</li>
+      <li><strong>Identify reusable steps.</strong> Read the scenario line by line and, for each, search existing <code>*Steps.cs</code> for a matching phrasing/regex before writing anything.</li>
+      <li><strong>When to reuse an existing step definition:</strong> if a step's regex already matches your sentence, reuse it verbatim — that's free reuse and the whole point of the grammar. Adjust your wording to fit an existing step rather than cloning it.</li>
+      <li><strong>When to create a new step definition:</strong> only when no regex matches and the action is genuinely new. Add it to the page's <code>*Steps.cs</code>, keep it thin (one page/service call + <code>UpdateCurrentPage()</code>), never logic.</li>
+      <li><strong>When to reuse an existing page-object method:</strong> if the screen already exposes the action (a <code>ClickSave</code>, a table setter), call it. The page is the reuse boundary for UI mechanics.</li>
+      <li><strong>When to create a new page-object method:</strong> when the screen gains a new interaction. Add it to the relevant <code>*Page.cs</code> (or a shared component / <code>PropertyCell</code> subclass if it's grid/modal behaviour), with its selectors in the nested <code>Selectors</code> class.</li>
+      <li><strong>Where to update ScenarioContext:</strong> in the step that creates/loads an entity — set <code>ScenarioContextProperties.CurrentQuote</code> (etc.) so later steps and placeholder tokens resolve it. Never store raw values under ad-hoc keys.</li>
+      <li><strong>Where assertions go:</strong> in <code>Then</code> steps via <code>.Should()</code> (AwesomeAssertions). Read state through the page/service or <code>ScenarioContextProperties</code>; keep the assertion in the step, the "how to read" in the page.</li>
+      <li><strong>How to avoid duplicate code:</strong> reuse steps → reuse page methods → reuse components. If you're about to copy a block, it belongs on a page/component/service instead. Register created entities with <code>AddCreatedEntity</code> so you never hand-write teardown.</li>
+      <li><strong>How to follow existing conventions:</strong> match the tag set, the <code>PageName,</code> prefix, the "no blank line before <code>Examples:</code>" rule, Scenario Outline only for ≥2 real variants, and English-only text (per CLAUDE.md).</li>
+    </ol>
+
+    <h3>Add a new page</h3>
+    <ol class="steps">
+      <li>Create <code>XxxPage.cs</code> in <code>PageObjects/PageObjects/[Feature]/</code>, inherit <code>PageObjectBase</code>, call <code>VerifyPageObjectUrlAndState(nameof(XxxPage))</code>.</li>
+      <li>Add nested <code>static class Selectors</code> (const CSS + parameterised methods); prefer IDs, then <code>data-*</code>.</li>
+      <li>Actions as <code>async Task&lt;NextPage&gt;</code> returning the next page; settle with <code>ClickAndWaitForLoadingAsync</code>.</li>
+      <li>Register in the <code>UpdateCurrentPage()</code> switch so factory-driven steps resolve it.</li>
+      <li>Create <code>XxxSteps.cs</code> beside it; cast <code>CurrentPage</code>, delegate.</li>
+    </ol>
+
+    <h3>Add a new API endpoint/service</h3>
+    <ol class="steps">
+      <li>Add a method to the right <code>*Service</code>, or create <code>XxxService : ApiService</code> (set <code>EntityName</code>) if no entity fits.</li>
+      <li>Express the verb with inherited wrappers; use <code>BulkUpdateAsync</code> when recalculation must run.</li>
+      <li>Add <code>CreateXxxService(org)</code> to <code>ApiServiceFactory</code>; payloads in <code>Models/Helpers</code>, DTOs in <code>Models/DTO</code>.</li>
+      <li>Add <code>XxxApiSteps.cs</code> in <code>ApiSteps/</code>; on create call <code>AddCreatedEntity</code> and store on <code>ScenarioContextProperties</code>.</li>
+    </ol>
+
+    <h3>Add a customer override</h3>
+    <ol class="steps">
+      <li>Subclass the base page in <code>TestCustomObjects/[Customer]/PageObjects/</code>; override the <code>virtual</code> selector seam or add customer-only actions.</li>
+      <li>Add <code>[Scope(Feature="…")]</code> steps with a customer-prefixed grammar.</li>
+      <li>Add the org to <code>orgsettings.json</code> with its own profiles. Core is untouched.</li>
+    </ol>
+  </section>
+
+  <!-- 27 -->
+  <section id="evolution">
+    <div class="kicker">Section 27</div>
+    <h2>Build it from scratch — the order</h2>
+    <p class="lead">Rebuilding from an empty solution, this is the sequence and why each step must precede the next.</p>
+    <ol class="steps">
+      <li><strong>Solution skeleton</strong> — five projects, dependency direction fixed (Models is the leaf). Boundaries are expensive to move later.</li>
+      <li><strong>Configuration</strong> — <code>Microsoft.Extensions.Configuration</code> + JSON + env vars. Everything downstream needs a URL and creds.</li>
+      <li><strong>Domain models</strong> — reference/author entity shapes. API and pages both bind to these.</li>
+      <li><strong>Browser lifecycle</strong> — centralise Playwright creation + the settle helper. Nothing UI works until launch/wait are solid.</li>
+      <li><strong>DI + hooks</strong> — wire BoDi and <code>TestHooks</code>; create browser in <code>BeforeScenario</code>, dispose in <code>AfterScenario</code>.</li>
+      <li><strong>ScenarioContext facade</strong> — <code>StepsBase</code> + <code>ScenarioContextProperties</code> + <code>ContextKeys</code>. Define state flow before steps depend on it.</li>
+      <li><strong>API layer</strong> — <code>ApiService</code> base + auth + one service. Data setup must exist before UI tests.</li>
+      <li><strong>Page Objects</strong> — <code>PageObjectBase</code> + self-validating ctor + Login page + the <code>UpdateCurrentPage</code> factory.</li>
+      <li><strong>Shared components</strong> — grid factories + modals, once ≥2 pages share a table. Don't abstract before the second use.</li>
+      <li><strong>Parallel execution</strong> — enable <code>Parallelizable</code>, add per-worker profiles, quarantine contended tests early.</li>
+      <li><strong>Reporting</strong> — LivingDoc, screenshots, then Xray/Jira as side effects.</li>
+      <li><strong>CI/CD</strong> — restore → transform config → build → install browsers → test (parallel) → publish.</li>
+    </ol>
+    <div class="note mind">
+      <span class="tag">Designer's mind · the ordering principle</span>
+      <p>The through-line: <strong>each layer can only be built once the state it depends on has an owner.</strong> Config owns environment → models own shape → browser owns session → context owns scenario state → pages/services own behaviour → reporting observes → CI orchestrates. Build in dependency order and every layer has solid ground; build out of order and you'll mock what you should have built.</p>
+    </div>
+  </section>
+
+  <!-- 28 -->
+  <section id="patterns">
+    <div class="kicker">Section 28</div>
+    <h2>Design patterns & SOLID index</h2>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Pattern</th><th>Where</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td>Page Object</td><td><code>*Page.cs</code></td><td>Encapsulate screen mechanics behind intent</td></tr>
+        <tr><td>Facade</td><td><code>StepsBase</code> over <code>ScenarioContext</code></td><td>Hide raw context API; typed access</td></tr>
+        <tr><td>Abstract Factory</td><td><code>EntityTableFactory</code>, <code>PropertyCellFactory</code></td><td>Choose behaviour from live DOM/type</td></tr>
+        <tr><td>Template Method</td><td><code>ApiService</code> base</td><td>Fix HTTP mechanics, vary the endpoint</td></tr>
+        <tr><td>Command</td><td><code>ITestCleanupAction</code></td><td>Pluggable, ordered, fail-soft teardown</td></tr>
+        <tr><td>Factory Method / registry</td><td><code>UpdateCurrentPage()</code>, <code>ApiServiceFactory</code></td><td>Construct the right object from a key</td></tr>
+        <tr><td>Fluent interface</td><td>Page actions returning next page</td><td>Model navigation as a chain</td></tr>
+        <tr><td>Strategy (via subclassing)</td><td><code>PropertyCell</code> subclasses</td><td>One <code>SetValueAsync</code>, many behaviours</td></tr>
+      </tbody>
+    </table></div>
+    <div class="facets three">
+      <div class="facet"><h5>S</h5><p>Five assemblies, one reason to change each; cleanup split into four actions.</p></div>
+      <div class="facet"><h5>O</h5><p>New cell type / cleanup = new subclass/class, callers untouched.</p></div>
+      <div class="facet"><h5>L</h5><p>Customer pages substitute base pages; grid treats every cell uniformly.</p></div>
+      <div class="facet"><h5>I</h5><p>Focused contracts: <code>ITableActions</code>, <code>ISearchActions</code>, <code>IPropertyCell</code>, <code>IEntityTable</code>.</p></div>
+      <div class="facet"><h5>D</h5><p>Steps depend on <code>PageObjectBase</code>; services on <code>ApiService</code> — abstractions, not concretes.</p></div>
+      <div class="facet"><h5>At scale</h5><p>Same principles at method, class, and assembly level — the mark of a considered framework.</p></div>
+    </div>
+  </section>
+
+  <!-- 29 -->
+  <section id="tradeoffs">
+    <div class="kicker">Section 29</div>
+    <h2>Trade-offs & watch-outs</h2>
+    <div class="note pit"><span class="tag">Watch-out · secrets in plaintext</span><p>Xray secret, Jira token, org passwords in tracked JSON. Move to pipeline secrets / key vault (env-var layer already supports it). Top priority.</p></div>
+    <div class="note warn"><span class="tag">Trade-off · two REST stacks</span><p><code>CpqRestApi</code> (current) vs. <code>Core/CpqApi</code> (legacy). Use the former; schedule the latter for deletion.</p></div>
+    <div class="note warn"><span class="tag">Trade-off · URL-switch page factory</span><p>Readable now; refactor to a registry when the switch outgrows a screen.</p></div>
+    <div class="note warn"><span class="tag">Trade-off · two assertion libraries</span><p>AwesomeAssertions + FluentAssertions; converge on one.</p></div>
+    <div class="note warn"><span class="tag">Trade-off · no API retry / token refresh</span><p>Add both at the <code>ApiService</code> base if setup flakiness or long scenarios appear.</p></div>
+    <div class="note good"><span class="tag">Bet that paid off · the settle helper</span><p>One <code>WaitForLoadingAsync</code> is why the suite is stable at 10× parallel. Keep it central.</p></div>
+    <div class="note good"><span class="tag">Bet that paid off · isolation by construction</span><p>Per-scenario browser + per-worker profile + scenario-scoped context ⇒ parallelism safe by default.</p></div>
+  </section>
+
+  <!-- 30 -->
+  <section id="exercises">
+    <div class="kicker">Section 30</div>
+    <h2>Exercises, docs & the one-paragraph takeaway</h2>
+
+    <h3>Docs to study (in order)</h3>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Topic</th><th>Source</th><th>Focus</th></tr></thead>
+      <tbody>
+        <tr><td>Reqnroll</td><td>docs.reqnroll.net</td><td>Bindings, Hooks, Context Injection, Step Argument Conversions</td></tr>
+        <tr><td>Playwright .NET</td><td>playwright.dev/dotnet</td><td>Locators, auto-waiting, Browser Contexts, Trace Viewer</td></tr>
+        <tr><td>.NET config</td><td>learn.microsoft.com</td><td>Provider order, binding, env-var provider</td></tr>
+        <tr><td>HttpClient</td><td>learn.microsoft.com</td><td>Static/shared instance, socket exhaustion</td></tr>
+        <tr><td>NUnit parallel</td><td>docs.nunit.org</td><td>Parallelizable, LevelOfParallelism, fixture scope</td></tr>
+        <tr><td>Xray Cloud import</td><td>docs.getxray.app</td><td>import/execution/cucumber/multipart</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>Exercises to cement it</h3>
+    <ol class="steps">
+      <li>Trace one scenario on paper: for each line name the step, page, component, and what's written to <code>ScenarioContextProperties</code>.</li>
+      <li>Add a new page + one action + one step end-to-end, including the <code>UpdateCurrentPage</code> switch entry.</li>
+      <li>Convert a real cURL from DevTools into a new <code>*Service</code> method + <code>ApiStep</code>, authenticated and cleaned up (follow §20 exactly).</li>
+      <li>Add a new <code>ITestCleanupAction</code> and watch it run without editing the hook — feel Open/Closed.</li>
+      <li>Add a <code>PropertyCell</code> subclass for a fictional cell type and wire it into <code>PropertyCellFactory</code> — the hardest, most instructive change.</li>
+      <li>Introduce a deliberately ambiguous step binding and read Reqnroll's error — internalise the exactly-one-match rule from the failure.</li>
+    </ol>
+
+    <hr class="div">
+    <h3 style="margin-top:34px">The one-paragraph takeaway</h3>
+    <p class="lead">This framework is a disciplined answer to one question — <em>who owns which state, and for how long?</em> Config owns the environment (run-lived); the browser and <code>ScenarioContextProperties</code> own the test (scenario-lived); page objects own the view (view-lived). Every pattern — DI restraint, the settle helper, the context facade, the entity-grid factories, the <code>ApiService</code> template method, fail-soft cleanup, side-effect reporting, quarantined non-parallel tests — exists to manage those lifetimes safely under parallel load. Learn to think in lifetimes and ownership and you can not only maintain this framework — you can build the next one.</p>
+    <a class="backtop" href="#read">↑ back to top</a>
+  </section>
+
+  </main>
+</div>
+
+<footer>
+  Field Guide to the CPQ Automation Framework · Complete Edition · grounded in CPQPlatformTests.sln ·
+  Reqnroll 3.3 · Playwright 1.52 · .NET 10 · a reverse-engineering handbook, not official documentation.
+</footer>
+
+<script>
+  (function () {
+    var btn = document.getElementById('themeBtn');
+    var root = document.documentElement;
+    btn.addEventListener('click', function () {
+      var cur = root.getAttribute('data-theme');
+      if (!cur) cur = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      root.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+    });
+    var links = Array.prototype.slice.call(document.querySelectorAll('.rail nav a'));
+    var map = {};
+    links.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          links.forEach(function (l) { l.style.borderLeftColor = 'transparent'; l.style.color = ''; });
+          var a = map[e.target.id];
+          if (a) { a.style.borderLeftColor = 'var(--accent)'; a.style.color = 'var(--accent)'; }
+        }
+      });
+    }, { rootMargin: '-10% 0px -80% 0px' });
+    document.querySelectorAll('main section').forEach(function (s) { obs.observe(s); });
+  })();
+</script>
+</body>
+</html>
