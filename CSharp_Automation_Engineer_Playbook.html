@@ -1,0 +1,1487 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The C# Automation Engineer's Field Playbook</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='88'%3E%E2%9A%99%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<style>
+/* ============================================================
+   THE C# AUTOMATION ENGINEER'S FIELD PLAYBOOK
+   Blueprint field-guide UI · C# / .NET only · deep detail
+   ============================================================ */
+:root{
+  --paper:#E9EDF1; --panel:#FFFFFF; --panel-2:#F3F6F9; --ink:#131A22; --ink-soft:#3D4A57;
+  --ink-faint:#647383; --rule:#D2DAE2; --rule-soft:#E1E7ED; --accent:#1E7C9C; --accent-deep:#145E77;
+  --accent-wash:#E1EFF4; --amber:#A9711A; --amber-wash:#F6ECD8; --green:#2E7D52; --green-wash:#E0EFE6;
+  --red:#B34632; --red-wash:#F6E2DC; --code-bg:#F4F7FA; --code-ink:#1c2530;
+  --shadow:0 1px 2px rgba(19,26,34,.06),0 8px 24px rgba(19,26,34,.06);
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif;
+  --mono:ui-monospace,"Cascadia Mono","SF Mono",Consolas,"Roboto Mono",monospace;
+  --measure:72ch; --rail:310px;
+}
+@media (prefers-color-scheme:dark){
+  :root{--paper:#0C1219;--panel:#121B24;--panel-2:#16212C;--ink:#DCE4EC;--ink-soft:#A7B4C1;
+    --ink-faint:#74838F;--rule:#24323F;--rule-soft:#1B2732;--accent:#4FB6D8;--accent-deep:#7FD0EA;
+    --accent-wash:#12303C;--amber:#D6A24E;--amber-wash:#2C2413;--green:#5EBE88;--green-wash:#14271C;
+    --red:#E07C63;--red-wash:#2C1712;--code-bg:#0E1720;--code-ink:#cdd7e1;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);}
+}
+:root[data-theme="light"]{--paper:#E9EDF1;--panel:#FFFFFF;--panel-2:#F3F6F9;--ink:#131A22;--ink-soft:#3D4A57;--ink-faint:#647383;--rule:#D2DAE2;--rule-soft:#E1E7ED;--accent:#1E7C9C;--accent-deep:#145E77;--accent-wash:#E1EFF4;--amber:#A9711A;--amber-wash:#F6ECD8;--green:#2E7D52;--green-wash:#E0EFE6;--red:#B34632;--red-wash:#F6E2DC;--code-bg:#F4F7FA;--code-ink:#1c2530;--shadow:0 1px 2px rgba(19,26,34,.06),0 8px 24px rgba(19,26,34,.06)}
+:root[data-theme="dark"]{--paper:#0C1219;--panel:#121B24;--panel-2:#16212C;--ink:#DCE4EC;--ink-soft:#A7B4C1;--ink-faint:#74838F;--rule:#24323F;--rule-soft:#1B2732;--accent:#4FB6D8;--accent-deep:#7FD0EA;--accent-wash:#12303C;--amber:#D6A24E;--amber-wash:#2C2413;--green:#5EBE88;--green-wash:#14271C;--red:#E07C63;--red-wash:#2C1712;--code-bg:#0E1720;--code-ink:#cdd7e1;--shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35)}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:17px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.shell{display:grid;grid-template-columns:var(--rail) minmax(0,1fr);gap:0;max-width:1400px;margin:0 auto}
+.rail{position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;padding:28px 18px 60px 26px;border-right:1px solid var(--rule);background:linear-gradient(180deg,var(--panel-2),var(--paper) 70%)}
+.rail .brand{font-family:var(--mono);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+.rail .brand-title{font-size:1.1rem;font-weight:700;line-height:1.25;margin:0 0 18px;color:var(--ink)}
+.rail nav a{display:block;font-family:var(--mono);font-size:.74rem;line-height:1.4;color:var(--ink-soft);text-decoration:none;padding:3px 0 3px 12px;border-left:2px solid transparent}
+.rail nav a:hover{color:var(--accent);border-left-color:var(--accent)}
+.rail nav .grp{font-family:var(--mono);font-size:.63rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);margin:15px 0 5px}
+.rail nav a .n{color:var(--ink-faint);margin-right:6px}
+main{padding:0 clamp(20px,4vw,64px) 100px;overflow:hidden}
+section{padding-top:42px;scroll-margin-top:16px}
+section>.kicker{font-family:var(--mono);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}
+h1,h2,h3,h4{font-family:var(--serif);color:var(--ink);text-wrap:balance;line-height:1.2}
+h2{font-size:clamp(1.55rem,3vw,2.05rem);margin:6px 0 4px;letter-spacing:-.01em}
+h3{font-size:1.3rem;margin:32px 0 6px}
+h4{font-size:1.04rem;margin:22px 0 4px;font-variant:small-caps;letter-spacing:.03em;color:var(--accent-deep)}
+p,li{max-width:var(--measure)}
+a{color:var(--accent-deep)} strong{color:var(--ink)}
+.lead{font-size:1.14rem;color:var(--ink-soft);max-width:64ch}
+.part{font-family:var(--mono);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);border-top:2px solid var(--accent);padding-top:10px;margin-top:24px}
+hr.div{border:0;border-top:1px solid var(--rule);margin:38px 0 0}
+.hero{padding:60px clamp(20px,4vw,64px) 22px;border-bottom:1px solid var(--rule);position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--rule-soft) 1px,transparent 1px),linear-gradient(90deg,var(--rule-soft) 1px,transparent 1px);background-size:26px 26px;opacity:.55;mask-image:radial-gradient(120% 80% at 80% 0%,#000 30%,transparent 78%);-webkit-mask-image:radial-gradient(120% 80% at 80% 0%,#000 30%,transparent 78%)}
+.hero>*{position:relative}
+.hero .eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent)}
+.hero h1{font-size:clamp(2rem,5.5vw,3.6rem);margin:12px 0 10px;letter-spacing:-.02em}
+.hero h1 em{font-style:italic;color:var(--accent-deep)}
+.hero .sub{font-size:1.18rem;color:var(--ink-soft);max-width:62ch}
+.hero .meta{font-family:var(--mono);font-size:.74rem;color:var(--ink-faint);margin-top:22px;display:flex;flex-wrap:wrap;gap:8px 22px}
+.hero .meta b{color:var(--accent-deep);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 0}
+.chip{font-family:var(--mono);font-size:.72rem;padding:4px 10px;border:1px solid var(--rule);border-radius:2px;background:var(--panel);color:var(--ink-soft)}
+.chip b{color:var(--accent-deep)}
+.note{border:1px solid var(--rule);border-left:3px solid var(--accent);background:var(--panel);border-radius:3px;padding:15px 19px;margin:20px 0;box-shadow:var(--shadow);max-width:78ch}
+.note .tag{font-family:var(--mono);font-size:.67rem;letter-spacing:.13em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:5px}
+.note.mind{border-left-color:var(--accent)} .note.mind .tag{color:var(--accent)}
+.note.warn{border-left-color:var(--amber);background:var(--amber-wash)} .note.warn .tag{color:var(--amber)}
+.note.good{border-left-color:var(--green);background:var(--green-wash)} .note.good .tag{color:var(--green)}
+.note.pit{border-left-color:var(--red);background:var(--red-wash)} .note.pit .tag{color:var(--red)}
+.note p:first-of-type{margin-top:0} .note p:last-child{margin-bottom:0}
+pre{background:var(--code-bg);color:var(--code-ink);border:1px solid var(--rule);border-left:3px solid var(--accent);border-radius:4px;padding:14px 17px;overflow-x:auto;font-family:var(--mono);font-size:.79rem;line-height:1.55;margin:16px 0}
+pre.diagram{line-height:1.35;font-size:.75rem;color:var(--ink-soft);background:var(--panel-2);border-left-color:var(--rule)}
+pre.diagram b{color:var(--accent-deep);font-weight:600}
+pre .c{color:var(--ink-faint)} pre .k{color:var(--accent-deep);font-weight:600} pre .s{color:var(--green)}
+code{font-family:var(--mono);font-size:.84em;background:var(--code-bg);padding:1px 5px;border-radius:3px;border:1px solid var(--rule-soft);color:var(--code-ink)}
+pre code{background:none;border:0;padding:0;font-size:1em}
+.cap{font-family:var(--mono);font-size:.7rem;color:var(--ink-faint);margin:-8px 0 20px;letter-spacing:.02em}
+.tw{overflow-x:auto;margin:18px 0;border:1px solid var(--rule);border-radius:4px}
+table{border-collapse:collapse;width:100%;font-size:.82rem;font-family:var(--serif)}
+th,td{text-align:left;padding:8px 13px;border-bottom:1px solid var(--rule-soft);vertical-align:top}
+th{font-family:var(--mono);font-size:.65rem;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-faint);background:var(--panel-2);border-bottom:1px solid var(--rule)}
+tr:last-child td{border-bottom:0}
+td code{font-size:.82em}
+caption{caption-side:top;text-align:left;font-size:.74rem;color:var(--ink-faint);font-style:italic;padding:0 0 6px}
+.facets{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:4px;overflow:hidden;margin:20px 0}
+@media (min-width:720px){.facets{grid-template-columns:1fr 1fr}.facets.three{grid-template-columns:1fr 1fr 1fr}}
+.facet{background:var(--panel);padding:13px 17px}
+.facet h5{font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin:0 0 5px}
+.facet p{margin:0;font-size:.89rem;color:var(--ink-soft);max-width:none}
+ol.steps{counter-reset:s;list-style:none;padding:0;margin:18px 0}
+ol.steps>li{counter-increment:s;position:relative;padding:4px 0 14px 44px;max-width:74ch}
+ol.steps>li::before{content:counter(s,decimal-leading-zero);position:absolute;left:0;top:2px;font-family:var(--mono);font-size:.78rem;color:var(--accent);border:1px solid var(--rule);border-radius:3px;padding:2px 6px;background:var(--panel)}
+ul.check{list-style:none;padding-left:2px;margin:10px 0}
+ul.check>li{position:relative;padding:2px 0 6px 26px;max-width:74ch}
+ul.check>li::before{content:"\2610";position:absolute;left:0;top:-1px;color:var(--accent);font-size:1.05rem}
+ul.tick>li::before{content:"\2713";color:var(--green);font-weight:700}
+.kbd{font-family:var(--mono);font-size:.78em;border:1px solid var(--rule);border-bottom-width:2px;border-radius:3px;padding:1px 5px;background:var(--panel)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-family:var(--mono);font-size:.72rem;color:var(--ink-faint);margin:8px 0 0}
+.legend span::before{content:"\258A "}
+.legend .l-mind::before{color:var(--accent)} .legend .l-warn::before{color:var(--amber)}
+.legend .l-good::before{color:var(--green)} .legend .l-pit::before{color:var(--red)}
+.backtop{display:inline-block;font-family:var(--mono);font-size:.7rem;color:var(--ink-faint);text-decoration:none;margin-top:16px}
+.backtop:hover{color:var(--accent)}
+footer{border-top:1px solid var(--rule);margin-top:56px;padding:28px clamp(20px,4vw,64px);font-family:var(--mono);font-size:.74rem;color:var(--ink-faint)}
+.toggle{position:fixed;top:12px;right:14px;z-index:50;font-family:var(--mono);font-size:.7rem;background:var(--panel);color:var(--ink-soft);border:1px solid var(--rule);border-radius:3px;padding:6px 10px;cursor:pointer;box-shadow:var(--shadow)}
+.toggle:hover{color:var(--accent);border-color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (max-width:880px){.shell{grid-template-columns:1fr}.rail{position:static;height:auto;border-right:0;border-bottom:1px solid var(--rule)}.rail nav{columns:2;column-gap:20px}}
+@media print{
+  @page{size:A4;margin:16mm 15mm 18mm}
+  body{background:#fff;font-size:10.5pt}
+  .toggle,.rail{display:none}
+  .shell{grid-template-columns:1fr;max-width:none}
+  main{padding:0}
+  section.p{page-break-before:always}
+  h2,h3,h4{page-break-after:avoid}
+  pre,table,.note,.facets{page-break-inside:avoid}
+  a{color:inherit;text-decoration:none}
+}
+</style>
+</head>
+<body>
+<button class="toggle" id="themeBtn" aria-label="Toggle theme">◐ THEME</button>
+
+<header class="hero">
+  <div class="eyebrow">Field Playbook · C# / .NET Automation · Deep Edition</div>
+  <h1>The C# Automation Engineer's <em>Field Playbook</em></h1>
+  <p class="sub">How an expert (or an AI coding agent) meets an unfamiliar .NET repository and works it end to end — recon, tracing linkages, placing code, running <code>dotnet test</code>, reading C# stack traces, killing flaky Selenium/Playwright failures, and verifying beyond green. C# only, in depth.</p>
+  <div class="chips">
+    <span class="chip"><b>.NET</b> SDK / CLI</span>
+    <span class="chip"><b>xUnit · NUnit · MSTest</b></span>
+    <span class="chip"><b>Reqnroll / SpecFlow</b></span>
+    <span class="chip"><b>Playwright &amp; Selenium</b> .NET</span>
+    <span class="chip"><b>Roslyn</b> analyzers</span>
+    <span class="chip"><b>RestSharp / HttpClient</b></span>
+    <span class="chip"><b>PowerShell</b></span>
+  </div>
+  <div class="meta">
+    <span>AUDIENCE · <b>working automation engineers</b></span>
+    <span>SCOPE · <b>C# / .NET only</b></span>
+    <span>USE · <b>second-monitor field manual</b></span>
+  </div>
+</header>
+
+<div class="shell">
+  <aside class="rail">
+    <div class="brand">Field Playbook · C#</div>
+    <div class="brand-title">C# Automation<br>Engineer's Field Guide</div>
+    <nav>
+      <div class="grp">Mindset</div>
+      <a href="#p0"><span class="n">0</span>How an expert thinks</a>
+      <div class="grp">Recon &amp; Navigation</div>
+      <a href="#p1"><span class="n">1</span>Reading a .NET repo fast</a>
+      <a href="#p2"><span class="n">2</span>Finding linkages</a>
+      <a href="#p3"><span class="n">3</span>Planning &amp; scoping</a>
+      <a href="#p4"><span class="n">4</span>Where code belongs</a>
+      <a href="#p5"><span class="n">5</span>Implementation discipline</a>
+      <div class="grp">Tests &amp; Failures</div>
+      <a href="#p6"><span class="n">6</span>Running &amp; reading tests</a>
+      <a href="#p7"><span class="n">7</span>Reading stack traces</a>
+      <a href="#p8"><span class="n">8</span>Verifying beyond green</a>
+      <div class="grp">Reference</div>
+      <a href="#p9"><span class="n">9</span>CLI cheat sheets</a>
+      <a href="#p10"><span class="n">10</span>Automation-specific skills</a>
+      <div class="grp">Growth</div>
+      <a href="#p11"><span class="n">11</span>30-day practice plan</a>
+      <a href="#p12"><span class="n">12</span>Working without AI</a>
+      <div class="grp">Power Tools</div>
+      <a href="#p13"><span class="n">13</span>Advanced terminal &amp; diagnostics</a>
+      <a href="#appx"><span class="n">A</span>One-page quick reference</a>
+    </nav>
+  </aside>
+
+  <main>
+
+  <!-- ================= PART 0 ================= -->
+  <section class="p" id="p0">
+    <div class="part">Part 0 · Mindset</div>
+    <div class="kicker">Section 0</div>
+    <h2>How an expert (or AI agent) actually thinks</h2>
+    <p class="lead">Seniority is not memorised syntax or typing speed. It is a <strong>loop</strong> run without being told to, and a refusal to act on anything unconfirmed. Everything else in this playbook is a tool that loop wields.</p>
+
+    <div class="legend">
+      <span class="l-mind">Expert's mind — the reasoning behind a move</span>
+      <span class="l-good">Good habit to build</span>
+      <span class="l-warn">Trade-off / judgement call</span>
+      <span class="l-pit">Trap that wastes hours</span>
+    </div>
+
+    <h3>0.1 The core loop: recon → plan → implement → verify → summarize</h3>
+    <p>Every competent change follows the same five beats. Each beat exists to kill one category of wasted time; skipping a beat is exactly where debugging hours disappear.</p>
+    <pre class="diagram">
+   ┌─────────┐   ┌────────┐   ┌───────────┐   ┌────────┐   ┌───────────┐
+   │ 1 RECON │──►│ 2 PLAN │──►│3 IMPLEMENT│──►│4 VERIFY│──►│5 SUMMARIZE│
+   └─────────┘   └────────┘   └───────────┘   └────────┘   └───────────┘
+   read facts    what/where    smallest        narrow→wide   what changed,
+   before        /how-verify   idiomatic        revert-test  why, residual
+   touching      (write it)    change           build+lint   risk
+        ▲                                                          │
+        └──────────────── new facts feed the next loop ◄───────────┘
+</pre>
+    <div class="tw"><table>
+      <caption>The five beats and the specific failure each one prevents.</caption>
+      <thead><tr><th>Beat</th><th>What you actually do</th><th>Waste it prevents</th></tr></thead>
+      <tbody>
+        <tr><td>1 · Recon</td><td>Read structure, entry points, conventions, the failing test. Gather facts.</td><td>Editing the wrong file; rebuilding something that exists.</td></tr>
+        <tr><td>2 · Plan</td><td>State what changes, in which files, in what order, and how you'll verify.</td><td>Half-finished edits; forgotten callers; scope creep.</td></tr>
+        <tr><td>3 · Implement</td><td>Smallest change that satisfies the plan, in the local style.</td><td>Big speculative rewrites nobody can review or revert.</td></tr>
+        <tr><td>4 · Verify</td><td>Run the narrowest test, widen; read output; check callers &amp; build.</td><td>"It compiles" shipped as "it works"; silent regressions.</td></tr>
+        <tr><td>5 · Summarize</td><td>Record what changed, why, what's verified, residual risk.</td><td>Lost context; re-deriving everything tomorrow.</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note mind"><span class="tag">Expert's mind · why it's front-loaded</span><p>Most debugging time is not spent fixing — it is spent <strong>fixing the wrong thing</strong> because recon was skipped. Ten minutes of recon routinely saves hours of blind editing. An AI agent is disciplined about this because it cannot afford wrong guesses across many tool calls; a human should be disciplined for the same reason.</p></div>
+
+    <h3>0.2 "Guess and edit" vs "confirm and edit"</h3>
+    <p>These are two whole operating modes. The entire playbook exists to move you permanently into the second.</p>
+    <div class="tw"><table>
+      <thead><tr><th>Situation</th><th>Guess &amp; edit (amateur)</th><th>Confirm &amp; edit (expert)</th></tr></thead>
+      <tbody>
+        <tr><td>"This method looks unused."</td><td>Delete it.</td><td><code>rg "MethodName"</code> across src + tests + config, then decide.</td></tr>
+        <tr><td>"The bug is in this method."</td><td>Change lines to see what helps.</td><td>Reproduce in one test, read the trace, confirm the exact line.</td></tr>
+        <tr><td>"This timeout should be 30s."</td><td>Change it and hope.</td><td>Find where it's read and who else depends on it, then change.</td></tr>
+        <tr><td>"Tests pass — done."</td><td>Push.</td><td>Confirm the change is exercised (revert-test), run callers, smoke.</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note mind"><span class="tag">Expert's mind · a distinct example</span><p>A test asserts a quote total of <code>110</code> but gets <code>100</code>. The guesser edits the assertion to <code>100</code> and moves on — hiding a real pricing bug. The confirmer traces the <code>100</code> back to a discount applied twice, fixes the <em>source</em>, and the assertion passes honestly. Same red test; opposite outcomes. The only difference was <em>confirming the cause before editing.</em></p></div>
+
+    <h3>0.3 Why narrating the plan first catches most mistakes</h3>
+    <p>Saying the plan out loud — even to yourself, even in a scratch comment — forces the vague into the specific, and specifics expose flaws that fuzzy intentions hide.</p>
+    <ol class="steps">
+      <li><strong>It surfaces unknowns.</strong> "I'll update the discount logic" collapses the moment you try to name the file — you realise you don't yet know where it lives. Discover that now, not mid-edit.</li>
+      <li><strong>It reveals missing consumers.</strong> Writing "change <code>CalculateTotal()</code>" prompts "who calls it?" — which you answer <em>before</em> breaking three callers.</li>
+      <li><strong>It sets a stopping condition.</strong> A plan ending in "verified by <code>dotnet test --filter ~QuoteTotal</code>" tells you exactly when you're done.</li>
+    </ol>
+    <div class="note good"><span class="tag">Good habit · the three-line plan</span><p>Before any change, write three lines in a scratch file: <em>WHAT</em> I'm changing, <em>WHERE</em> (files), <em>HOW I'll verify</em>. If you can't fill all three, you're still in recon — stay there. This is the single highest-leverage habit in the book.</p></div>
+
+    <h3>0.4 What to copy from how an AI agent works</h3>
+    <ul class="check">
+      <li>It <strong>searches before it reads</strong> (grep/glob) and <strong>reads before it writes</strong> — never edits a file it hasn't opened.</li>
+      <li>It <strong>reads the whole relevant region</strong>, not one line, so the edit matches surrounding style automatically.</li>
+      <li>It <strong>runs the narrowest verification</strong> that proves the change, then widens.</li>
+      <li>It <strong>states assumptions explicitly</strong>, so a wrong one is visible and cheap to fix.</li>
+    </ul>
+    <p>You have the same tools it does — <code>rg</code>, <code>git</code>, <code>dotnet test</code>, a stack trace. Parts 1–9 are those tools; Part 0 is the loop that wields them.</p>
+  </section>
+
+  <!-- ================= PART 1 ================= -->
+  <section class="p" id="p1">
+    <div class="part">Part 1 · Recon &amp; Navigation</div>
+    <div class="kicker">Section 1</div>
+    <h2>Reading a .NET repository fast</h2>
+    <p class="lead">Your first pass builds a <em>map</em>, not full understanding: where things are, how it builds, how it tests, and which conventions rule. Detail comes on demand once the map is right.</p>
+
+    <h3>1.1 The first-10-minutes checklist</h3>
+    <ol class="steps">
+      <li><strong>Read <code>README</code> / <code>CONTRIBUTING</code></strong> — how to build, test, run. Two minutes saves twenty.</li>
+      <li><strong>List the top level</strong> — <code>Get-ChildItem</code> / <code>ls</code>. Identify src vs tests vs config vs docs vs CI.</li>
+      <li><strong>Open the <code>.sln</code></strong> — it names every project and how they group.</li>
+      <li><strong>Read the CI file</strong> (<code>azure-pipelines.yml</code>, <code>.github/workflows/*.yml</code>) — the <em>authoritative</em> build+test recipe, because it's what actually runs green.</li>
+      <li><strong>Find the test projects</strong> — folder names + the test framework tell you how the team verifies.</li>
+      <li><strong>Find config/env files</strong> — <code>appsettings.json</code>, <code>*.runsettings</code>, <code>.env</code> — they reveal external dependencies (URLs, DBs, creds).</li>
+      <li><strong><code>git log --oneline -20</code></strong> — what's changing and the commit-message style.</li>
+      <li><strong>Build once:</strong> <code>dotnet build</code> — a green build confirms your environment before you touch anything.</li>
+      <li><strong>Run one test</strong> — confirms the test path works and shows the runner's output format.</li>
+      <li><strong>Note conventions</strong> — naming, folders, formatting, <code>.editorconfig</code>. You will match these, not fight them.</li>
+    </ol>
+    <div class="note mind"><span class="tag">Expert's mind · why CI beats the README</span><p>READMEs drift; CI does not. If the pipeline is green, its commands are correct <em>today</em>. When docs and CI disagree, believe CI — copy its exact <code>dotnet test</code> line and run that.</p></div>
+
+    <h3>1.2 The solution &amp; project model (.sln / .csproj)</h3>
+    <p>A .NET repo is a <strong>solution</strong> (<code>.sln</code>) containing <strong>projects</strong> (<code>.csproj</code>). Each project compiles to one assembly (DLL/EXE) and declares its own dependencies. Understanding the project graph is understanding the architecture.</p>
+    <pre><code><span class="c"># What SDKs/runtimes are installed, and which the repo resolves to</span>
+dotnet --info
+dotnet --list-sdks
+
+<span class="c"># The solution's projects and their relationships</span>
+dotnet sln list                          <span class="c"># every project in the .sln</span>
+dotnet list SpecFlowTests/SpecFlowTests.csproj reference   <span class="c"># project-to-project deps</span>
+dotnet list SpecFlowTests/SpecFlowTests.csproj package     <span class="c"># NuGet deps + versions</span>
+
+<span class="c"># Prove the environment is good before editing anything</span>
+dotnet restore
+dotnet build -c Release</code></pre>
+    <p><strong>Read a <code>.csproj</code> like a manifest.</strong> These are the lines that tell you the most:</p>
+    <pre><code>&lt;Project Sdk="Microsoft.NET.Sdk"&gt;
+  &lt;PropertyGroup&gt;
+    <span class="k">&lt;TargetFramework&gt;</span>net10.0<span class="k">&lt;/TargetFramework&gt;</span>   <span class="c">&lt;!-- runtime the project targets --&gt;</span>
+    &lt;Nullable&gt;enable&lt;/Nullable&gt;               <span class="c">&lt;!-- nullable ref types on --&gt;</span>
+    &lt;ImplicitUsings&gt;enable&lt;/ImplicitUsings&gt;   <span class="c">&lt;!-- global usings; see also GlobalUsings.cs --&gt;</span>
+    &lt;IsPackable&gt;false&lt;/IsPackable&gt;
+  &lt;/PropertyGroup&gt;
+  &lt;ItemGroup&gt;
+    <span class="k">&lt;PackageReference</span> Include="Microsoft.Playwright" Version="1.52.0" /&gt;   <span class="c">&lt;!-- NuGet --&gt;</span>
+    <span class="k">&lt;ProjectReference</span> Include="..\PageObjects\PageObjects.csproj" /&gt;      <span class="c">&lt;!-- internal dep --&gt;</span>
+    &lt;Reference Include="GuidedSelling.Web.Entities"&gt;                         <span class="c">&lt;!-- raw DLL ref --&gt;</span>
+      &lt;HintPath&gt;..\Models\DLL\GuidedSelling.Web.Entities.dll&lt;/HintPath&gt;
+    &lt;/Reference&gt;
+  &lt;/ItemGroup&gt;
+&lt;/Project&gt;</code></pre>
+    <div class="tw"><table>
+      <thead><tr><th>File / signal</th><th>What it tells you</th></tr></thead>
+      <tbody>
+        <tr><td><code>*.sln</code></td><td>The umbrella; project grouping and build order.</td></tr>
+        <tr><td><code>*.csproj</code></td><td><code>&lt;TargetFramework&gt;</code>, <code>&lt;PackageReference&gt;</code> (NuGet), <code>&lt;ProjectReference&gt;</code> (internal deps), <code>&lt;Reference&gt;</code> (raw DLLs).</td></tr>
+        <tr><td><code>Directory.Build.props</code> / <code>.targets</code></td><td>Settings applied to <em>every</em> project — global nullable, analysis level, versions. Always check it.</td></tr>
+        <tr><td><code>Directory.Packages.props</code></td><td>Central Package Management — one place pins all NuGet versions.</td></tr>
+        <tr><td><code>nuget.config</code></td><td>Package sources (private/internal feeds live here).</td></tr>
+        <tr><td><code>global.json</code></td><td>Pins the exact SDK version — matches your build to CI's.</td></tr>
+        <tr><td><code>.editorconfig</code></td><td>The formatting + analyzer-severity contract. This IS the style guide.</td></tr>
+        <tr><td><code>GlobalUsings.cs</code> / <code>ImplicitUsings</code></td><td>Why types resolve with no <code>using</code> in a file.</td></tr>
+        <tr><td><code>Program.cs</code> / <code>Main</code></td><td>Entry point for executables (not test libraries).</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note mind"><span class="tag">Expert's mind · the project graph is the dependency law</span><p><code>ProjectReference</code> edges are one-directional and enforced by the compiler: if <code>Models</code> does not reference <code>PageObjects</code>, then no domain model can accidentally depend on a page object. Reading the reference graph (<code>dotnet list … reference</code> on each project) tells you the intended layering before you read a single class — and tells you instantly where a new piece of code is <em>allowed</em> to live.</p></div>
+
+    <h3>1.3 NuGet — reading the dependency surface</h3>
+    <pre><code>dotnet list package                      <span class="c"># direct packages</span>
+dotnet list package --include-transitive <span class="c"># everything pulled in indirectly</span>
+dotnet list package --outdated           <span class="c"># which have newer versions</span>
+dotnet list package --vulnerable         <span class="c"># known CVEs</span>
+dotnet nuget locals all --list           <span class="c"># where packages are cached on disk</span></code></pre>
+    <p>The package list is a fingerprint of what the project <em>is</em>: <code>Microsoft.Playwright</code> → browser automation; <code>Reqnroll</code>/<code>SpecFlow</code> → BDD; <code>xunit</code>/<code>nunit</code>/<code>MSTest.*</code> → the test framework; <code>Microsoft.NET.Test.Sdk</code> → it's a runnable test project; <code>RestSharp</code> → API tests; <code>FluentAssertions</code>/<code>AwesomeAssertions</code> → the assertion style.</p>
+
+    <h3>1.4 Recognising an automation framework's landmarks</h3>
+    <p>A test-automation repo has recognisable parts. Spotting them tells you instantly where new logic belongs (Part 4 makes this a rule).</p>
+    <div class="tw"><table>
+      <thead><tr><th>Landmark</th><th>How to recognise it in C#</th><th>What lives there</th></tr></thead>
+      <tbody>
+        <tr><td>Page Object Model</td><td>Classes named <code>*Page</code> with locators + action methods, one per screen; usually inherit a <code>PageObjectBase</code>.</td><td>How to <em>drive</em> a screen (selectors, clicks, reads).</td></tr>
+        <tr><td>BDD layer</td><td><code>*.feature</code> files (Gherkin) + <code>[Binding]</code> step classes (Reqnroll/SpecFlow).</td><td>Given/When/Then glue mapping sentences to page/API calls.</td></tr>
+        <tr><td>Hooks / lifecycle</td><td><code>[BeforeScenario]</code>/<code>[AfterScenario]</code>, or <code>[SetUp]</code>/<code>[OneTimeSetUp]</code>, or a <code>BaseTest</code>.</td><td>Browser lifecycle, setup/teardown, shared context.</td></tr>
+        <tr><td>Config / environments</td><td><code>appsettings.json</code>, <code>*.runsettings</code>, <code>orgsettings.json</code>.</td><td>URLs, credentials, timeouts, run mode.</td></tr>
+        <tr><td>Test data / fixtures</td><td><code>TestData/</code>, <code>Fixtures/</code>, <code>Resources/</code>; builder classes (<code>*Helper</code>, <code>*Builder</code>).</td><td>Sample payloads, seed data, expected files.</td></tr>
+        <tr><td>Shared helpers/components</td><td><code>Shared/</code>, <code>Helpers/</code>, <code>Core/</code>, <code>Extensions/</code>.</td><td>Cross-cutting, screen-independent utilities.</td></tr>
+        <tr><td>API client</td><td><code>*Service</code>/<code>*Client</code> classes wrapping <code>HttpClient</code>/RestSharp.</td><td>Transport for data setup / verification.</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note good"><span class="tag">Recon complete when…</span><p>You can answer, for any .NET repo: <em>Which SDK &amp; target framework? How do I build it? How do I run one test? What are the projects and how do they reference each other? Where do pages, steps, config, test data, and helpers live? What does <code>.editorconfig</code> enforce?</em> If yes, you're ready to trace linkages (Part 2).</p></div>
+  </section>
+
+  <!-- ================= PART 2 ================= -->
+  <section class="p" id="p2">
+    <div class="part">Part 2 · Recon &amp; Navigation</div>
+    <div class="kicker">Section 2</div>
+    <h2>Finding linkages between files</h2>
+    <p class="lead">Code is a graph, not a list. Before you touch a node you must see its edges — who calls it, what it calls, when it last changed and why. These techniques turn an opaque solution into a navigable map.</p>
+
+    <h3>2.1 The universal layer: git + ripgrep (the 80%)</h3>
+    <p>You can trace almost anything with git and a fast grep, with no IDE. Learn these cold — they work even over SSH on a build agent.</p>
+    <pre><code><span class="c"># Find every reference to a symbol (ripgrep respects .gitignore, is fast)</span>
+rg "CalculateTotal"                 <span class="c"># all hits, file:line</span>
+rg -w "Total"                       <span class="c"># whole word (won't match SubTotal)</span>
+rg -t cs "CalculateTotal"           <span class="c"># C# files only</span>
+rg -n -C 3 "CalculateTotal"         <span class="c"># 3 lines of context each side</span>
+rg -l "CalculateTotal"              <span class="c"># just the file names</span>
+rg -g "!**/bin/**" -g "!**/obj/**" "CalculateTotal"   <span class="c"># exclude build output</span>
+
+<span class="c"># Who changed a line, and in which commit?</span>
+git blame -L 40,60 src/Pricing.cs
+
+<span class="c"># The behavioural history of a file</span>
+git log -p -- src/Pricing.cs        <span class="c"># every diff that touched it</span>
+git log --follow -- src/Pricing.cs  <span class="c"># keep history across RENAMES</span>
+git log -S"CalculateTotal"          <span class="c"># commits that ADDED/REMOVED that string (pickaxe)</span>
+git log -G"discount.*0\.1"          <span class="c"># commits whose diff matches a regex</span>
+git show &lt;commit&gt;                    <span class="c"># the full change + message (the "why")</span></code></pre>
+    <div class="note mind"><span class="tag">Expert's mind · the define / consume / test triangle</span><p>For any symbol, answer three questions with the commands above: (1) <em>Definition</em> — where declared? (2) <em>Consumers</em> — who references it (<code>rg -w</code>)? (3) <em>Tests</em> — which test names mention it? Sketch that triangle on paper. It is the unit of safe change: you may edit the definition only once you can see every consumer and the tests that guard them.</p></div>
+    <div class="note warn"><span class="tag">Trade-off · rg finds text, not semantics</span><p><code>rg</code> can't tell an overload apart, resolve an interface to its implementations, or follow reflection. It's the fast first pass. For overloads, inheritance, and interface implementations use Roslyn (2.2). And always <code>rg</code> the string name too, because C# can bind by string — DI registration, reflection, config keys — which the compiler won't catch on a rename.</p></div>
+
+    <h3>2.2 C# semantic tooling (Roslyn-powered)</h3>
+    <p>Roslyn is the C# compiler-as-a-service; every "smart" navigation in Visual Studio and Rider is built on it. Use the IDE for semantics, the CLI for repeatability.</p>
+    <div class="tw"><table>
+      <thead><tr><th>Task</th><th>Visual Studio</th><th>Rider / ReSharper</th></tr></thead>
+      <tbody>
+        <tr><td>Go to definition</td><td><span class="kbd">F12</span></td><td><span class="kbd">F12</span> / <span class="kbd">Ctrl</span>+<span class="kbd">B</span></td></tr>
+        <tr><td>Find all references</td><td><span class="kbd">Shift</span>+<span class="kbd">F12</span></td><td><span class="kbd">Alt</span>+<span class="kbd">F7</span></td></tr>
+        <tr><td>Call hierarchy (who calls whom)</td><td><span class="kbd">Ctrl</span>+<span class="kbd">K</span>,<span class="kbd">Ctrl</span>+<span class="kbd">T</span></td><td><span class="kbd">Ctrl</span>+<span class="kbd">Alt</span>+<span class="kbd">H</span></td></tr>
+        <tr><td>Go to implementation (interface → impl)</td><td><span class="kbd">Ctrl</span>+<span class="kbd">F12</span></td><td><span class="kbd">Ctrl</span>+<span class="kbd">F12</span></td></tr>
+        <tr><td>Navigate to any symbol</td><td><span class="kbd">Ctrl</span>+<span class="kbd">T</span></td><td><span class="kbd">Ctrl</span>+<span class="kbd">T</span> / <span class="kbd">Shift</span>×2</td></tr>
+      </tbody>
+    </table></div>
+    <pre><code><span class="c"># CLI, no IDE — headless code inspection with ReSharper command-line tools</span>
+dotnet tool install -g JetBrains.ReSharper.GlobalTools
+jb inspectcode CPQPlatformTests.sln -o=inspect.xml   <span class="c"># full static inspection report</span>
+
+<span class="c"># Format &amp; apply style/analyzer fixes to convention</span>
+dotnet format                       <span class="c"># whitespace + style + analyzers</span>
+dotnet format --verify-no-changes   <span class="c"># CI check: fail if not already formatted</span>
+dotnet format style                 <span class="c"># only IDExxxx style rules</span>
+dotnet format analyzers             <span class="c"># only analyzer (CAxxxx) fixes</span>
+
+<span class="c"># Source-only a compiled DLL when you have no source (a referenced .dll)</span>
+dotnet tool install -g ilspycmd
+ilspycmd Models/DLL/GuidedSelling.Web.Entities.dll &gt; entities.decompiled.cs</code></pre>
+    <div class="note good"><span class="tag">Good habit · decompile the black box</span><p>When a test binds to a referenced DLL you don't have source for (like a domain-entities assembly), decompile it with <code>ilspycmd</code> to read the real property names, types, and shapes instead of guessing. Guessing at an entity's property name is the #1 cause of silent test-data bugs.</p></div>
+
+    <h3>2.3 Worked example — trace a failing UI test to its root, in C#</h3>
+    <p><strong>Scenario.</strong> A Reqnroll UI test fails asserting an order total. Trace from the failing <em>scenario</em> → the <em>step</em> → the <em>page/service method</em> → the <em>logic</em> → back to the <em>test that guards it</em>.</p>
+    <pre class="diagram">
+ .feature line            Step [Binding]           Page/Service           Domain logic
+ "Basket, I verify   ──►  BasketPageSteps      ──► BasketPage        ──►  CalculateTotal()
+  the total is 110"        .ThenTotalIs(...)        .GetTotalAsync()        (the actual bug)
+        │                       │                        │                      │
+        └─── rg the phrase ─────┴──── rg the method ─────┴──── go to def ───────┘
+</pre>
+    <pre><code><span class="c"># 1. Find the failing scenario / assertion phrase</span>
+rg -t cs -n "total is" ; rg -g "*.feature" "the total"
+<span class="c"># 2. Find the step binding that matches that Gherkin line</span>
+rg -t cs -n "the total is"          <span class="c"># lands in BasketPageSteps.cs [Then(...)]</span>
+<span class="c"># 3. Find the page/service method the step calls</span>
+rg -t cs -n "GetTotalAsync|CalculateTotal"
+<span class="c"># 4. See when the logic last changed and why</span>
+git log -p -S"CalculateTotal" -- src/
+<span class="c"># 5. Reproduce just that one test (fast loop)</span>
+dotnet test --filter "FullyQualifiedName~OrderTotal"</code></pre>
+    <div class="note mind"><span class="tag">Expert's mind · trace along the layers, not randomly</span><p>Notice the trace follows the framework's own layering: feature → step → page → logic. Because an automation framework is layered on purpose, tracing is deterministic: each layer names the next. If you find yourself grepping randomly, you've lost the layer thread — go back to the last file you understood and read which layer it calls into.</p></div>
+
+    <h3>2.4 Building the mental dependency map</h3>
+    <ul class="check">
+      <li><strong>Top-down:</strong> from the <code>.sln</code>, list projects and their <code>ProjectReference</code> edges → the architecture skeleton.</li>
+      <li><strong>Middle-out:</strong> pick the class you're changing; find its consumers (Find All References) and its dependencies (what it <code>new</code>s / injects).</li>
+      <li><strong>Bottom-up (history):</strong> <code>git log --follow -p</code> on the file to learn <em>why</em> it is the way it is before "improving" it.</li>
+    </ul>
+
+    <h3>2.5 The AI agent's glance-and-map arsenal</h3>
+    <p>This is how an agent like Claude Code — and a fast human — "glances" through an unfamiliar codebase and reconstructs relationships in seconds, without opening every file. The trick is to ask the repo <em>structured questions</em> with search, instead of reading linearly.</p>
+
+    <h4>Step 1 · Get the shape of the repo instantly</h4>
+    <pre><code><span class="c"># Every tracked file — the fastest possible overview (no build output noise)</span>
+git ls-files
+git ls-files "*.cs" | rg -v "/(bin|obj)/" | wc -l      <span class="c"># how big is the C# surface?</span>
+git ls-files "*.csproj"                                  <span class="c"># the project list = the architecture</span>
+git ls-files "*.feature" | head                          <span class="c"># the behaviours under test</span>
+
+<span class="c"># List files by name super-fast (ripgrep can enumerate, not just search)</span>
+rg --files -t cs | rg -i "page|steps|service"            <span class="c"># the POM / BDD / API surface at a glance</span>
+fd -e cs -E bin -E obj                                    <span class="c"># fd: same idea, excludes build dirs</span>
+
+<span class="c"># Directory tree without the noise (PowerShell / cross-platform tree)</span>
+git ls-files | %{ ($_ -split '/')[0..1] -join '/' } | Sort-Object -Unique   <span class="c"># top 2 levels</span></code></pre>
+
+    <h4>Step 2 · Find relationships between files (the real skill)</h4>
+    <p>Relationships in C# are expressed as inheritance, interface implementation, instantiation, injection, and attribute use. Each is a searchable pattern:</p>
+    <div class="tw"><table>
+      <caption>Turn "how are these files related?" into one search.</caption>
+      <thead><tr><th>Question</th><th>Command</th></tr></thead>
+      <tbody>
+        <tr><td>What subclasses this base?</td><td><code>rg -t cs ": PageObjectBase\b"</code></td></tr>
+        <tr><td>Who implements this interface?</td><td><code>rg -t cs ":\s*.*\bIEntityTable\b"</code> (or Rider Go-to-Implementation)</td></tr>
+        <tr><td>Where is this type instantiated?</td><td><code>rg -t cs "new BasketPage\b"</code></td></tr>
+        <tr><td>Where is it injected (DI)?</td><td><code>rg -t cs "AddScoped&lt;.*BasketService&gt;\|BasketService\b"</code></td></tr>
+        <tr><td>All step-binding classes</td><td><code>rg -t cs -l "\[Binding\]"</code></td></tr>
+        <tr><td>All test methods</td><td><code>rg -t cs "\[(Test|Fact|Theory|TestMethod)\]"</code></td></tr>
+        <tr><td>Which step matches a Gherkin line?</td><td><code>rg -t cs '\[(Given|When|Then)\(.*click.*button'</code></td></tr>
+        <tr><td>Where a config key is read</td><td><code>rg -t cs '"DefaultTimeout"'</code> then <code>rg -g "*.json" DefaultTimeout</code></td></tr>
+        <tr><td>Every caller of a method</td><td><code>rg -t cs -w "CalculateTotal"</code></td></tr>
+        <tr><td>Definitions only (skip calls)</td><td><code>rg -t cs "(public|private|internal).*CalculateTotal\s*\("</code></td></tr>
+      </tbody>
+    </table></div>
+    <pre><code><span class="c"># Advanced ripgrep flags that make glancing precise</span>
+rg -o "class \w+ : \w+" -t cs              <span class="c"># -o: print ONLY the match → an inheritance list</span>
+rg -U "class BasketPage[\s\S]*?\}" bask*.cs <span class="c"># -U: multiline match (a whole block)</span>
+rg --pcre2 "(?&lt;!//\s)TODO"                 <span class="c"># PCRE2 lookbehind: real TODOs, not commented notes</span>
+rg -c "\[Test\]" -t cs                      <span class="c"># -c: count matches per file → biggest test files</span>
+rg --stats "await "                         <span class="c"># --stats: totals across the repo</span>
+rg -i "todo|fixme|hack|xxx" -t cs           <span class="c"># the team's own list of known weak spots</span>
+rg "pattern" -r "replacement"               <span class="c"># preview a replacement (does NOT write)</span></code></pre>
+    <div class="note mind"><span class="tag">Expert's mind · why an agent searches instead of reads</span><p>Reading a 300-file repo top to bottom is O(n) and forgets the start by the end. Searching is O(1) per question: "what implements <code>IEntityTable</code>?" is one command, answered in milliseconds, and the answer <em>is</em> the relationship. An agent builds the map by asking a dozen precise questions, not by reading a dozen files. Copy that: form the question, express it as a search, read only the 3–5 lines that answer it.</p></div>
+
+    <h4>Step 3 · Trace history &amp; plan the change from git</h4>
+    <p>Before changing a function, read its life story — git can trace a single function across its whole history:</p>
+    <pre><code><span class="c"># Follow ONE method's evolution across the whole history (super powerful)</span>
+git log -L :CalculateTotal:src/BasketBasePage.cs   <span class="c"># every commit that changed that method's body</span>
+git log -L 40,60:src/Pricing.cs                    <span class="c"># same, by line range</span>
+
+<span class="c"># Who owns / knows this area (for questions &amp; review)?</span>
+git shortlog -sn -- src/Pricing.cs                 <span class="c"># commit counts per author for this file</span>
+git blame -w -C -C src/Pricing.cs                  <span class="c"># -w ignore whitespace, -C detect moved/copied code</span>
+
+<span class="c"># What changed recently &amp; how big — scope a task at a glance</span>
+git log --oneline --stat -5                        <span class="c"># recent commits with file churn</span>
+git diff --stat main...HEAD                         <span class="c"># size of your branch vs main</span>
+git log --oneline --graph --decorate --all         <span class="c"># the branch topology</span>
+
+<span class="c"># git grep — search AT ANY commit/branch (search the past, not just now)</span>
+git grep -n "CalculateTotal" &lt;commit&gt;              <span class="c"># where was it before a refactor?</span>
+git grep -l "IEntityTable"                          <span class="c"># files (tracked) referencing it</span></code></pre>
+    <div class="note good"><span class="tag">Good habit · <code>git log -L</code> is the planning superpower</span><p>Before editing a method, run <code>git log -L :Method:File</code>. In one command you see every change ever made to <em>that method</em>, with messages — the bugs it already had, the edge cases previously handled, and who to ask. You plan the change knowing the history instead of re-introducing an old bug.</p></div>
+
+    <h4>Step 4 · From map to plan</h4>
+    <ul class="check">
+      <li><strong>Enumerate the surface</strong> (<code>git ls-files</code>, <code>rg --files</code>) → know what exists.</li>
+      <li><strong>Query the relationships</strong> (the table above) → know how the target connects.</li>
+      <li><strong>Read the history</strong> (<code>git log -L</code>, <code>blame -C</code>) → know why it's shaped this way.</li>
+      <li><strong>List the consumers</strong> (<code>rg -w</code> + string search) → know the blast radius (Part 3).</li>
+      <li><strong>Now write the three-line plan</strong> (Part 0.3). Only now do you touch code.</li>
+    </ul>
+  </section>
+
+  <!-- ================= PART 3 ================= -->
+  <section class="p" id="p3">
+    <div class="part">Part 3 · Recon &amp; Navigation</div>
+    <div class="kicker">Section 3</div>
+    <h2>Planning &amp; scoping work before touching code</h2>
+    <p class="lead">A change you can't describe in advance is a change you don't understand yet. Planning turns a vague task into a bounded, verifiable sequence — and tells you the risk before you incur it.</p>
+
+    <h3>3.1 Classify by blast radius</h3>
+    <p>The first decision is <em>how far the change reaches</em>. It sets how much recon and verification you owe.</p>
+    <div class="tw"><table>
+      <thead><tr><th>Class</th><th>Example (C# automation)</th><th>Recon owed</th><th>Verification owed</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Single-line</strong></td><td>Fix a locator string; bump one timeout</td><td>Confirm nothing else reads the exact value</td><td>Build + the one affected test</td></tr>
+        <tr><td><strong>Single-file</strong></td><td>Add a method to one page object</td><td>Read the whole page; match its style</td><td>Tests that exercise that page</td></tr>
+        <tr><td><strong>Cross-cutting</strong></td><td>Change a shared <code>PageObjectBase</code> method, or a step used by many features, or an API service signature</td><td>Enumerate <em>every</em> caller (Part 2), including string/reflection callers</td><td>All callers' tests + full <code>dotnet build</code> + smoke</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note pit"><span class="tag">The classic mistake</span><p>Treating a cross-cutting change as single-file. Editing a shared helper "just for my case" and shipping when your one test passes — while three other callers now silently misbehave. If a symbol has many consumers, it is <em>never</em> a single-file change. In a POM/BDD framework the shared bases (<code>PageObjectBase</code>, <code>StepsBase</code>, an API <code>ApiService</code>) are the highest-blast-radius files in the repo — treat every edit to them as cross-cutting.</p></div>
+
+    <h3>3.2 The plan template</h3>
+    <p>Fill this in before editing. It fits in a scratch file or the PR description and is the artefact you reason from.</p>
+    <pre><code><span class="c">GOAL:      one sentence — the observable outcome when done.</span>
+<span class="c">CHANGES:   file-by-file, in the order you'll make them.</span>
+           1. BasketBasePage.cs → fix double-applied discount in CalculateTotal
+           2. BasketTotalTests.cs → add a regression test for the discount case
+<span class="c">CONSUMERS: everyone who calls the changed code (from Part 2 search).</span>
+           - BasketPageSteps.cs, QuoteDetailPage.cs (checked: signature unchanged)
+<span class="c">VERIFY:    the exact commands that prove success.</span>
+           - dotnet test --filter "FullyQualifiedName~BasketTotal"
+           - dotnet build   (no new warnings)
+<span class="c">RISK:      what could still be wrong, and why it's acceptable.</span>
+           - Multi-currency rounding untouched; out of scope, tracked separately.</code></pre>
+
+    <h3>3.3 Identify every caller before you change</h3>
+    <ol class="steps">
+      <li><strong>List consumers:</strong> <code>rg -w "SymbolName"</code>, then Find All References (Roslyn) to catch overloads accurately.</li>
+      <li><strong>Also grep the string name</strong> — DI (<code>services.AddScoped&lt;X&gt;()</code>), reflection, config keys, and Gherkin step regexes bind by name and won't show as compile errors on a rename.</li>
+      <li><strong>Separate reads from writes:</strong> who merely calls it vs who depends on its exact return shape / side effects.</li>
+      <li><strong>Note each consumer's tests</strong> — those are your safety net; list which must stay green.</li>
+      <li><strong>Decide compatibility:</strong> keep the signature (safe, additive overload) or break it (then update all callers in the same change).</li>
+    </ol>
+    <div class="note mind"><span class="tag">Expert's mind · the search that changes the design</span><p>You want <code>GetUser(int id)</code> to also accept an email. Guess-and-edit adds an overload and moves on. Confirm-and-edit runs <code>rg -w "GetUser"</code>, finds 14 call sites and 6 tests, notices three call it by name via reflection, and <em>therefore</em> chooses an additive overload — precisely because a signature change would break the reflection callers the compiler can't see. The search didn't just inform the change; it dictated the design.</p></div>
+  </section>
+
+  <!-- ================= PART 4 ================= -->
+  <section class="p" id="p4">
+    <div class="part">Part 4 · Recon &amp; Navigation</div>
+    <div class="kicker">Section 4</div>
+    <h2>Deciding where code belongs</h2>
+    <p class="lead">Correct code in the wrong place is debt on day one. Placement decides who can reuse it, who must change when it changes, and whether the next person can find it. In a C# automation framework this is the decision engineers get wrong most often.</p>
+
+    <h3>4.1 SOLID — the practical test you actually apply</h3>
+    <div class="tw"><table>
+      <thead><tr><th>Principle</th><th>The question you ask</th><th>C# automation example</th></tr></thead>
+      <tbody>
+        <tr><td><strong>S</strong>ingle Responsibility</td><td>"Do I need the word <em>and</em> to describe this class?" If yes, split.</td><td>A <code>BasketPage</code> that also does HTTP → split the HTTP into a <code>BasketService</code>.</td></tr>
+        <tr><td><strong>O</strong>pen/Closed</td><td>"Can I add the new case without editing existing code?"</td><td>New editable cell type → a new <code>PropertyCell</code> subclass + one factory branch, not an <code>if</code> in every step.</td></tr>
+        <tr><td><strong>L</strong>iskov</td><td>"Can the subclass stand in for the base with no surprises?"</td><td>A customer <code>ClearwaterBasketPage : BasketPage</code> must not throw on inherited methods.</td></tr>
+        <tr><td><strong>I</strong>nterface Segregation</td><td>"Does any implementer leave methods empty / NotImplemented?"</td><td>Prefer small <code>ITableActions</code>, <code>ISearchActions</code> over one fat <code>IPage</code>.</td></tr>
+        <tr><td><strong>D</strong>ependency Inversion</td><td>"Does high-level code <code>new</code> up a concrete detail?"</td><td>A step depends on <code>PageObjectBase</code>/an interface, not on <code>new ChromeDriver()</code> directly.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>4.2 C# structural conventions</h3>
+    <ul class="check">
+      <li><strong>Namespace mirrors folder:</strong> <code>PageObjects.Quote.Basket</code> lives in <code>PageObjects/Quote/Basket/</code>. Breaking this makes types unfindable.</li>
+      <li><strong>One public type per file,</strong> file named after the type (<code>BasketPage.cs</code> holds <code>BasketPage</code>).</li>
+      <li><strong>Extension methods</strong> go in a <code>static class XxxExtensions</code> — use them to add verbs to a type you <em>don't own</em> (e.g. <code>this IPage</code> from Playwright). Don't use them to hide logic that belongs on your own class.</li>
+      <li><strong>Interfaces</strong> prefixed <code>I</code>, kept beside their primary implementation or in an <code>Abstractions/</code> folder. Create one only when there is (or will be) more than one implementation the caller shouldn't distinguish.</li>
+      <li><strong>Partial classes</strong> only for generator output (e.g. Reqnroll's <code>*.feature.cs</code>) or a genuinely large cohesive type — never to hide a god class across files.</li>
+      <li><strong>Static helpers</strong> for stateless, cross-cutting operations only (<code>UrlHelper</code>, a factory). A <code>static</code> class holding unrelated methods is a smell (4.4).</li>
+    </ul>
+    <pre><code><span class="c">// Extension method done right: a verb on a type you don't own (Playwright's IPage)</span>
+<span class="k">public static class</span> PlaywrightExtensions
+{
+    <span class="k">public static async</span> Task ClickAndWaitAsync(<span class="k">this</span> IPage page, <span class="k">string</span> selector)
+    {
+        <span class="k">await</span> page.Locator(selector).First.ClickAsync();
+        <span class="k">await</span> page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+    }
+}
+<span class="c">// Usage reads like a native Playwright call:</span>
+<span class="k">await</span> page.ClickAndWaitAsync(<span class="s">"#SaveButton"</span>);</code></pre>
+
+    <h3>4.3 Automation-specific placement rules</h3>
+    <p>This table routes new logic to its correct home. Memorise it — it prevents the two worst automation anti-patterns (4.4).</p>
+    <div class="tw"><table>
+      <thead><tr><th>The new logic is…</th><th>It belongs in…</th><th>Because…</th></tr></thead>
+      <tbody>
+        <tr><td>How to interact with one screen (locators, clicks, reads)</td><td><strong>Page Object</strong> (<code>*Page.cs</code>)</td><td>A DOM change should touch exactly one file.</td></tr>
+        <tr><td>Translating a Gherkin sentence into actions</td><td><strong>Step definition</strong> (thin <code>[Binding]</code>)</td><td>Steps orchestrate; they don't compute.</td></tr>
+        <tr><td>Editing a grid cell / driving a table or modal</td><td><strong>Shared component</strong> / cell subclass</td><td>Reused across many pages; belongs in <code>Shared/</code>.</td></tr>
+        <tr><td>Reusable, stateless operation (date math, string format)</td><td><strong>Helper / Extension</strong></td><td>Cross-cutting and screen-independent.</td></tr>
+        <tr><td>Browser lifecycle, setup/teardown, shared state</td><td><strong>Hooks / Base test / Fixture</strong></td><td>Runs <em>around</em> tests, not inside one.</td></tr>
+        <tr><td>URLs, credentials, timeouts, run mode</td><td><strong>Config</strong> (<code>appsettings.json</code>)</td><td>Changes per environment, not per test.</td></tr>
+        <tr><td>Sample payloads, seed data, expected files</td><td><strong>Test data / Fixtures folder</strong></td><td>Data, not behaviour.</td></tr>
+        <tr><td>Calling a REST endpoint for setup/verification</td><td><strong>API client/service</strong></td><td>Transport belongs in one layer, reused by many steps.</td></tr>
+        <tr><td>Assembling an entity payload with sane defaults</td><td><strong>Builder / Helper</strong> (<code>*Builder.cs</code>)</td><td>Keeps steps and tests free of literal object graphs.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>4.4 The two anti-patterns that define junior automation code</h3>
+    <div class="note pit"><span class="tag">Anti-pattern 1 · logic in step definitions</span><p>A <code>[When]</code> step with an <code>if</code>/<code>for</code>/calculation inside it. Steps must be one page/service call plus a context update — no branching business logic. If a step computes an expected value, that computation belongs in a builder or the page. <strong>Test:</strong> if you can't read a step method aloud as a single sentence, it's doing too much.</p></div>
+    <div class="note pit"><span class="tag">Anti-pattern 2 · the god "Helpers" class</span><p>A 2,000-line <code>TestHelper</code> / <code>Utils</code> of unrelated statics. Before adding to it, ask: is this behaviour of a <em>screen</em> (→ page), a <em>data shape</em> (→ builder/model), or a <em>transport</em> (→ service)? It almost always is — and belongs there. Utilities are justified only for genuinely cross-cutting, stateless operations, and even then name them for what they do, not "Helper" / "Manager" / "Utils".</p></div>
+    <div class="note mind"><span class="tag">Expert's mind · the two-question heuristic</span><p><em>"Who else would want this, and what makes it change?"</em> Wanted by many screens &amp; changes with the DOM → shared component. Wanted by one screen → that page. Changes per environment → config. Changes with a data contract → a model/builder. Answer those two and placement is usually obvious — and matches how the existing framework is already organised, which is the point.</p></div>
+  </section>
+
+  <!-- ================= PART 5 ================= -->
+  <section class="p" id="p5">
+    <div class="part">Part 5 · Recon &amp; Navigation</div>
+    <div class="kicker">Section 5</div>
+    <h2>Implementation discipline</h2>
+    <p class="lead">The best change is one a reviewer barely notices because it looks like it was always there. Discipline is mostly restraint: match what exists, change little, stay idiomatic C#.</p>
+
+    <h3>5.1 Match existing conventions — don't introduce new ones</h3>
+    <ul class="check">
+      <li><strong>Read the neighbours first.</strong> Before writing a method, read two or three existing methods in the same file; copy their naming, async style, error handling, and comment density.</li>
+      <li><strong>Use the project's utilities.</strong> If there's a <code>WaitForLoadingAsync()</code>, use it — don't hand-roll <code>Thread.Sleep</code>.</li>
+      <li><strong>Match the assertion library</strong> already in use (FluentAssertions / AwesomeAssertions / <code>Assert.*</code>) — don't add a second for one test.</li>
+      <li><strong>Run the formatter</strong> so your diff is content, not whitespace: <code>dotnet format</code> (honours <code>.editorconfig</code>).</li>
+      <li><strong>Follow the nullable contract.</strong> If <code>&lt;Nullable&gt;enable&lt;/Nullable&gt;</code>, respect the annotations — don't silence warnings with <code>!</code> unless you can prove non-null.</li>
+    </ul>
+    <div class="note mind"><span class="tag">Expert's mind · consistency beats personal taste</span><p>A codebase where every author imposed their preferences is unreadable even if each choice was individually defensible. When your taste conflicts with the local convention, the convention wins. Raise your idea separately — never smuggle a style change into an unrelated functional change; it makes the diff unreviewable.</p></div>
+
+    <h3>5.2 Small, verifiable changes over large speculative rewrites</h3>
+    <div class="tw"><table>
+      <thead><tr><th></th><th>Small verifiable change</th><th>Large speculative rewrite</th></tr></thead>
+      <tbody>
+        <tr><td>Reviewability</td><td>A reviewer holds it in their head</td><td>Rubber-stamped because it's too big to read</td></tr>
+        <tr><td>Revertability</td><td>One clean <code>git revert</code></td><td>Entangled; reverting breaks other things</td></tr>
+        <tr><td>Bisectability</td><td><code>git bisect</code> pinpoints the culprit commit</td><td>Culprit hidden in a 40-file commit</td></tr>
+        <tr><td>Risk</td><td>Bounded and known</td><td>Unknown until it fails in CI or a demo</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>Rule:</strong> if a change spans many files, split it into a sequence where each step builds and passes on its own — "refactor" then "add feature" as two commits, never tangled into one.</p>
+
+    <h3>5.3 Idiomatic C# quick reference</h3>
+    <p>"Idiomatic" means writing it the way a fluent C# developer would. Non-idiomatic code often works but reads as "translated," and reviewers trust it slower.</p>
+    <div class="tw"><table>
+      <caption>Null &amp; absence handling.</caption>
+      <thead><tr><th>Intent</th><th>Idiomatic C#</th><th>Avoid</th></tr></thead>
+      <tbody>
+        <tr><td>Default if null</td><td><code>var name = user?.Name ?? "guest";</code></td><td><code>if (user != null) …</code> chains</td></tr>
+        <tr><td>Null-safe chain</td><td><code>order?.Customer?.Address?.City</code></td><td>nested null checks</td></tr>
+        <tr><td>Assign if null</td><td><code>_cache ??= Build();</code></td><td><code>if (_cache == null) _cache = …</code></td></tr>
+        <tr><td>Guard a required arg</td><td><code>ArgumentNullException.ThrowIfNull(page);</code></td><td>manual <code>if (page==null) throw…</code></td></tr>
+        <tr><td>Pattern-match null/type</td><td><code>if (result is BasketPage bp) …</code></td><td><code>as</code> + null-check + cast</td></tr>
+      </tbody>
+    </table></div>
+    <div class="tw"><table>
+      <caption>Collections &amp; LINQ.</caption>
+      <thead><tr><th>Intent</th><th>Idiomatic C#</th></tr></thead>
+      <tbody>
+        <tr><td>Transform</td><td><code>items.Select(x =&gt; x.Total)</code></td></tr>
+        <tr><td>Filter</td><td><code>items.Where(x =&gt; x.IsActive)</code></td></tr>
+        <tr><td>First match (or null)</td><td><code>items.FirstOrDefault(x =&gt; x.Id == id)</code></td></tr>
+        <tr><td>Any / all</td><td><code>items.Any(x =&gt; x.Failed)</code> · <code>items.All(x =&gt; x.Passed)</code></td></tr>
+        <tr><td>Sum / group</td><td><code>items.Sum(x =&gt; x.Price)</code> · <code>items.GroupBy(x =&gt; x.Category)</code></td></tr>
+        <tr><td>To dictionary</td><td><code>items.ToDictionary(x =&gt; x.Key, x =&gt; x.Value)</code></td></tr>
+      </tbody>
+    </table></div>
+    <div class="tw"><table>
+      <caption>Error handling &amp; cleanup.</caption>
+      <thead><tr><th>Intent</th><th>Idiomatic C#</th></tr></thead>
+      <tbody>
+        <tr><td>Catch specific first</td><td><code>catch (TimeoutException ex) { … } catch (Exception ex) { … }</code></td></tr>
+        <tr><td>Guaranteed cleanup</td><td><code>using var driver = new ChromeDriver();</code> (disposed at scope end)</td></tr>
+        <tr><td>Re-throw preserving stack</td><td><code>catch (Exception ex) { Log(ex); throw; }</code> (bare <code>throw;</code>, not <code>throw ex;</code>)</td></tr>
+        <tr><td>Wrap with context</td><td><code>throw new InvalidOperationException("loading config failed", ex);</code></td></tr>
+      </tbody>
+    </table></div>
+    <div class="note pit"><span class="tag">The async trap every automation engineer hits</span><p>Never block on async with <code>.Result</code> or <code>.Wait()</code> — it can deadlock and it mangles the stack trace into an <code>AggregateException</code> (Part 7.4). <strong>Async all the way:</strong> if a method awaits, make it <code>async Task</code> and <code>await</code> it. And use bare <code>throw;</code> to rethrow — <code>throw ex;</code> resets the stack trace to the rethrow line, destroying the origin you need for debugging.</p></div>
+    <div class="note good"><span class="tag">Good habit · let the compiler and analyzers teach you idiom</span><p>With <code>&lt;Nullable&gt;enable&gt;</code> and .NET analyzers on, the compiler suggests idiomatic fixes (use <code>??</code>, use pattern matching, dispose this). Turn on <code>&lt;AnalysisLevel&gt;latest&lt;/AnalysisLevel&gt;</code> locally and read the squiggles — they are a free idiom tutor calibrated to your exact SDK.</p></div>
+  </section>
+
+  <!-- ================= PART 6 ================= -->
+  <section class="p" id="p6">
+    <div class="part">Part 6 · Tests &amp; Failures</div>
+    <div class="kicker">Section 6</div>
+    <h2>Running &amp; reading tests</h2>
+    <p class="lead">Tests are your feedback loop. The skill is running the <em>narrowest</em> useful subset fast, and reading the summary to find the one failure that matters — not staring at a wall of red.</p>
+
+    <h3>6.1 <code>dotnet test</code> and its filter language</h3>
+    <pre><code>dotnet test                                   <span class="c"># build + run every test in the solution</span>
+dotnet test SpecFlowTests/SpecFlowTests.csproj   <span class="c"># one test project only</span>
+dotnet test --no-build                         <span class="c"># skip rebuild when already built (faster loop)</span>
+dotnet test -l "console;verbosity=detailed"    <span class="c"># richer per-test logger output</span>
+dotnet test --logger "trx;LogFileName=results.trx"   <span class="c"># machine-readable results file</span>
+dotnet test --blame-hang-timeout 5m            <span class="c"># diagnose a hanging test (who froze)</span>
+dotnet test -- NUnit.NumberOfTestWorkers=1     <span class="c"># force serial (rule out parallel flakiness)</span></code></pre>
+    <p><strong>The <code>--filter</code> expression language</strong> is the single most useful thing to memorise — it turns a 5-minute suite into a 5-second loop.</p>
+    <div class="tw"><table>
+      <caption>Filter operators: <code>=</code> exact · <code>!=</code> not · <code>~</code> contains. Combine with <code>&amp;</code> (and) / <code>|</code> (or).</caption>
+      <thead><tr><th>Goal</th><th>Command</th></tr></thead>
+      <tbody>
+        <tr><td>Name contains</td><td><code>dotnet test --filter "FullyQualifiedName~OrderTotal"</code></td></tr>
+        <tr><td>One exact test</td><td><code>dotnet test --filter "FullyQualifiedName=Ns.OrderTests.TotalIsSum"</code></td></tr>
+        <tr><td>By simple name</td><td><code>dotnet test --filter "Name=TotalIsSum"</code></td></tr>
+        <tr><td>By class</td><td><code>dotnet test --filter "ClassName~OrderTests"</code></td></tr>
+        <tr><td>NUnit / xUnit category</td><td><code>dotnet test --filter "Category=Smoke"</code></td></tr>
+        <tr><td>MSTest category</td><td><code>dotnet test --filter "TestCategory=Smoke"</code></td></tr>
+        <tr><td>Combine</td><td><code>dotnet test --filter "Category=Smoke&amp;FullyQualifiedName~Quote"</code></td></tr>
+        <tr><td>Exclude</td><td><code>dotnet test --filter "FullyQualifiedName!~CustomerTests"</code></td></tr>
+      </tbody>
+    </table></div>
+    <div class="note warn"><span class="tag">Trade-off · the category key differs by framework</span><p>The property name for "category" is <strong>not</strong> universal: NUnit <code>[Category("Smoke")]</code> and xUnit <code>[Trait("Category","Smoke")]</code> filter as <code>Category=Smoke</code>; MSTest <code>[TestCategory("Smoke")]</code> filters as <code>TestCategory=Smoke</code>. Using the wrong key silently matches zero tests (a green run that ran nothing). Confirm what your project uses before trusting a filtered run.</p></div>
+
+    <h3>6.2 The three C# test frameworks — same runner, different dialect</h3>
+    <p>All three run under <code>dotnet test</code> via <code>Microsoft.NET.Test.Sdk</code>. Knowing the dialect lets you read any test file instantly.</p>
+    <div class="tw"><table>
+      <thead><tr><th>Concern</th><th>xUnit</th><th>NUnit</th><th>MSTest</th></tr></thead>
+      <tbody>
+        <tr><td>Test method</td><td><code>[Fact]</code></td><td><code>[Test]</code></td><td><code>[TestMethod]</code></td></tr>
+        <tr><td>Data-driven</td><td><code>[Theory]</code>+<code>[InlineData]</code>/<code>[MemberData]</code></td><td><code>[TestCase(...)]</code>/<code>[TestCaseSource]</code></td><td><code>[DataRow(...)]</code>/<code>[DynamicData]</code></td></tr>
+        <tr><td>Per-test setup</td><td>constructor</td><td><code>[SetUp]</code></td><td><code>[TestInitialize]</code></td></tr>
+        <tr><td>Per-test teardown</td><td><code>IDisposable.Dispose()</code></td><td><code>[TearDown]</code></td><td><code>[TestCleanup]</code></td></tr>
+        <tr><td>Once per class</td><td><code>IClassFixture&lt;T&gt;</code></td><td><code>[OneTimeSetUp]</code></td><td><code>[ClassInitialize]</code></td></tr>
+        <tr><td>Category / tag</td><td><code>[Trait("Category","X")]</code></td><td><code>[Category("X")]</code></td><td><code>[TestCategory("X")]</code></td></tr>
+        <tr><td>Parallelism</td><td>on by default (per collection)</td><td><code>[Parallelizable]</code> / <code>[NonParallelizable]</code></td><td><code>[Parallelize]</code> / <code>[DoNotParallelize]</code></td></tr>
+        <tr><td>Test output</td><td><code>ITestOutputHelper</code></td><td><code>TestContext.WriteLine</code></td><td><code>TestContext.WriteLine</code></td></tr>
+        <tr><td>Skip a test</td><td><code>[Fact(Skip="reason")]</code></td><td><code>[Ignore("reason")]</code></td><td><code>[Ignore]</code></td></tr>
+      </tbody>
+    </table></div>
+    <div class="note mind"><span class="tag">Expert's mind · read the setup style to know the isolation model</span><p>xUnit constructs a <em>new class instance per test</em> (setup = constructor), so tests are isolated by design. NUnit/MSTest reuse the fixture instance and run <code>[SetUp]</code> before each. When a test "passes alone but fails in the suite," the framework's isolation model is your first suspect — shared instance state in NUnit/MSTest is a classic cause (Part 10.4).</p></div>
+
+    <h3>6.3 Running Reqnroll / SpecFlow scenarios</h3>
+    <p>BDD scenarios compile to normal tests of the configured provider (here, NUnit), so the same <code>dotnet test</code> filters apply — you just filter on the generated scenario name.</p>
+    <pre><code><span class="c"># Run one scenario by its title (becomes the test name)</span>
+dotnet test --filter "FullyQualifiedName~Quote_Create_New_Quote"
+<span class="c"># Run a whole feature (feature name is part of the FQN)</span>
+dotnet test --filter "FullyQualifiedName~SimpleQuoteWorkflow"
+<span class="c"># Tag-based, if the provider maps Gherkin tags to categories</span>
+dotnet test --filter "Category=smoke"</code></pre>
+    <p class="small">Reqnroll's <code>reqnroll.json</code> declares the <code>unitTestProvider</code> (NUnit) and <code>bindingAssemblies</code> (where step classes live). If a scenario reports "no matching step definition," the binding assembly isn't listed or the regex doesn't match — not a test failure.</p>
+
+    <h3>6.4 Driving the browser — headless vs headed, and evidence</h3>
+    <div class="tw"><table>
+      <thead><tr><th>Tool (C#)</th><th>Headed (watch it)</th><th>Headless (CI)</th><th>Failure evidence</th></tr></thead>
+      <tbody>
+        <tr><td>Playwright .NET</td><td><code>LaunchAsync(new(){ Headless=false })</code></td><td><code>Headless=true</code> (default)</td><td>Tracing API + <code>page.ScreenshotAsync(...)</code>; video via context</td></tr>
+        <tr><td>Selenium .NET</td><td>default (Chrome window)</td><td><code>options.AddArgument("--headless=new")</code></td><td><code>((ITakesScreenshot)driver).GetScreenshot().SaveAsFile(path)</code></td></tr>
+      </tbody>
+    </table></div>
+    <pre><code><span class="c">// Playwright .NET — the canonical shape, with tracing for evidence</span>
+<span class="k">using var</span> pw = <span class="k">await</span> Playwright.CreateAsync();
+<span class="k">await using var</span> browser = <span class="k">await</span> pw.Chromium.LaunchAsync(<span class="k">new</span>() { Headless = <span class="k">true</span> });
+<span class="k">var</span> context = <span class="k">await</span> browser.NewContextAsync();
+<span class="k">await</span> context.Tracing.StartAsync(<span class="k">new</span>() { Screenshots = <span class="k">true</span>, Snapshots = <span class="k">true</span> });
+<span class="k">var</span> page = <span class="k">await</span> context.NewPageAsync();
+<span class="k">await</span> page.GotoAsync(<span class="s">"https://app.example.com"</span>);
+<span class="k">await</span> page.GetByRole(AriaRole.Button, <span class="k">new</span>() { Name = <span class="s">"Submit"</span> }).ClickAsync();
+<span class="k">await</span> Assertions.Expect(page.GetByText(<span class="s">"Saved"</span>)).ToBeVisibleAsync();   <span class="c">// auto-waits</span>
+<span class="k">await</span> context.Tracing.StopAsync(<span class="k">new</span>() { Path = <span class="s">"trace.zip"</span> });          <span class="c">// open with: playwright show-trace trace.zip</span></code></pre>
+    <div class="note good"><span class="tag">Good habit · reproduce CI mode locally</span><p>Most "works locally, fails in CI" UI failures are headless-only. Run the CI command headless on your machine (<code>Headless=true</code> / <code>--headless=new</code>) before touching anything. Then open the captured trace/screenshot — <em>look before you re-run.</em></p></div>
+
+    <h3>6.5 Reading CI logs (Azure DevOps / GitHub Actions / Jenkins)</h3>
+    <ol class="steps">
+      <li><strong>Read from the failure, not the top.</strong> Search the log for the first <code>Failed!</code>, <code>error</code>, or the first red X, then scroll <em>up</em> to its cause.</li>
+      <li><strong>Find the run summary line</strong> — e.g. <code>Passed! - Failed: 2, Passed: 340, Skipped: 5</code>. That tells you scale and whether it's one bug or a collapse.</li>
+      <li><strong>Download artifacts</strong> — the pipeline publishes screenshots, Playwright traces, <code>.trx</code>, and reports. Open them before re-running blindly.</li>
+      <li><strong>Copy the exact test command</strong> from the pipeline YAML and run it locally — you want to run what CI ran (same filter, same <code>NumberOfTestWorkers</code>).</li>
+    </ol>
+
+    <h3>6.6 Reading a test-run summary</h3>
+    <pre class="diagram">
+ Passed!  - Failed:     0, Passed:   312, Skipped:  4, Total:   316   <span class="b">← healthy</span>
+ Failed!  - Failed:    17, Passed:   299, Skipped:  0, Total:   316   <span class="b">← is it 17 bugs or 1?</span>
+</pre>
+    <ol class="steps">
+      <li><strong>Counts first:</strong> passed / failed / skipped. Skipped is <em>not</em> passed — know why they skipped (a broken <code>[Ignore]</code>? a filter that excluded real tests?).</li>
+      <li><strong>Find the FIRST real failure.</strong> Later failures are often fallout — a broken <code>[SetUp]</code> or a failed login cascades into dozens of reds. Fix the first, re-run, re-assess.</li>
+      <li><strong>Error vs failure:</strong> an <em>assertion failure</em> (<code>Expected 110 but was 100</code>) means the code ran and produced the wrong value; an <em>exception/error</em> (<code>NullReferenceException</code>) means it couldn't run. Very different root causes (Part 7).</li>
+      <li><strong>Narrow, then widen.</strong> Reproduce the one failing test in isolation (6.1) before running the whole suite again.</li>
+    </ol>
+    <div class="note mind"><span class="tag">Expert's mind · why narrowest-first is the biggest daily time saver</span><p>Iterating against the full suite pays the whole suite's runtime on every attempt (minutes). Iterating against the single failing test pays seconds. Only once it's green do you widen — file, then suite — to catch regressions. A 2-second loop versus a 5-minute loop, run twenty times a day, is the difference between finishing at lunch and finishing at midnight.</p></div>
+  </section>
+
+  <!-- ================= PART 7 ================= -->
+  <section class="p" id="p7">
+    <div class="part">Part 7 · Tests &amp; Failures</div>
+    <div class="kicker">Section 7</div>
+    <h2>Reading &amp; handling C# stack traces</h2>
+    <p class="lead">A stack trace is a signed confession: the program telling you exactly where — and often why — it failed. Reading it well turns "I have no idea" into a precise, testable hypothesis in under a minute, usually with no debugger at all.</p>
+
+    <h3>7.1 Triage in 30 seconds — what to read, what to skip</h3>
+    <p>You can diagnose most failures from the trace and the test result alone. Read in this order; ignore the rest until you need it.</p>
+    <ol class="steps">
+      <li><strong>The exception type.</strong> The category of problem — <code>NullReferenceException</code>, <code>TimeoutException</code>, an assertion. This already halves the search space.</li>
+      <li><strong>The message.</strong> Often names the offending value: <code>Expected 110 but found 100</code>, <code>no element matches selector "#submit"</code>.</li>
+      <li><strong>The FIRST frame that is YOUR code.</strong> Skip framework/library frames at the top; the first frame in a file you own is where to look.</li>
+      <li><strong>The innermost <code>InnerException</code> / last <code>--- End of inner exception ---</code>.</strong> The <em>root</em> is usually deeper than the exception printed first.</li>
+    </ol>
+    <div class="note mind"><span class="tag">Expert's mind · origin vs surface</span><p>An exception <em>surfaces</em> where it's thrown and <em>originates</em> where the bad state was created. A <code>NullReferenceException</code> surfaces at <code>order.Total</code> but originates wherever <code>order</code> was left null. The trace shows the surface; your job is to walk down the frames to the origin. This one distinction <em>is</em> the skill of debugging.</p></div>
+    <div class="note good"><span class="tag">Good habit · diagnose from the test result first</span><p>Before opening a debugger, read the failure message + trace and write your hypothesis. Distinguish immediately: an <strong>assertion failure</strong> means the code <em>ran</em> and computed the wrong value (logic bug); an <strong>exception</strong> means it <em>couldn't run</em> (null, timeout, missing element). That fork points you at logic vs. environment/timing before you touch anything.</p></div>
+
+    <h3>7.2 General anatomy — yours vs library frames</h3>
+    <pre class="diagram">
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at Vendor.Grid.Render(Cell c)              <span class="b">← library frame (skip)</span>
+   at MyApp.Pricing.CalculateTotal()          <span class="b">← ★ FIRST of MY frames — start here</span>  Pricing.cs:41
+   at MyApp.Checkout.Submit()                 <span class="b">← my caller (how we got here)</span>       Checkout.cs:88
+   at NUnit.Framework.Internal.TestMethodCommand.Invoke()   <span class="b">← test-runner frame (skip)</span>
+</pre>
+    <p>Read a trace like the call stack it is: the top frame is where it blew up; each frame below is who called it. To understand <em>why</em> the top frame got bad input, read downward to the caller that supplied it. In a Release build without PDBs you may lose line numbers — build Debug or ship symbols to get <code>File.cs:line</code>.</p>
+
+    <h3>7.3 <code>InnerException</code> chains — the real cause is nested</h3>
+    <pre><code>System.InvalidOperationException: Failed to initialise pricing engine
+ ---&gt; System.IO.FileNotFoundException: Could not find file 'prices.json'.   <span class="c">← ROOT cause</span>
+   at System.IO.FileStream..ctor(String path, FileMode mode)
+   at MyApp.Config.Load()                                                    Config.cs:22
+   --- End of inner exception stack trace ---                               <span class="c">← boundary marker</span>
+   at MyApp.Config.Load()                                                    Config.cs:22
+   at MyApp.Startup.Configure()                                              Startup.cs:15</code></pre>
+    <ul class="check">
+      <li>The <code>---&gt;</code> arrow and "inner exception" mark the <strong>real cause</strong>. Read the innermost first; the outer is just a wrapper adding context.</li>
+      <li>In code: <code>ex.InnerException</code> walks one level; <code>ex.GetBaseException()</code> jumps straight to the deepest root.</li>
+      <li>When you re-throw, <strong>wrap</strong> with the inner preserved: <code>throw new InvalidOperationException("context", ex);</code> — that's what produced the chain above and it's what the next reader needs.</li>
+    </ul>
+
+    <h3>7.4 <code>AggregateException</code> &amp; async traces (the automation classics)</h3>
+    <pre><code><span class="c">// Symptom of blocking on async with .Result / .Wait() — DON'T do this:</span>
+<span class="k">var</span> page = GetPageAsync().Result;     <span class="c">// wraps any error in AggregateException + risks deadlock</span>
+
+System.AggregateException: One or more errors occurred. (Timeout 30000ms exceeded.)
+ ---&gt; Microsoft.Playwright.TimeoutException: Timeout 30000ms exceeded.        <span class="c">← the actual error</span>
+   Call log: waiting for locator("#submit") to be visible
+   at Microsoft.Playwright.Locator.ClickAsync()
+   at MyTests.Checkout.&lt;SubmitAsync&gt;d__4.MoveNext()                          <span class="c">← async state machine frame</span></code></pre>
+    <div class="tw"><table>
+      <thead><tr><th>Signal in the trace</th><th>What it means</th><th>What to do</th></tr></thead>
+      <tbody>
+        <tr><td><code>AggregateException</code></td><td>Something blocked on a Task (<code>.Result</code>/<code>.Wait()</code>) or ran parallel tasks</td><td>Read <code>InnerExceptions[0]</code> for the real error; switch to <code>await</code> (async all the way)</td></tr>
+        <tr><td><code>&lt;MethodName&gt;d__N.MoveNext()</code></td><td>An <code>async</code> method's compiler-generated state machine</td><td>Ignore the plumbing; the method name in the <code>&lt;…&gt;</code> is your frame</td></tr>
+        <tr><td><code>TargetInvocationException</code></td><td>An error thrown through reflection (e.g. a data-driven test source)</td><td>Read the <code>InnerException</code> — the real exception is inside</td></tr>
+        <tr><td><code>TypeInitializationException</code></td><td>A <code>static</code> constructor / field initialiser threw</td><td>Read the inner; the bug is in static setup (often bad config at class load)</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note pit"><span class="tag">The stack-trace destroyer</span><p><code>catch (Exception ex) { throw ex; }</code> <strong>resets</strong> the stack trace to the rethrow line — you lose the origin. Always rethrow with bare <code>throw;</code>, or wrap: <code>throw new X("context", ex);</code>. Similarly, blocking with <code>.Result</code> buries your real exception one level down inside an <code>AggregateException</code>. Both are self-inflicted and both hide the very frame you need.</p></div>
+
+    <h3>7.5 The automation exception dictionary (Selenium &amp; Playwright, C#)</h3>
+    <p>These account for the vast majority of UI-automation failures. Most are <strong>timing or locator</strong> problems, not "the app is broken." Learn the root cause and fix for each.</p>
+    <div class="tw"><table>
+      <thead><tr><th>Exception</th><th>Means</th><th>Typical root cause</th><th>Fix</th></tr></thead>
+      <tbody>
+        <tr><td><code>NoSuchElementException</code> (Selenium) / locator resolves to 0 (Playwright)</td><td>Element not in the DOM right now</td><td>Wrong/changed selector; searched before render; inside an iframe or shadow DOM</td><td>Verify the selector in DevTools; wait for it; switch into the frame</td></tr>
+        <tr><td><code>StaleElementReferenceException</code> (Selenium)</td><td>You hold a reference to an element the DOM has since re-rendered</td><td>SPA re-rendered the section after you located the element and cached it</td><td>Re-locate immediately before use; don't cache <code>IWebElement</code> across actions. (Playwright's <code>ILocator</code> re-resolves each use, so it's immune.)</td></tr>
+        <tr><td><code>WebDriverTimeoutException</code> (Selenium) / <code>Microsoft.Playwright.TimeoutException</code></td><td>A wait condition wasn't met in time</td><td>App genuinely slow; condition wrong; element never appears; an earlier step half-failed</td><td>Read the "Call log" — it names the exact wait; fix the condition or the app; don't blindly raise the timeout</td></tr>
+        <tr><td><code>ElementNotInteractableException</code> / <code>ElementClickInterceptedException</code> (Selenium)</td><td>Element exists but can't be acted on</td><td>Hidden, disabled, off-screen, or covered by an overlay/modal/spinner/toast</td><td>Wait for visible &amp; enabled; wait for the overlay to detach; scroll into view</td></tr>
+        <tr><td><code>InvalidSelectorException</code></td><td>The selector syntax itself is invalid</td><td>Malformed CSS/XPath — usually a bad string interpolation</td><td>Log the final composed selector; fix the syntax</td></tr>
+        <tr><td><code>WebDriverException: no such window / session</code></td><td>The driver/browser died</td><td>Browser crashed, driver-version mismatch, or you used a disposed driver</td><td>Match driver ↔ browser version; recreate the session; check for a crash in setup</td></tr>
+      </tbody>
+    </table></div>
+    <pre><code><span class="c">// The fix for 80% of these: wait for STATE, never sleep. (Selenium explicit wait)</span>
+<span class="k">var</span> wait = <span class="k">new</span> WebDriverWait(driver, TimeSpan.FromSeconds(10));
+<span class="k">var</span> btn  = wait.Until(d =&gt; { <span class="k">var</span> e = d.FindElement(By.Id(<span class="s">"submit"</span>)); <span class="k">return</span> e.Displayed &amp;&amp; e.Enabled ? e : <span class="k">null</span>; });
+btn.Click();
+<span class="c">// Playwright does this for you: locators auto-wait for actionability before acting.</span>
+<span class="k">await</span> page.GetByRole(AriaRole.Button, <span class="k">new</span>(){ Name=<span class="s">"Submit"</span> }).ClickAsync();</code></pre>
+    <div class="note mind"><span class="tag">Expert's mind · the 3-question flaky-UI triage</span><p>(1) Is the selector correct <em>right now</em> in DevTools? (2) Did I wait for the element's <em>state</em> — present → visible → enabled → uncovered — not just its presence? (3) Did a <em>previous</em> step half-succeed and leave the page in the wrong state? Ninety percent of "flaky" UI failures answer to one of these three. Only after all three are ruled out do you suspect the application itself.</p></div>
+
+    <h3>7.6 Hypothesis-driven debugging</h3>
+    <p>Debugging is science, not poking. Form a hypothesis, run one experiment that can <em>disprove</em> it, iterate. Guessing changes many things at once and learns nothing; this learns something every step.</p>
+    <ol class="steps">
+      <li><strong>Isolate.</strong> Reduce to the smallest failing case — one test, one input: <code>dotnet test --filter "FullyQualifiedName~TheOneTest"</code>.</li>
+      <li><strong>Reproduce reliably.</strong> If it fails only sometimes, make it fail every time (fixed data, disable retries, run serial) before trusting any fix.</li>
+      <li><strong>Read the trace &amp; form ONE hypothesis.</strong> "The discount is applied twice in <code>CalculateTotal</code>." Specific and falsifiable.</li>
+      <li><strong>Instrument to confirm/kill — don't fix yet.</strong> Add one <code>TestContext.WriteLine($"discounts={count}")</code> or a breakpoint that will prove or disprove the hypothesis.</li>
+      <li><strong>Confirm.</strong> Run once. Match? If not, discard the hypothesis (don't patch around it) and form a new one from what you learned.</li>
+      <li><strong>Fix at the origin.</strong> Change the root cause — not the symptom, and never the assertion.</li>
+      <li><strong>Re-verify narrow → wide</strong>, remove instrumentation, confirm no new warnings.</li>
+    </ol>
+    <div class="note pit"><span class="tag">The cardinal sin</span><p>Changing multiple things at once "to see what happens." When it goes green you won't know which change fixed it — or whether you masked the bug and introduced another. One hypothesis, one experiment, one confirmation. Every time.</p></div>
+    <div class="note mind"><span class="tag">Expert's mind · worked mini-example (C#)</span><p><em>Symptom:</em> <code>Expected 110 but was 100</code>. <em>Isolate:</em> <code>dotnet test --filter ~QuoteTotal</code>. <em>Read:</em> it's an assertion, not an exception → code ran, logic wrong. <em>Hypothesis:</em> discount applied twice. <em>Instrument:</em> <code>TestContext.WriteLine</code> the discount count in <code>CalculateTotal</code>. <em>Confirm:</em> prints <code>2</code>. <em>Fix:</em> remove the duplicate application at its source (a base method AND an override both applying it). <em>Re-verify:</em> passes honestly; remove the log. Minutes, because every step was aimed.</p></div>
+  </section>
+
+  <!-- ================= PART 8 ================= -->
+  <section class="p" id="p8">
+    <div class="part">Part 8 · Tests &amp; Failures</div>
+    <div class="kicker">Section 8</div>
+    <h2>Verifying beyond "tests passed"</h2>
+    <p class="lead">Green tests prove the paths you tested still work. They don't prove your change is exercised, that callers still compile, that style holds, or that the UI actually behaves. Real verification is a short checklist you run every time.</p>
+
+    <h3>8.1 C# static analysis — bugs tests never run</h3>
+    <p>The .NET compiler and analyzers catch whole classes of defects without executing anything: nulls, unawaited tasks, disposed objects, dead code, style drift.</p>
+    <div class="tw"><table>
+      <thead><tr><th>Layer</th><th>What it is</th><th>How you run it</th></tr></thead>
+      <tbody>
+        <tr><td>Compiler warnings (<code>CSxxxx</code>)</td><td>Language-level issues (unawaited task <code>CS4014</code>, unused var)</td><td><code>dotnet build</code>; enforce with <code>&lt;TreatWarningsAsErrors&gt;true&lt;/&gt;</code></td></tr>
+        <tr><td>.NET analyzers (<code>CAxxxx</code>)</td><td>Correctness/perf/security rules (was FxCop)</td><td><code>&lt;EnableNETAnalyzers&gt;true&lt;/&gt;</code>, <code>&lt;AnalysisLevel&gt;latest&lt;/&gt;</code></td></tr>
+        <tr><td>Style rules (<code>IDExxxx</code>)</td><td>Formatting &amp; idiom (use <code>??</code>, pattern-match)</td><td><code>dotnet format style</code>; severities in <code>.editorconfig</code></td></tr>
+        <tr><td>StyleCop (<code>SAxxxx</code>)</td><td>Layout/ordering/doc conventions</td><td>NuGet <code>StyleCop.Analyzers</code> + <code>.editorconfig</code></td></tr>
+        <tr><td>Nullable reference types</td><td>Null-safety flow analysis</td><td><code>&lt;Nullable&gt;enable&lt;/&gt;</code> → warnings <code>CS86xx</code></td></tr>
+      </tbody>
+    </table></div>
+    <pre><code><span class="c"># The exact gate CI will apply — run it before you push</span>
+dotnet format --verify-no-changes     <span class="c"># fail if not formatted to .editorconfig</span>
+dotnet build -c Release /warnaserror   <span class="c"># no warnings allowed</span>
+dotnet test --filter "FullyQualifiedName~YourArea"</code></pre>
+    <div class="note mind"><span class="tag">Expert's mind · <code>.editorconfig</code> is the contract, not your opinion</span><p>Rule severities (<code>warning</code>, <code>error</code>, <code>suggestion</code>, <code>none</code>) live in <code>.editorconfig</code> and travel with the repo, so every developer and CI agent enforces the same thing. When an analyzer flags your code, the fix is to satisfy the rule — not to suppress it with <code>#pragma warning disable</code> unless you can justify it in a comment. Suppressions are debt with a name attached to them in <code>git blame</code>.</p></div>
+
+    <h3>8.2 The full verification checklist</h3>
+    <ul class="check">
+      <li><strong>Build clean</strong> — no new warnings; treat your own warnings as failures.</li>
+      <li><strong>Your change is actually exercised</strong> — is there a test that fails if you revert the fix? (see 8.3)</li>
+      <li><strong>All callers still compile &amp; pass</strong> — run the tests of every consumer listed in Part 3, not just your own.</li>
+      <li><strong>Static analysis clean</strong> — <code>dotnet format --verify-no-changes</code> + analyzers.</li>
+      <li><strong>Manual smoke</strong> — for a UI change, run the scenario headed once; automated green ≠ "looks right to a human."</li>
+      <li><strong>Diff review</strong> — read your own <code>git diff</code> line by line; remove debug logs, stray files, commented-out code.</li>
+      <li><strong>No unrelated changes</strong> — the diff contains only what the plan said (no drive-by reformatting).</li>
+    </ul>
+
+    <h3>8.3 The revert test — the strongest proof you have</h3>
+    <div class="note good"><span class="tag">Good habit · prove the fix, don't assume it</span><p>Undo your fix and watch a test go <strong>red</strong>; redo it and watch it go <strong>green</strong>. If nothing goes red when you revert, either the bug isn't covered or your change does nothing — both mean you haven't proven anything. This single check catches "phantom fixes" that pass for unrelated reasons (a flaky test that happened to go green, a change that never runs).</p></div>
+    <pre><code><span class="c"># Practical revert test with git stash</span>
+git stash                     <span class="c"># temporarily remove your change</span>
+dotnet test --filter ~TheBug <span class="c"># EXPECT: red (proves the test catches the bug)</span>
+git stash pop                 <span class="c"># restore your change</span>
+dotnet test --filter ~TheBug <span class="c"># EXPECT: green (proves your fix works)</span></code></pre>
+
+    <h3>8.4 Build &amp; caller impact across the solution</h3>
+    <ol class="steps">
+      <li><strong>Full-solution build,</strong> not just your project — a change compatible with yours can break a downstream project: <code>dotnet build CPQPlatformTests.sln</code>.</li>
+      <li><strong>Re-run the consumer list</strong> from Part 3 explicitly (<code>--filter</code> each consumer's tests).</li>
+      <li><strong>Grep the string name</strong> after any rename — DI registrations, reflection, config keys, and Gherkin step regexes bind by string and won't surface as compile errors.</li>
+    </ol>
+  </section>
+
+  <!-- ================= PART 9 ================= -->
+  <section class="p" id="p9">
+    <div class="part">Part 9 · Reference</div>
+    <div class="kicker">Section 9</div>
+    <h2>CLI / terminal cheat sheets</h2>
+    <p class="lead">Keep this Part open on your second monitor. Every command is real and verified. This is also the "AI agent's arsenal" — the commands used to glance through code, find files, and map relationships fast.</p>
+
+    <h3>9.1 Read the built-in help — don't rely on memory</h3>
+    <p>You'll never memorise every flag, and you don't need to. Every serious CLI documents itself; reading that is faster and more reliable than any cheat sheet, because it matches the version you actually have.</p>
+    <pre><code>git commit --help        <span class="c"># full man page (git &lt;cmd&gt; --help)</span>
+git commit -h            <span class="c"># short flag summary (quicker)</span>
+dotnet test --help       <span class="c"># every flag for THIS SDK version</span>
+rg --help  ·  fd --help  ·  git log --help
+Get-Help Select-String -Examples          <span class="c"># PowerShell's help, with examples</span>
+Get-Command dotnet ; (Get-Command git).Source   <span class="c"># where a tool lives</span></code></pre>
+    <ol class="steps">
+      <li><strong>Read the SYNOPSIS</strong> — the command's shape; <code>[optional]</code> vs required.</li>
+      <li><strong>Search, don't scroll:</strong> <code>dotnet test --help | rg -i "filter"</code> jumps to the flag in two seconds.</li>
+      <li><strong>Note short vs long</strong> (<code>-x</code> = <code>--exitfirst</code>) — long form in scripts, short when typing.</li>
+      <li><strong>Trust the tool over blog posts</strong> — a flag in <code>--help</code> exists in <em>your</em> version; a flag from a 2019 article may not.</li>
+    </ol>
+
+    <h3>9.2 git — everyday + advanced (the mapping commands)</h3>
+    <div class="tw"><table>
+      <thead><tr><th>Goal</th><th>Command</th></tr></thead>
+      <tbody>
+        <tr><td>Status / staged diff</td><td><code>git status</code> · <code>git diff</code> · <code>git diff --staged</code></td></tr>
+        <tr><td>Recent history / topology</td><td><code>git log --oneline -20</code> · <code>git log --oneline --graph --decorate --all</code></td></tr>
+        <tr><td>All tracked files (fast overview)</td><td><code>git ls-files</code> · <code>git ls-files "*.csproj"</code></td></tr>
+        <tr><td>File history across renames</td><td><code>git log --follow -p -- path/File.cs</code></td></tr>
+        <tr><td><strong>One method's whole history</strong></td><td><code>git log -L :MethodName:path/File.cs</code></td></tr>
+        <tr><td>By line range</td><td><code>git log -L 40,60:path/File.cs</code></td></tr>
+        <tr><td>Who changed a line (move-aware)</td><td><code>git blame -w -C -C -L 40,60 path/File.cs</code></td></tr>
+        <tr><td>Commit that added/removed text</td><td><code>git log -S"literal"</code> · regex <code>git log -G"pattern"</code></td></tr>
+        <tr><td>Search tracked files (optionally at a commit)</td><td><code>git grep -n "pattern"</code> · <code>git grep -n "pattern" &lt;commit&gt;</code></td></tr>
+        <tr><td>Multi-term search</td><td><code>git grep -e A --and -e B</code></td></tr>
+        <tr><td>Show a commit / a file at a rev</td><td><code>git show &lt;commit&gt;</code> · <code>git show &lt;branch&gt;:path/File.cs</code></td></tr>
+        <tr><td>Find the breaking commit</td><td><code>git bisect start</code> → <code>git bisect bad</code> → <code>git bisect good &lt;rev&gt;</code></td></tr>
+        <tr><td>Who knows this area</td><td><code>git shortlog -sn -- path/</code></td></tr>
+        <tr><td>Branch size vs main</td><td><code>git diff --stat main...HEAD</code> · files only: <code>--name-only</code></td></tr>
+        <tr><td>Undo / stash</td><td><code>git restore path</code> · <code>git stash</code> / <code>git stash pop</code></td></tr>
+      </tbody>
+    </table></div>
+    <div class="note mind"><span class="tag">Expert's mind · the four git commands that carry the day</span><p><code>git log -L :Method:File</code> (history of one method — plan a change knowing its past), <code>git log -S"x"</code> (when a value/flag appeared — the pickaxe), <code>git blame -C</code> (who wrote a line, even if moved), and <code>git bisect</code> (binary-search the breaking commit). These four turn "I have no idea when/why this changed" into a two-minute answer.</p></div>
+
+    <h3>9.3 ripgrep (rg) &amp; fd — find code &amp; files fast</h3>
+    <div class="tw"><table>
+      <thead><tr><th>Goal</th><th>ripgrep (content)</th></tr></thead>
+      <tbody>
+        <tr><td>Basic / case-insensitive / word</td><td><code>rg "x"</code> · <code>rg -i "x"</code> · <code>rg -w "Total"</code></td></tr>
+        <tr><td>By type / glob</td><td><code>rg -t cs "x"</code> · <code>rg -g "*.feature" "Scenario"</code> · exclude <code>-g "!**/obj/**"</code></td></tr>
+        <tr><td>Context</td><td><code>rg -C 3 "x"</code> (or <code>-A</code>/<code>-B</code>)</td></tr>
+        <tr><td>Files-with / count / list all</td><td><code>rg -l "x"</code> · <code>rg -c "x"</code> · <code>rg --files -t cs</code></td></tr>
+        <tr><td>Only the match / multiline / PCRE2</td><td><code>rg -o "class \w+ : \w+"</code> · <code>rg -U "…"</code> · <code>rg --pcre2 "(?&lt;!//)TODO"</code></td></tr>
+        <tr><td>Search ignored/hidden too</td><td><code>rg -uu "x"</code></td></tr>
+        <tr><td>Replacement preview (no write)</td><td><code>rg "foo" -r "bar"</code></td></tr>
+        <tr><td>Stats across repo</td><td><code>rg --stats "await "</code></td></tr>
+      </tbody>
+    </table></div>
+    <div class="tw"><table>
+      <thead><tr><th>Goal</th><th>fd (file names) / fallback</th></tr></thead>
+      <tbody>
+        <tr><td>Find by name / extension</td><td><code>fd BasketPage</code> · <code>fd -e cs</code></td></tr>
+        <tr><td>Exclude build output</td><td><code>fd -e cs -E bin -E obj</code></td></tr>
+        <tr><td>Only files / dirs; hidden</td><td><code>fd -t f</code> · <code>fd -t d</code> · <code>fd -H</code></td></tr>
+        <tr><td>Run a command per hit</td><td><code>fd -e trx -x rm</code></td></tr>
+        <tr><td>No rg/fd installed?</td><td><code>grep -rn "x" .</code> · <code>find . -name "*.cs"</code></td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>9.4 .NET CLI</h3>
+    <div class="tw"><table>
+      <thead><tr><th>Goal</th><th>Command</th></tr></thead>
+      <tbody>
+        <tr><td>Environment</td><td><code>dotnet --info</code> · <code>dotnet --list-sdks</code></td></tr>
+        <tr><td>Restore / build / run</td><td><code>dotnet restore</code> · <code>dotnet build -c Release</code> · <code>dotnet run --project src/App</code></td></tr>
+        <tr><td>Test (all / filter / single)</td><td><code>dotnet test</code> · <code>--filter "FullyQualifiedName~X"</code> · <code>--filter "Name=Y"</code></td></tr>
+        <tr><td>Test diagnostics</td><td><code>--logger "trx"</code> · <code>--blame-hang-timeout 5m</code> · <code>--no-build</code></td></tr>
+        <tr><td>Format</td><td><code>dotnet format</code> · <code>dotnet format --verify-no-changes</code></td></tr>
+        <tr><td>Solution / project graph</td><td><code>dotnet sln list</code> · <code>dotnet list &lt;p&gt; reference</code> · <code>dotnet list package [--include-transitive]</code></td></tr>
+        <tr><td>Global tools (navigation)</td><td><code>dotnet tool install -g ilspycmd</code> · <code>dotnet tool install -g JetBrains.ReSharper.GlobalTools</code></td></tr>
+        <tr><td>Runtime diagnostics</td><td><code>dotnet-trace</code> · <code>dotnet-dump</code> · <code>dotnet-counters</code></td></tr>
+        <tr><td>Playwright browsers</td><td><code>pwsh bin/Debug/net10.0/playwright.ps1 install</code></td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>9.5 PowerShell (Windows) — with Bash equivalents</h3>
+    <p>Automation on Windows lives in PowerShell. Know both dialects; a pasted Bash one-liner won't run in PowerShell and vice-versa.</p>
+    <div class="tw"><table>
+      <thead><tr><th>Operation</th><th>PowerShell</th><th>Bash</th></tr></thead>
+      <tbody>
+        <tr><td>List files</td><td><code>Get-ChildItem</code> (<code>ls</code>)</td><td><code>ls -la</code></td></tr>
+        <tr><td>Recurse by name</td><td><code>Get-ChildItem -Recurse -Filter *.cs</code></td><td><code>find . -name "*.cs"</code> / <code>fd -e cs</code></td></tr>
+        <tr><td>Search text</td><td><code>Select-String -Pattern "x" -Path *.cs</code></td><td><code>grep -rn "x" .</code> / <code>rg "x"</code></td></tr>
+        <tr><td>Print / tail a log</td><td><code>Get-Content log -Tail 50 -Wait</code></td><td><code>tail -n 50 -f log</code></td></tr>
+        <tr><td>First N lines</td><td><code>Get-Content f -TotalCount 20</code></td><td><code>head -n 20 f</code></td></tr>
+        <tr><td>Env var read / set</td><td><code>$env:PATH</code> · <code>$env:KEY="v"</code></td><td><code>$PATH</code> · <code>export KEY=v</code></td></tr>
+        <tr><td>Count lines</td><td><code>... | Measure-Object -Line</code></td><td><code>... | wc -l</code></td></tr>
+        <tr><td>Where a tool is</td><td><code>(Get-Command git).Source</code></td><td><code>which git</code></td></tr>
+        <tr><td>Delete recursively</td><td><code>Remove-Item -Recurse -Force dir</code></td><td><code>rm -rf dir</code></td></tr>
+        <tr><td>Chain on success</td><td><code>a; if($?){b}</code> (pwsh 7: <code>a &amp;&amp; b</code>)</td><td><code>a &amp;&amp; b</code></td></tr>
+      </tbody>
+    </table></div>
+    <div class="note warn"><span class="tag">Cross-shell gotchas</span><p>PowerShell pipes <em>objects</em> (<code>Select-String</code> returns match objects — use <code>.Line</code>/<code>.LineNumber</code>); Bash pipes <em>text</em>. PowerShell's escape char is the backtick <code>`</code>, not the backslash. And <code>/dev/null</code> is <code>$null</code> in PowerShell. Know which shell you're in before pasting a one-liner from the web.</p></div>
+  </section>
+
+  <!-- ================= PART 10 ================= -->
+  <section class="p" id="p10">
+    <div class="part">Part 10 · Reference</div>
+    <div class="kicker">Section 10</div>
+    <h2>Automation-engineer-specific skills</h2>
+    <p class="lead">Everything so far applies to any C# engineer. This Part is the automation specialist's edge — framework patterns, API test tooling, pipeline diagnosis, flaky-test elimination, and reporting — all in .NET.</p>
+
+    <h3>10.1 Framework architecture patterns</h3>
+    <div class="tw"><table>
+      <thead><tr><th>Pattern</th><th>Idea</th><th>Use when</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Page Object Model</strong></td><td>One class per screen; encapsulates locators + actions behind intent methods, usually over a <code>PageObjectBase</code></td><td>Almost always — the baseline for UI suites</td></tr>
+        <tr><td><strong>Screenplay</strong></td><td>Actors with Abilities perform Tasks/Questions; behaviour-composed, not page-centric</td><td>Large suites where POM classes bloat; high reuse of user goals</td></tr>
+        <tr><td><strong>BDD (Reqnroll/SpecFlow)</strong></td><td>Gherkin (Given/When/Then) maps business language to <code>[Binding]</code> step code</td><td>Stakeholder-readable specs; shared vocabulary with QA/PO</td></tr>
+      </tbody>
+    </table></div>
+    <pre><code><span class="c">// The canonical C# POM shape: locators + intent methods, fluent navigation</span>
+<span class="k">public class</span> BasketPage : PageObjectBase
+{
+    <span class="k">public</span> BasketPage(IPage page) : <span class="k">base</span>(page) { VerifyOnBasket(); }
+    <span class="k">private static class</span> Selectors { <span class="k">public const string</span> Save = <span class="s">"#SaveButton:visible"</span>; }
+
+    <span class="k">public async</span> Task&lt;QuotesPage&gt; ClickSaveAsync()            <span class="c">// returns the NEXT page (fluent)</span>
+    {
+        <span class="k">await</span> CurrentPage.ClickAndWaitAsync(Selectors.Save);
+        <span class="k">return new</span> QuotesPage(CurrentPage);                     <span class="c">// self-validates in its ctor</span>
+    }
+}
+<span class="c">// The step is THIN — it orchestrates, it doesn't compute (Part 4.4):</span>
+[<span class="k">When</span>(<span class="s">@"Basket, I click on Save"</span>)]
+<span class="k">public async</span> Task WhenIClickSave() =&gt; CurrentPage = <span class="k">await</span> BasketPage.ClickSaveAsync();</code></pre>
+    <div class="note mind"><span class="tag">Expert's mind · recognise the pattern to place your code</span><p><code>*Page</code> classes → POM: new UI logic goes on the page. <code>*.feature</code> + <code>[Binding]</code> → BDD: new sentences map to thin steps calling pages. Actors/Tasks → Screenplay: add a Task, not a page method. The pattern dictates placement — this is Part 4 in practice.</p></div>
+
+    <h3>10.2 API test tooling in C#</h3>
+    <p>API-first setup is the single biggest speed and stability lever in a UI suite. Two mainstream clients:</p>
+    <div class="tw"><table>
+      <thead><tr><th>Task</th><th><code>HttpClient</code> (built-in)</th><th>RestSharp (NuGet)</th></tr></thead>
+      <tbody>
+        <tr><td>Create client</td><td><code>static readonly HttpClient _c = new();</code></td><td><code>var c = new RestClient(baseUrl);</code></td></tr>
+        <tr><td>GET</td><td><code>await _c.GetAsync(url)</code></td><td><code>await c.ExecuteAsync(new RestRequest("res"))</code></td></tr>
+        <tr><td>POST JSON</td><td><code>await _c.PostAsJsonAsync(url, body)</code></td><td><code>req.AddJsonBody(body)</code> then execute</td></tr>
+        <tr><td>Deserialize</td><td><code>await resp.Content.ReadFromJsonAsync&lt;T&gt;()</code></td><td><code>await c.GetAsync&lt;T&gt;(req)</code></td></tr>
+        <tr><td>Assert status</td><td><code>resp.StatusCode.Should().Be(HttpStatusCode.OK)</code></td><td><code>resp.IsSuccessful.Should().BeTrue()</code></td></tr>
+      </tbody>
+    </table></div>
+    <pre><code><span class="c">// Build a precondition over the API in milliseconds, then test the UI behaviour</span>
+[<span class="k">Given</span>(<span class="s">@"Api, I create a Quote named ""(.*)"""</span>)]
+<span class="k">public async</span> Task GivenApiQuote(<span class="k">string</span> name)
+{
+    <span class="k">var</span> quote = <span class="k">await</span> _quoteService.CreateQuoteAsync(QuoteBuilder.Default(name));
+    _context.CurrentQuote = quote;                 <span class="c">// later steps reference it</span>
+}</code></pre>
+    <div class="note good"><span class="tag">Good habit · a single static <code>HttpClient</code></span><p>Per MS guidance, never <code>new HttpClient()</code> per request — it exhausts sockets under load. One shared static instance reuses connections. Wrap it in a base <code>ApiService</code> that centralises auth headers + (de)serialization, so every endpoint method is one line of domain intent (mirrors the framework handbook's API layer).</p></div>
+
+    <h3>10.3 Reading CI/CD output &amp; pipeline-only failures</h3>
+    <p>"Passes locally, fails in CI" is a category, not a mystery. Work the differences systematically.</p>
+    <div class="tw"><table>
+      <thead><tr><th>Difference local↔CI</th><th>Symptom</th><th>Check / fix</th></tr></thead>
+      <tbody>
+        <tr><td>Headless vs headed</td><td><code>ElementNotInteractable</code> only in CI</td><td>Run headless locally; fix waits/viewport</td></tr>
+        <tr><td>Parallelism</td><td>Passes alone, fails in the suite</td><td>Shared/static state; isolate data per test; try <code>NumberOfTestWorkers=1</code></td></tr>
+        <tr><td>Env / secrets</td><td>Auth or config errors only in CI</td><td>Compare pipeline variables vs local <code>appsettings.json</code>; missing secret?</td></tr>
+        <tr><td>Machine speed</td><td>Timeouts only in CI</td><td>Agents are slower; fix the wait condition, don't just raise the timeout</td></tr>
+        <tr><td>Browser/driver version</td><td>Selector/behaviour differs</td><td>Pin versions; ensure the pipeline runs the Playwright/driver install step</td></tr>
+        <tr><td>Working directory</td><td>File-not-found only in CI</td><td>Relative paths + <code>CopyToOutputDirectory</code> on data files</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>10.4 Diagnosing flaky tests — systematic elimination</h3>
+    <p>A flaky test passes and fails without code changes. Never "just re-run" — that trains the team to ignore real failures. Eliminate causes in order of likelihood.</p>
+    <div class="tw"><table>
+      <thead><tr><th>Cause</th><th>Signature</th><th>Fix</th></tr></thead>
+      <tbody>
+        <tr><td>Bad waits (race)</td><td>Fails on slow agents; "not found/interactable"</td><td>Wait for explicit <em>state</em>; never <code>Thread.Sleep</code></td></tr>
+        <tr><td>Shared / static state</td><td>Fails in suite, passes alone</td><td>Isolate per test; beware <code>static</code> fields &amp; NUnit fixture reuse</td></tr>
+        <tr><td>Test-data collisions</td><td>Fails under parallel</td><td>Per-worker data / unique IDs; no shared mutable fixtures</td></tr>
+        <tr><td>Animations / overlays</td><td>Intermittent click intercepted</td><td>Disable animations; wait for the overlay to detach</td></tr>
+        <tr><td>External dependency</td><td>Fails when a service is slow/down</td><td>Stub it, or retry only that boundary with backoff</td></tr>
+        <tr><td>Time / locale</td><td>Fails at midnight / other timezone</td><td>Inject the clock; set explicit <code>CultureInfo</code></td></tr>
+      </tbody>
+    </table></div>
+    <ol class="steps">
+      <li><strong>Reproduce it</strong> — loop the test until it fails: <code>dotnet test --filter ~Flaky</code> in a shell loop, or NUnit <code>[Retry]</code>/repeat locally. A flake you can't reproduce, you can't fix.</li>
+      <li><strong>Bisect the cause</strong> — run it alone (order?), then headless (rendering?), then serial (<code>NumberOfTestWorkers=1</code> — parallel collision?), then with fixed data.</li>
+      <li><strong>Fix the root, keep the guard</strong> — replace the sleep with a state wait; loop it again to prove it's stable.</li>
+    </ol>
+    <div class="note pit"><span class="tag">Retries hide, they don't heal</span><p>Auto-retry belongs on a genuinely external boundary. Retrying a race condition just lowers the failure rate enough to be ignored — until it fails in a demo. Fix the wait; reserve retries for true externalities.</p></div>
+
+    <h3>10.5 Test data &amp; reporting</h3>
+    <ul class="check">
+      <li><strong>Own your data:</strong> each test creates what it needs (API setup) and removes it (teardown). No dependence on pre-existing records.</li>
+      <li><strong>Builders over literals:</strong> a <code>QuoteBuilder.Default()</code> with sane defaults beats copy-pasted object graphs; override only the field under test.</li>
+      <li><strong>Deterministic uniqueness:</strong> per-run/per-worker prefixes so parallel tests never collide.</li>
+    </ul>
+    <div class="tw"><table>
+      <thead><tr><th>Reporting tool (.NET)</th><th>Gives you</th></tr></thead>
+      <tbody>
+        <tr><td>Allure (Allure.NUnit / Allure.Xunit / Allure.Reqnroll)</td><td>Rich HTML: steps, attachments, history, trends</td></tr>
+        <tr><td>ExtentReports</td><td>HTML dashboards with screenshots</td></tr>
+        <tr><td>Reqnroll / SpecFlow+ LivingDoc</td><td>Executable feature documentation</td></tr>
+        <tr><td><code>.trx</code> + built-in loggers</td><td>Machine-readable results for CI dashboards</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>Attach evidence on failure</strong> — screenshot, Playwright trace, and the failing step — in your <code>[AfterScenario]</code>/teardown. A report that shows <em>why</em> a test failed without a re-run is worth more than any pass-rate number.</p>
+  </section>
+
+  <!-- ================= PART 11 ================= -->
+  <section class="p" id="p11">
+    <div class="part">Part 11 · Growth</div>
+    <div class="kicker">Section 11</div>
+    <h2>A 30-day plan to build this instinct</h2>
+    <p class="lead">Instinct is trained, not read. Thirty days, ~30 focused minutes each, building the five-beat loop into muscle memory. Use any C# repo — ideally an unfamiliar automation suite.</p>
+
+    <h3>11.1 Weekly themes</h3>
+    <div class="tw"><table>
+      <thead><tr><th>Week</th><th>Theme</th><th>Outcome by Friday</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Recon speed</td><td>Map any .NET repo (build, test, projects, conventions) in under 10 minutes</td></tr>
+        <tr><td>2</td><td>Linkage-finding</td><td>Trace any symbol → definition → test with git + rg alone</td></tr>
+        <tr><td>3</td><td>Stack-trace reading</td><td>Diagnose a failure's cause from the trace before opening a debugger</td></tr>
+        <tr><td>4</td><td>Full-cycle debugging</td><td>Run the whole loop — recon→plan→fix→verify — on real bugs, timed</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>11.2 Daily exercises (timed)</h3>
+    <h4>Week 1 — Recon</h4>
+    <ul class="check">
+      <li><strong>Day 1 (15m):</strong> Clone an unfamiliar C# repo. Answer: target framework? test framework? how to run one test? Write it down.</li>
+      <li><strong>Day 2 (15m):</strong> <code>dotnet build</code> then run a single test green. Record the exact commands.</li>
+      <li><strong>Day 3 (20m):</strong> <code>dotnet sln list</code> + <code>dotnet list … reference</code> — draw the project graph; verify against the folders.</li>
+      <li><strong>Day 4 (15m):</strong> Read the CI YAML; list every command it runs; reproduce one locally.</li>
+      <li><strong>Day 5 (20m):</strong> New repo. Beat your Day-1 time.</li>
+    </ul>
+    <h4>Week 2 — Linkages</h4>
+    <ul class="check">
+      <li><strong>Day 6–7 (20m):</strong> Pick a method; find all callers with <code>rg -w</code> + Find All References; sketch the define/consume/test triangle.</li>
+      <li><strong>Day 8 (15m):</strong> <code>git log -S</code> to find when a value/flag was introduced; read that commit's message.</li>
+      <li><strong>Day 9 (20m):</strong> <code>git log -L :Method:File</code> on a real method; summarise its evolution in three sentences.</li>
+      <li><strong>Day 10 (25m):</strong> Run the Part 2.3 worked trace end-to-end (feature → step → page → logic → test).</li>
+    </ul>
+    <h4>Week 3 — Stack traces</h4>
+    <ul class="check">
+      <li><strong>Day 11–12 (15m):</strong> Break a test on purpose; read the trace; write your hypothesis <em>before</em> reading the code.</li>
+      <li><strong>Day 13 (20m):</strong> Cause each automation exception (Part 7.5) — force a <code>StaleElementReference</code> and a <code>TimeoutException</code>; fix each.</li>
+      <li><strong>Day 14 (20m):</strong> Read an <code>InnerException</code>/<code>AggregateException</code> chain; find the root in under 30 seconds with <code>GetBaseException()</code>.</li>
+      <li><strong>Day 15 (25m):</strong> Given only a CI log + screenshot, diagnose without running; then verify by reproducing headless.</li>
+    </ul>
+    <h4>Week 4 — Full cycle</h4>
+    <ul class="check">
+      <li><strong>Day 16–19 (30m):</strong> Take a real "good first issue" in an OSS C# project. Run the full loop; write the three-line plan first.</li>
+      <li><strong>Day 20 (30m):</strong> Make a cross-cutting change; enumerate every caller (incl. string/reflection) before editing; verify all their tests.</li>
+      <li><strong>Day 21–25 (30m):</strong> One bug/day, timed. Target: correct hypothesis within 5 minutes of reading the failure.</li>
+      <li><strong>Day 26–30 (30m):</strong> Teach it — write a short note explaining one repo's architecture to a newcomer. Teaching exposes gaps.</li>
+    </ul>
+
+    <h3>11.3 Weekly self-review checklist</h3>
+    <ul class="check">
+      <li>Did I <strong>confirm before editing</strong> every time, or guess at least once?</li>
+      <li>Did I <strong>write the three-line plan</strong> before coding?</li>
+      <li>Did I run the <strong>narrowest test first</strong>, or waste time on full-suite loops?</li>
+      <li>Could I <strong>read each failure to a hypothesis</strong> without a debugger?</li>
+      <li>Did I <strong>verify beyond green</strong> — build, callers, format, revert-test, smoke?</li>
+      <li>What did I add to my <strong>knowledge base</strong> (Part 12)?</li>
+    </ul>
+  </section>
+
+  <!-- ================= PART 12 ================= -->
+  <section class="p" id="p12">
+    <div class="part">Part 12 · Growth</div>
+    <div class="kicker">Section 12</div>
+    <h2>Working smart without AI</h2>
+    <p class="lead">An AI assistant is an accelerator, not a crutch. These manual checklists reproduce what a good agent does for you — so you stay sharp and effective when it's offline, restricted, or simply the wrong tool.</p>
+
+    <h3>12.1 Manual code-review checklist (your own diff, before commit)</h3>
+    <ul class="check">
+      <li><strong>Read every changed line</strong> as if reviewing a stranger. <code>git diff</code> is not optional.</li>
+      <li><strong>Only intended changes present</strong> — no stray files, <code>Console.WriteLine</code>, commented-out code, or formatting churn.</li>
+      <li><strong>Matches local conventions</strong> — naming, async style, assertion library, nullable annotations.</li>
+      <li><strong>Every new branch handled</strong> — null / empty / timeout / error paths, not just the happy path.</li>
+      <li><strong>Names say what they do</strong> — a reader shouldn't need the method body to understand the call.</li>
+      <li><strong>A test fails if I revert the fix</strong> (the revert test, Part 8.3).</li>
+      <li><strong>Callers updated</strong> — if a signature/behaviour changed, all consumers (incl. string/reflection) changed too.</li>
+    </ul>
+
+    <h3>12.2 Manual debugging checklist</h3>
+    <ol class="steps">
+      <li><strong>Reproduce narrowly</strong> — one test, fixed input (<code>dotnet test --filter</code>).</li>
+      <li><strong>Read the trace</strong> — exception type → message → first frame of my code → innermost inner exception.</li>
+      <li><strong>One hypothesis</strong> — specific and falsifiable.</li>
+      <li><strong>One experiment</strong> — a log/breakpoint that confirms or kills it, without changing behaviour.</li>
+      <li><strong>Confirm, then fix the origin</strong> — never the symptom or the assertion.</li>
+      <li><strong>Re-verify narrow → wide</strong>, remove instrumentation, no new warnings.</li>
+    </ol>
+
+    <h3>12.3 Manual "where does this belong" checklist</h3>
+    <ul class="check">
+      <li>Who else would want this? (many screens → shared component; one screen → that page)</li>
+      <li>What makes it change? (DOM → page; environment → config; data shape → model/builder; transport → service)</li>
+      <li>Is it behaviour or data? (behaviour → code layer; data → test-data/fixtures)</li>
+      <li>Would putting it here create a circular <code>ProjectReference</code>? (if so, extract a shared piece)</li>
+      <li>Am I about to add logic to a step or dump it in "Helpers"? (stop — re-route per Part 4)</li>
+    </ul>
+
+    <h3>12.4 Build &amp; maintain a personal knowledge base</h3>
+    <p>Experts aren't faster because they remember everything — they're faster because they <em>wrote it down once</em> and never re-solve the same problem. Keep a single searchable file (Markdown / a wiki / notes).</p>
+    <div class="tw"><table>
+      <thead><tr><th>Capture</th><th>Example entry (C#)</th></tr></thead>
+      <tbody>
+        <tr><td>Flaky signatures</td><td>"<code>ElementClickIntercepted</code> on Save → toast overlay; wait for <code>.toast</code> to detach before click."</td></tr>
+        <tr><td>Exception → fix</td><td>"<code>InvalidOperationException: Collection was modified</code> → don't mutate a list while <code>foreach</code>-ing; iterate <code>.ToList()</code>."</td></tr>
+        <tr><td>Async traps</td><td>"<code>AggregateException</code> in a test → someone used <code>.Result</code>; make it <code>async Task</code> + <code>await</code>."</td></tr>
+        <tr><td>Repo conventions</td><td>"Repo X: steps live in <code>PageObjects</code>, not the test project; new page must be added to the URL switch."</td></tr>
+        <tr><td>Command recipes</td><td>"Run one Reqnroll scenario: <code>dotnet test --filter FullyQualifiedName~ScenarioName</code>."</td></tr>
+        <tr><td>Environment gotchas</td><td>"CI is headless &amp; slower → replace every <code>Thread.Sleep</code> with a state wait."</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note mind"><span class="tag">Expert's mind · the compounding habit</span><p>Every bug you solve is either a one-time cost or a permanent asset — the difference is whether you record its signature. After a year, your knowledge base recognises most failures on sight. That recognition <em>is</em> seniority, and it's fully independent of any AI tool.</p></div>
+  </section>
+
+  <!-- ================= PART 13 ================= -->
+  <section class="p" id="p13">
+    <div class="part">Part 13 · Power Tools</div>
+    <div class="kicker">Section 13</div>
+    <h2>Advanced terminal &amp; diagnostics</h2>
+    <p class="lead">The engineers who never get stuck are the ones who can interrogate the <em>environment</em>, not just the code — kill a hung driver, find what's holding a port, time a slow build, smoke an API from the shell, and inspect exactly what any command returned. This Part is that toolkit, with where to run each command and how to check the result.</p>
+
+    <h3>13.1 Where to run — cmd vs PowerShell 5.1 vs PowerShell 7</h3>
+    <p>Three shells exist on a typical Windows dev box. Using the wrong one is why a pasted one-liner "doesn't work." Know which you're in and which to reach for.</p>
+    <div class="tw"><table>
+      <thead><tr><th>Shell</th><th>How to open / identify</th><th>Use it for</th></tr></thead>
+      <tbody>
+        <tr><td><strong>PowerShell 7</strong> (<code>pwsh</code>)</td><td>Type <code>pwsh</code>; the modern, cross-platform one. Check: <code>$PSVersionTable.PSVersion</code> → 7.x</td><td>Everything. Object pipeline, <code>&amp;&amp;</code>/<code>||</code>, <code>ForEach-Object -Parallel</code>.</td></tr>
+        <tr><td><strong>Windows PowerShell 5.1</strong></td><td>Ships with Windows (<code>powershell</code>). Check: version 5.1</td><td>Legacy scripts. No <code>&amp;&amp;</code>; use <code>; if($?){...}</code>.</td></tr>
+        <tr><td><strong>cmd.exe</strong></td><td>Type <code>cmd</code>. Prompt looks like <code>C:\path&gt;</code></td><td>Legacy <code>.bat</code>, <code>%ERRORLEVEL%</code>, <code>taskkill</code>, quick <code>where</code>.</td></tr>
+        <tr><td>VS Code integrated terminal</td><td><span class="kbd">Ctrl</span>+<span class="kbd">`</span>; pick the profile in the dropdown</td><td>Day-to-day; inherits the workspace as the working directory.</td></tr>
+      </tbody>
+    </table></div>
+    <pre><code><span class="c"># WHERE TO RUN: any shell. HOW TO CHECK which shell/version you're in:</span>
+$PSVersionTable.PSVersion        <span class="c"># PowerShell: prints 7.x or 5.1</span>
+$PSVersionTable.PSEdition        <span class="c"># "Core" = pwsh 7, "Desktop" = 5.1</span>
+ver                              <span class="c"># cmd.exe: prints the Windows version banner</span>
+(Get-Location).Path              <span class="c"># PowerShell: your current working directory (matters for dotnet/rg/git!)</span></code></pre>
+    <div class="note warn"><span class="tag">Where you run matters as much as what you run</span><p><code>dotnet</code>, <code>git</code>, and <code>rg</code> are <strong>working-directory-sensitive</strong> — run them from the repo root (or a project folder), not from <code>C:\</code>. <code>dotnet test</code> from the wrong folder finds no project; <code>rg</code> from the wrong folder searches the wrong tree. Always confirm <code>Get-Location</code> first. Prefer PowerShell 7 (<code>pwsh</code>) unless a script explicitly needs 5.1.</p></div>
+
+    <h3>13.2 The "how to check" reflex — never trust, verify</h3>
+    <p>Advanced users don't guess what a command did — they <em>inspect</em> it. Three habits cover almost everything.</p>
+    <h4>Check what a command returned (its shape)</h4>
+    <pre><code><span class="c"># PowerShell pipes OBJECTS. Get-Member shows every property/method you can use.</span>
+Get-Process chrome | Get-Member                 <span class="c"># what can I read off a process object?</span>
+Get-Process chrome | Select-Object Id, Name, WorkingSet, StartTime   <span class="c"># pick fields</span>
+Get-Process chrome | Format-List *              <span class="c"># dump ALL properties of the first items</span></code></pre>
+    <h4>Check whether it succeeded (exit status)</h4>
+    <pre><code><span class="c"># PowerShell</span>
+dotnet build
+$?                 <span class="c"># True/False: did the LAST command succeed?</span>
+$LASTEXITCODE      <span class="c"># the native exe's exit code (0 = success). CI gates on this.</span>
+
+<span class="c">:: cmd.exe</span>
+dotnet build
+echo %ERRORLEVEL%  <span class="c">:: 0 = success, non-zero = failure</span></code></pre>
+    <h4>Check how long it took (find the slow step)</h4>
+    <pre><code><span class="c"># PowerShell: time any command or block</span>
+Measure-Command { dotnet build -c Release }     <span class="c"># prints TotalSeconds — profile a slow build/test</span>
+Measure-Command { dotnet test --filter ~Smoke } </code></pre>
+    <div class="note mind"><span class="tag">Expert's mind · <code>Get-Member</code> is how you learn PowerShell without docs</span><p>Every PowerShell command returns objects, and <code>| Get-Member</code> lists exactly what you can pull off them. Stuck on "how do I get the PID of the process on port 5000?" — pipe <code>Get-NetTCPConnection</code> into <code>Get-Member</code>, see the <code>OwningProcess</code> property, done. This turns the shell into a self-documenting API, the same way <code>--help</code> does for CLIs (Part 9.1).</p></div>
+
+    <h3>13.3 Advanced PowerShell for engineers</h3>
+    <p>The object pipeline (<code>Where-Object</code>, <code>ForEach-Object</code>, <code>Select-Object</code>, <code>Sort-Object</code>, <code>Measure-Object</code>, <code>Group-Object</code>) is what makes PowerShell powerful. Run these from the repo root.</p>
+    <pre><code><span class="c"># Find the 10 biggest source files (bloat hunting)</span>
+Get-ChildItem -Recurse -File -Filter *.cs |
+  Sort-Object Length -Descending | Select-Object -First 10 Name, Length
+
+<span class="c"># Files changed in the last day (what did I / CI just touch?)</span>
+Get-ChildItem -Recurse -File |
+  Where-Object { $_.LastWriteTime -gt (Get-Date).AddDays(-1) } |
+  Select-Object FullName, LastWriteTime
+
+<span class="c"># Count tests per file quickly (Group-Object)</span>
+Select-String -Path *.cs -Pattern '\[Test\]|\[Fact\]' |
+  Group-Object Path | Sort-Object Count -Descending | Select-Object Count, Name
+
+<span class="c"># Follow a live log (watch a test run / app log as it writes)</span>
+Get-Content .\Results\run.log -Tail 50 -Wait     <span class="c"># -Wait = tail -f</span>
+
+<span class="c"># Select-String with context + capture groups (grep on steroids)</span>
+Select-String -Path *.cs -Pattern 'timeout\s*=\s*(\d+)' -Context 1,1
+(Select-String -Path *.cs -Pattern '(\d+)ms' -AllMatches).Matches.Groups</code></pre>
+    <pre><code><span class="c"># Run independent work in parallel (pwsh 7+) — e.g. hit N endpoints fast</span>
+1..5 | ForEach-Object -Parallel { "checked $_" } -ThrottleLimit 4</code></pre>
+
+    <h3>13.4 Process &amp; port control — the automation lifesavers</h3>
+    <p>Two failures dominate flaky local automation: a <strong>hung browser/driver</strong> that locks the next run, and a <strong>port already in use</strong> so the app-under-test won't start. These commands fix both in seconds.</p>
+    <pre><code><span class="c"># --- HUNG DRIVER/BROWSER: find and kill leftovers (PowerShell) ---</span>
+Get-Process chromedriver, chrome, dotnet -ErrorAction SilentlyContinue   <span class="c"># what's running?</span>
+Stop-Process -Name chromedriver -Force                <span class="c"># kill all chromedriver</span>
+Get-Process | Where-Object { $_.Name -match 'chrome|playwright|dotnet' } | Stop-Process -Force
+
+<span class="c">:: cmd.exe equivalents</span>
+tasklist | findstr /i "chromedriver chrome dotnet"
+taskkill /F /IM chromedriver.exe                      <span class="c">:: /F force, /IM by image name</span>
+
+<span class="c"># --- PORT IN USE: what's holding port 5000? (the app won't start) ---</span>
+Get-NetTCPConnection -LocalPort 5000                  <span class="c"># PowerShell: shows OwningProcess (PID)</span>
+Get-Process -Id (Get-NetTCPConnection -LocalPort 5000).OwningProcess   <span class="c"># which app is it?</span>
+netstat -ano | Select-String ":5000"                  <span class="c"># PID is the last column</span>
+
+<span class="c">:: cmd.exe</span>
+netstat -ano | findstr :5000
+taskkill /F /PID 12345                                 <span class="c">:: kill by the PID you found</span>
+
+<span class="c"># --- IS THE APP-UNDER-TEST ACTUALLY UP? (before blaming the test) ---</span>
+Test-NetConnection localhost -Port 5000               <span class="c"># TcpTestSucceeded: True/False</span></code></pre>
+    <div class="note good"><span class="tag">Good habit · check the environment before re-running</span><p>When a UI test fails to even start, don't re-run it — <em>check the environment first</em>: Is a stale <code>chromedriver</code> still running? Is the app's port free? Is the app reachable (<code>Test-NetConnection</code>)? Nine times out of ten a "flaky start" is a leftover process or a busy port, fixed by two commands — not a code change.</p></div>
+
+    <h3>13.5 Smoke an API straight from the terminal</h3>
+    <p>Before writing an API test, confirm the endpoint and payload from the shell — faster than a full test run, and it validates your understanding (ties to converting a cURL, framework-handbook style).</p>
+    <pre><code><span class="c"># Invoke-RestMethod: parses JSON into an object you can drill into</span>
+$r = Invoke-RestMethod -Uri 'https://localhost:5001/v3/api/quotes/123' `
+     -Headers @{ Authorization = $token } -Method Get
+$r.quoteNumber                                        <span class="c"># drill straight into the parsed response</span>
+
+<span class="c"># POST a JSON body</span>
+$body = @{ name = 'Smoke'; status = 'Draft' } | ConvertTo-Json
+Invoke-RestMethod -Uri 'https://localhost:5001/v3/api/quotes' -Method Post `
+  -ContentType 'application/json' -Body $body
+
+<span class="c"># Invoke-WebRequest: full response — HOW TO CHECK status &amp; headers</span>
+$resp = Invoke-WebRequest -Uri 'https://localhost:5001/health'
+$resp.StatusCode          <span class="c"># 200?</span>
+$resp.Content             <span class="c"># raw body</span></code></pre>
+    <div class="note mind"><span class="tag">Expert's mind · the shell is a REPL for your app's API</span><p><code>Invoke-RestMethod</code> returns a live object, so you can explore an unfamiliar API interactively — call it, inspect <code>$r | Get-Member</code>, drill into fields — <em>before</em> committing to a C# model. You discover the real response shape in seconds instead of guessing property names in code (the #1 cause of API-test data bugs).</p></div>
+
+    <h3>13.6 cmd.exe advanced — when you're stuck in it</h3>
+    <p>Sometimes you're in a plain <code>cmd</code> window (a CI step, an RDP box, a <code>.bat</code>). These are the ones worth knowing.</p>
+    <div class="tw"><table>
+      <thead><tr><th>Goal</th><th>cmd.exe command</th></tr></thead>
+      <tbody>
+        <tr><td>Where is a tool installed?</td><td><code>where dotnet</code> · <code>where git</code></td></tr>
+        <tr><td>Search text recursively</td><td><code>findstr /s /i /n "CalculateTotal" *.cs</code> (<code>/s</code> recurse, <code>/i</code> ignore-case, <code>/n</code> line#)</td></tr>
+        <tr><td>List files recursively (bare paths)</td><td><code>dir /s /b *.cs</code></td></tr>
+        <tr><td>Loop over files</td><td><code>for /r %f in (*.feature) do @echo %f</code></td></tr>
+        <tr><td>Check last exit code</td><td><code>echo %ERRORLEVEL%</code></td></tr>
+        <tr><td>Env var (session / persistent)</td><td><code>set KEY=value</code> · <code>setx KEY value</code> (new sessions)</td></tr>
+        <tr><td>Kill a process</td><td><code>taskkill /F /IM chromedriver.exe</code> · <code>taskkill /F /PID 1234</code></td></tr>
+        <tr><td>What's on a port</td><td><code>netstat -ano | findstr :5000</code></td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>13.7 .NET runtime diagnostics — inspect a running or crashed process</h3>
+    <p>When a test <em>hangs</em>, <em>leaks</em>, or is <em>mysteriously slow</em>, these global tools inspect the live .NET process. Install once, then run from any shell.</p>
+    <pre><code><span class="c"># Install the diagnostic tools (once)</span>
+dotnet tool install -g dotnet-trace
+dotnet tool install -g dotnet-dump
+dotnet tool install -g dotnet-counters
+dotnet tool install -g dotnet-stack
+
+<span class="c"># Find the process id first</span>
+Get-Process dotnet | Select-Object Id, StartTime      <span class="c"># or: dotnet-trace ps</span>
+
+<span class="c"># Live counters — CPU, memory, GC, thread count (why is the run slow/leaking?)</span>
+dotnet-counters monitor -p 12345
+dotnet-counters monitor --name testhost              <span class="c"># by process name</span>
+
+<span class="c"># A TEST IS HUNG: dump the managed thread stacks to see where it's stuck</span>
+dotnet-stack report -p 12345
+
+<span class="c"># Capture a full memory dump of a stuck/crashing process, then analyse it</span>
+dotnet-dump collect -p 12345
+dotnet-dump analyze .\core_20240101            <span class="c"># then: clrstack, dumpheap -stat, etc.</span>
+
+<span class="c"># Record a performance trace (open the .nettrace in PerfView / Visual Studio)</span>
+dotnet-trace collect -p 12345 --duration 00:00:30</code></pre>
+    <pre><code><span class="c"># Built into dotnet test — no extra tools needed:</span>
+dotnet test --blame                          <span class="c"># reports which test crashed the runner</span>
+dotnet test --blame-hang-timeout 3m          <span class="c"># dump stacks if a test hangs > 3 min (find the culprit)</span>
+dotnet test --diag:diag.log                  <span class="c"># verbose runner diagnostics to a file</span></code></pre>
+    <div class="note mind"><span class="tag">Expert's mind · a hung suite is diagnosable, not mysterious</span><p>When CI reports "the test run timed out" with no failure, most engineers just re-run it. The pro attaches <code>dotnet-stack report</code> (or runs <code>--blame-hang-timeout</code>) and reads the thread stacks: nearly always a <code>.Result</code> deadlock (Part 7.4) or an infinite wait on an element that never appears. The tool turns "no idea" into a named line of code.</p></div>
+
+    <h3>13.8 Verify &amp; compare artifacts</h3>
+    <pre><code><span class="c"># Verify a downloaded browser/driver/binary matches the expected hash</span>
+Get-FileHash .\chromedriver.exe -Algorithm SHA256
+
+<span class="c"># Diff two files or two lists (expected vs actual output)</span>
+Compare-Object (Get-Content expected.txt) (Get-Content actual.txt)
+<span class="c"># "=&gt;" = only in actual, "&lt;=" = only in expected</span>
+
+<span class="c"># Diff two directories' file lists (what changed between builds?)</span>
+Compare-Object (Get-ChildItem .\build1 -Recurse -Name) (Get-ChildItem .\build2 -Recurse -Name)</code></pre>
+    <div class="note good"><span class="tag">How to check, summarised</span><p><em>Did it work?</em> → <code>$?</code> / <code>$LASTEXITCODE</code> / <code>%ERRORLEVEL%</code>. <em>What did it return?</em> → <code>| Get-Member</code>, <code>| Select-Object</code>, <code>| Format-List *</code>. <em>How slow?</em> → <code>Measure-Command</code>. <em>Is the environment sane?</em> → <code>Get-Process</code>, <code>Get-NetTCPConnection</code>, <code>Test-NetConnection</code>. <em>Is a process stuck?</em> → <code>dotnet-stack</code> / <code>--blame-hang-timeout</code>. Build these five checks into reflexes and you stop guessing about the environment entirely.</p></div>
+  </section>
+
+  <!-- ================= APPENDIX ================= -->
+  <section class="p" id="appx">
+    <div class="part">Appendix</div>
+    <div class="kicker">One-page quick reference</div>
+    <h2>C# automation — the whole loop on one page</h2>
+    <p class="lead">Print this. It condenses recon, tests, traces, and commands into one scannable card.</p>
+
+    <div class="facets three">
+      <div class="facet"><h5>Recon &amp; map</h5><p><code>dotnet --info</code> · <code>dotnet sln list</code> · <code>dotnet build</code><br><code>git ls-files "*.csproj"</code><br><code>rg --files -t cs | rg "page|steps|service"</code><br><code>dotnet list &lt;p&gt; reference</code></p></div>
+      <div class="facet"><h5>Find relationships</h5><p><code>rg -t cs ": PageObjectBase"</code> (subclasses)<br><code>rg -t cs "new BasketPage"</code> (instantiation)<br><code>rg -t cs -l "\[Binding\]"</code> (step classes)<br><code>git log -L :Method:File</code> (history)</p></div>
+      <div class="facet"><h5>Run tests</h5><p><code>dotnet test --filter "FullyQualifiedName~X"</code><br>NUnit/xUnit: <code>--filter "Category=Smoke"</code><br>MSTest: <code>--filter "TestCategory=Smoke"</code><br><code>--no-build</code> for the fast loop</p></div>
+      <div class="facet"><h5>Read a trace</h5><p>type → message → first MY frame → innermost inner<br><code>ex.GetBaseException()</code> = root<br><code>AggregateException</code> → someone blocked on async<br><code>&lt;M&gt;d__N.MoveNext</code> = ignore, that's your async method</p></div>
+      <div class="facet"><h5>Automation exceptions</h5><p>NoSuchElement → selector/timing<br>StaleElement → re-locate, don't cache<br>Timeout → read call-log; fix condition<br>ClickIntercepted → wait for overlay to detach</p></div>
+      <div class="facet"><h5>Verify beyond green</h5><p><code>dotnet build /warnaserror</code><br><code>dotnet format --verify-no-changes</code><br>revert test: <code>git stash</code> → red → <code>pop</code> → green<br>run all callers' tests + smoke</p></div>
+    </div>
+
+    <h4>The loop, on one line</h4>
+    <div class="note mind"><span class="tag">Carry this everywhere</span><p><strong>Recon</strong> (map it) → <strong>Plan</strong> (what / where / verify) → <strong>Implement</strong> (smallest idiomatic change) → <strong>Verify</strong> (narrow→wide, revert-test, build + format + smoke) → <strong>Summarize</strong> (what, why, residual risk). Confirm before you edit. Read the trace before you guess. Run the narrowest test first. Write down every lesson.</p></div>
+
+    <h4>Debugging mantras</h4>
+    <ul class="tick">
+      <li>An assertion failure is a logic bug; an exception is a can't-run bug. Fork there.</li>
+      <li>Fix the origin, never the symptom — and never edit the assertion to match the bug.</li>
+      <li>One hypothesis, one experiment, one confirmation.</li>
+      <li>Wait for <em>state</em>, never <code>Thread.Sleep</code>. Async all the way; never <code>.Result</code>.</li>
+      <li>Rethrow with bare <code>throw;</code> — <code>throw ex;</code> erases the origin.</li>
+    </ul>
+
+    <hr class="div">
+    <p class="cap" style="text-align:center;margin-top:22px">— End of the C# Automation Engineer's Field Playbook —</p>
+    <a class="backtop" href="#p0">↑ back to top</a>
+  </section>
+
+  <!-- INSERT-HERE -->
+  </main>
+</div>
+
+<footer>
+  The C# Automation Engineer's Field Playbook · C# / .NET only · a practical field manual, not official documentation ·
+  print to PDF (Ctrl+P) for page numbers; each Part starts on a fresh page.
+</footer>
+
+<script>
+  (function(){
+    var btn=document.getElementById('themeBtn'),root=document.documentElement;
+    btn.addEventListener('click',function(){
+      var c=root.getAttribute('data-theme');
+      if(!c)c=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+      root.setAttribute('data-theme',c==='dark'?'light':'dark');
+    });
+    var links=[].slice.call(document.querySelectorAll('.rail nav a')),map={};
+    links.forEach(function(a){map[a.getAttribute('href').slice(1)]=a;});
+    var obs=new IntersectionObserver(function(es){es.forEach(function(e){
+      if(e.isIntersecting){links.forEach(function(l){l.style.borderLeftColor='transparent';l.style.color='';});
+        var a=map[e.target.id];if(a){a.style.borderLeftColor='var(--accent)';a.style.color='var(--accent)';}}
+    });},{rootMargin:'-10% 0px -80% 0px'});
+    document.querySelectorAll('main section').forEach(function(s){obs.observe(s);});
+  })();
+</script>
+</body>
+</html>
